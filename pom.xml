@@ -6,15 +6,13 @@
 	<version>10.0.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>autobob-webapp</name>
+	<name>netrelay</name>
 
 	<parent>
 		<groupId>de.braintags</groupId>
 		<artifactId>btVertxBasePOM</artifactId>
 		<version>8-SNAPSHOT</version>
 	</parent>
-
-
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -24,7 +22,6 @@
 	</properties>
 
 	<dependencies>
-
 		<dependency>
 			<groupId>de.braintags</groupId>
 			<artifactId>vertx-pojo-mapper-mysql</artifactId>
@@ -59,8 +56,5 @@
 	      <version>${stack.version}</version>
 	    </dependency>
 	    
-
-
-
 	</dependencies>
 </project>
