@@ -1,0 +1,55 @@
+= NetRelay
+
+NetRelay is a Web-Application Framework based on vertx
+
+
+== CONTROLLER:
+
+PersistenceController: 
+Verantwortlich für Laden von Datensätzen. In einem Lookup werden IQuery-Objekte abgelegt:
+  Map<Seite, IQuery[]>
+Properties für die Queries werden aus Request geholt.
+Separate Properties wie ME = meine Daten
+SelectionLength, Start als Parameter
+Paging-Informationen zurückgeben an Frontend
+
+Datei für Routendefinitionen:
+Routendefinition auslagern in Datei, incl. Auth-Definitionen
+enthält auch Standard-Extension z.B. „HTML“
+hier existiert ein Default-Eintrag für Datenerhebungscontroller
+1 weiterer Eintrag für einen Controller, der die Konventionen unten ausführt
+
+Konvertionen basierend auf Request-URL:
+= 1 Controller, der die Konventionen auswertet und auslöst.
+
+Stammpackage für Controller: controller
+Suche nach Standardcoltrollern:
+index.html: controller.IndexController
+/meineDaten/ controller.meinedaten.IndexController
+/backend/article/detail.html = controller. …
+/customer/12/edit = Datenerhebung + controller.customer.EditDetailController
+/customer  = Datenerhebung + controller.customer.IndexListController
+
+URL-Conventionen:
+
+
+Detail-Aufrufe:
+/customer/12/edit = Entität / ID / aktion
+/customer/12 = customer/12/index
+
+
+== VIEWS
+Thymeleaf
+
+
+== MODEL
+Standardpackage: model
+/customer/12 = es wird automatisch der Datensatz mit ID 12 von Mapper model.Customer geladen
+/customer/ = es wird automatisch die Liste von Mapper model.Customern geladen
+
+== Roles and Rights
+
+Admins Rollen und Rechte: Auth 1
+Customer etc.: Auth 2
+
+
