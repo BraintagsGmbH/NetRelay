@@ -5,8 +5,13 @@ NetRelay is a Web-Application Framework based on vertx
 
 == CONTROLLER:
 
-PersistenceController: 
-Verantwortlich für Laden von Datensätzen. In einem Lookup werden IQuery-Objekte abgelegt:
+=== PersistenceController
+Objekte sollen weitestgehend standardisiert persisitiert werden, indem die URL ausgewertet wird. 
+Eine ( dynamische ) URL definiert dabei die folgende Struktur:
+
+Listen: /dynamic/entityname/
+
+Verantwortlich für Laden von Datensätzen. In einem Lookup werden IQuery-Objekte abgelegt, etwa:
   Map<Seite, IQuery[]>
 Properties für die Queries werden aus Request geholt.
 Separate Properties wie ME = meine Daten
