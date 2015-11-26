@@ -11,15 +11,15 @@ Properties eines Eintrags:
 
 * name: +
 Name des Handlers - wird auf Existenz geprüft
-* Route +
-die definierte Route, die übernommen werden soll
+* Routes +
+die definierten Routen, die mit dieser Definition abgedeckt werden sollen
 * blocking: +
 soll er als blocking handker ausgeführt werden
 * handler: +
 handler class
 * HTTPMethod +
 method like POST, GET etc.
-* Capturing path parameters
+* Capturing path parameters +
 Durch capturing path parameters können dynamische Parts einer URL definiert werden. Dem Eintrag wird mitgeteilt, welcher 
 Parametername einer Definition für die verschiedenen Bereiche steht ( Entity, ID, Aktion ).
 	** EntityParameterName +
