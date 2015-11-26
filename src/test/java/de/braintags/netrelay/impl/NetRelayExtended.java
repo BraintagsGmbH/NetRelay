@@ -14,6 +14,7 @@ package de.braintags.netrelay.impl;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.netrelay.NetRelay;
+import de.braintags.netrelay.Settings;
 
 /**
  * 
@@ -29,12 +30,24 @@ public class NetRelayExtended extends NetRelay {
   public NetRelayExtended() {
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see de.braintags.netrelay.NetRelay#initDataStore()
    */
   @Override
   public IDataStore initDataStore() {
     return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.netrelay.NetRelay#createDefaultSettings()
+   */
+  @Override
+  public Settings createDefaultSettings() {
+    return super.createDefaultSettings();
   }
 
 }

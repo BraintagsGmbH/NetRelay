@@ -106,17 +106,17 @@ public class Settings {
    * @return
    */
   public static Settings loadSettings(NetRelay netRelay, Vertx vertx, Context context) {
-    String path = context.get(SETTINGS_LOCATION_PROPERTY);
+    String path = context.config().getString(SETTINGS_LOCATION_PROPERTY);
     if (path != null) {
-      return loadSettings(netRelay, vertx, path, true);
+      return loadSettings(netRelay, vertx, path);
     } else {
       vertx.fileSystem().mkdirsBlocking(LOCAL_USER_DIRECTORY);
       String localSettingsFileName = LOCAL_USER_DIRECTORY + "/" + netRelay.getClass().getName() + ".settings.json";
-      return loadSettings(netRelay, vertx, localSettingsFileName, false);
+      return loadSettings(netRelay, vertx, localSettingsFileName);
     }
   }
 
-  private static Settings loadSettings(NetRelay netRelay, Vertx vertx, String path, boolean errorNotExist) {
+  private static Settings loadSettings(NetRelay netRelay, Vertx vertx, String path) {
     FileSystem fs = vertx.fileSystem();
     if (fs.existsBlocking(path)) {
       Buffer buffer = fs.readFileBlocking(path);
@@ -124,14 +124,10 @@ public class Settings {
       LOGGER.debug("settings successfully loaded from " + path);
       return settings;
     } else {
-      if (errorNotExist) {
-        throw new FileSystemException("File does not exist " + path);
-      } else {
-        LOGGER.debug("creating default settings and store them in " + path);
-        Settings settings = netRelay.createDefaultSettings();
-        fs.writeFileBlocking(path, Buffer.buffer(Json.encode(settings)));
-        return settings;
-      }
+      LOGGER.debug("creating default settings and store them in " + path);
+      Settings settings = netRelay.createDefaultSettings();
+      fs.writeFileBlocking(path, Buffer.buffer(Json.encode(settings)));
+      throw new FileSystemException("File did not exist and was created new in path " + path);
     }
 
   }
