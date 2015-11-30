@@ -1,6 +1,6 @@
 /*
  * #%L
- * vertx-pojongo
+ * netrelay
  * %%
  * Copyright (C) 2015 Braintags GmbH
  * %%
@@ -14,7 +14,7 @@ package de.braintags.netrelay.impl;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.netrelay.NetRelay;
-import de.braintags.netrelay.Settings;
+import de.braintags.netrelay.init.Settings;
 
 /**
  * 

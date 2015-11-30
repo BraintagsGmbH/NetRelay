@@ -1,6 +1,6 @@
 /*
  * #%L
- * vertx-pojongo
+ * netrelay
  * %%
  * Copyright (C) 2015 Braintags GmbH
  * %%
@@ -10,11 +10,12 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.netrelay;
+package de.braintags.netrelay.init;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import de.braintags.netrelay.NetRelay;
 import de.braintags.netrelay.routing.RouterDefinition;
 import io.vertx.core.Context;
 import io.vertx.core.Vertx;
@@ -55,6 +56,7 @@ public class Settings {
 
   private int serverPort = 8080;
   private List<RouterDefinition> routerDefinitions = new ArrayList<>();
+  private DataStoreSettings datastoreSettings;
 
   /**
    * 
@@ -93,6 +95,25 @@ public class Settings {
   }
 
   /**
+   * The {@link DataStoreSettings} by which the IDataStore used by the current application is initialized
+   * 
+   * @return the datastoreSettings
+   */
+  public final DataStoreSettings getDatastoreSettings() {
+    return datastoreSettings;
+  }
+
+  /**
+   * The {@link DataStoreSettings} by which the IDataStore used by the current application is initialized
+   * 
+   * @param datastoreSettings
+   *          the datastoreSettings to set
+   */
+  public final void setDatastoreSettings(DataStoreSettings datastoreSettings) {
+    this.datastoreSettings = datastoreSettings;
+  }
+
+  /**
    * Loads existing settings from the context, when the property {@link #SETTINGS_LOCATION_PROPERTY} is defined;
    * or loads or generates default settings and stores them in the local user directory, subdirectory .netrelay
    * 
@@ -119,6 +140,7 @@ public class Settings {
   private static Settings loadSettings(NetRelay netRelay, Vertx vertx, String path) {
     FileSystem fs = vertx.fileSystem();
     if (fs.existsBlocking(path)) {
+      LOGGER.debug("going to load settings from " + path);
       Buffer buffer = fs.readFileBlocking(path);
       Settings settings = Json.decodeValue(buffer.toString(), Settings.class);
       LOGGER.debug("settings successfully loaded from " + path);

@@ -1,6 +1,6 @@
 /*
  * #%L
- * vertx-pojongo
+ * netrelay
  * %%
  * Copyright (C) 2015 Braintags GmbH
  * %%
@@ -12,15 +12,17 @@
  */
 package de.braintags.netrelay.routing;
 
+import java.util.Properties;
+
 import de.braintags.netrelay.controller.IController;
-import io.vertx.core.Handler;
+import de.braintags.netrelay.init.Settings;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.Route;
 import io.vertx.ext.web.Router;
-import io.vertx.ext.web.RoutingContext;
 
 /**
- * An IRouterDefinition defines in general, which {@link IController} shall be applied for which URI
+ * An IRouterDefinition defines in general, which {@link IController} shall be applied for which URI. A
+ * {@link RouterDefinition} is part of the {@link Settings}, by which the current application is initialized
  * 
  * @author Michael Remme
  * 
@@ -29,11 +31,45 @@ public class RouterDefinition {
   private String name;
   private String[] routes;
   private boolean blocking = false;
-  private Class<? extends Handler<RoutingContext>> handler;
+  private boolean failureDefinition = false;
+  private Class<? extends IController> controller;
   private HttpMethod httpMethod;
+  private Properties handlerProperties = new Properties();
 
   /**
-   * The name of the definition is used for display
+   * Create an instance of the defined IController and init it with the defined properties
+   * 
+   * @return the intialized IController
+   */
+  public IController instantiateController() throws Exception {
+    IController controller = getController().newInstance();
+    controller.init(getHandlerProperties());
+    return controller;
+  }
+
+  /**
+   * Defines properties, by which an {@link IController} is initialized
+   * 
+   * @return the handlerProperties
+   */
+  public final Properties getHandlerProperties() {
+    return handlerProperties;
+  }
+
+  /**
+   * Defines properties, by which an {@link IController} is initialized. Which properties are possible to be defined
+   * here, is described inside the appropriate implementation of IController
+   * 
+   * @param handlerProperties
+   *          the handlerProperties to set.
+   */
+  public final void setHandlerProperties(Properties handlerProperties) {
+    this.handlerProperties = handlerProperties;
+  }
+
+  /**
+   * Defines properties, by which an {@link IController} is initialized. Which properties are possible to be defined
+   * here, is described inside the appropriate implementation of IController
    * 
    * @return the defined name
    */
@@ -94,22 +130,22 @@ public class RouterDefinition {
   }
 
   /**
-   * Get the {@link Handler} which shall be executed
+   * Get the {@link IController} which shall be executed
    * 
-   * @return the handler
+   * @return the controller
    */
-  public Class<? extends Handler<RoutingContext>> getHandler() {
-    return handler;
+  public Class<? extends IController> getController() {
+    return controller;
   }
 
   /**
-   * Set the {@link Handler} which shall be executed
+   * Set the {@link IController} which shall be executed
    * 
-   * @param handler
-   *          the handler to set
+   * @param controller
+   *          the controller to set
    */
-  public final void setHandler(Class<? extends Handler<RoutingContext>> handler) {
-    this.handler = handler;
+  public final void setController(Class<? extends IController> controller) {
+    this.controller = controller;
   }
 
   /**
@@ -129,6 +165,26 @@ public class RouterDefinition {
    */
   public final void setHttpMethod(HttpMethod httpMethod) {
     this.httpMethod = httpMethod;
+  }
+
+  /**
+   * Specifies wether the current definition is a definition, which will be used as failure handling for the given route
+   * 
+   * @return the failureDefinition
+   */
+  public final boolean isFailureDefinition() {
+    return failureDefinition;
+  }
+
+  /**
+   * Specifies wether the current definition is a definition, which will be used as failure handling for the given route
+   * 
+   * @param failureDefinition
+   *          the failureDefinition to set
+   */
+
+  public final void setFailureDefinition(boolean failureDefinition) {
+    this.failureDefinition = failureDefinition;
   }
 
 }

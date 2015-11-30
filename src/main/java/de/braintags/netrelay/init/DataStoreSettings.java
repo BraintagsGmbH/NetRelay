@@ -1,9 +1,3 @@
-package de.braintags.netrelay;
-
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
-
 /*
  * #%L
  * netrelay
@@ -16,15 +10,22 @@ import org.junit.runners.Suite.SuiteClasses;
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
+package de.braintags.netrelay.init;
+
+import de.braintags.io.vertx.pojomapper.IDataStore;
 
 /**
+ * Preferences to initialize an {@link IDataStore}
  * 
- * 
- * @author Michael Remme
+ * @author mremme
  * 
  */
-@RunWith(Suite.class)
-@SuiteClasses({ TestSettings.class })
-public class AllTestsNetRelay {
+public class DataStoreSettings {
+
+  /**
+   * 
+   */
+  public DataStoreSettings() {
+  }
 
 }

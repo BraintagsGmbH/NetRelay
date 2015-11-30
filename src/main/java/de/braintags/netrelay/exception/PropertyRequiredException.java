@@ -1,9 +1,3 @@
-package de.braintags.netrelay;
-
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
-
 /*
  * #%L
  * netrelay
@@ -16,15 +10,21 @@ import org.junit.runners.Suite.SuiteClasses;
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
+package de.braintags.netrelay.exception;
 
 /**
- * 
+ * Exception is thrown when a Property was required but not found
  * 
  * @author Michael Remme
  * 
  */
-@RunWith(Suite.class)
-@SuiteClasses({ TestSettings.class })
-public class AllTestsNetRelay {
+public class PropertyRequiredException extends RuntimeException {
+
+  /**
+   * @param message
+   */
+  public PropertyRequiredException(String propertyName) {
+    super("Property was not found: " + propertyName);
+  }
 
 }

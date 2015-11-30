@@ -1,6 +1,6 @@
 /*
  * #%L
- * vertx-pojongo
+ * netrelay
  * %%
  * Copyright (C) 2015 Braintags GmbH
  * %%
@@ -12,7 +12,10 @@
  */
 package de.braintags.netrelay.controller;
 
+import java.util.Properties;
+
 import io.vertx.core.Handler;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
 /**
@@ -22,5 +25,13 @@ import io.vertx.ext.web.RoutingContext;
  * 
  */
 public interface IController extends Handler<RoutingContext> {
+
+  /**
+   * Initialize the current controller by the defined properties inside the given {@link JsonObject}.
+   * Possible properties are defined inside the implementation of IController
+   * 
+   * @param properties
+   */
+  void init(Properties properties);
 
 }

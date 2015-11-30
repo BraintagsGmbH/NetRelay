@@ -1,6 +1,6 @@
 /*
  * #%L
- * vertx-pojongo
+ * netrelay
  * %%
  * Copyright (C) 2015 Braintags GmbH
  * %%
@@ -15,7 +15,9 @@ package de.braintags.netrelay;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import de.braintags.io.vertx.pojomapper.testdatastore.TestHelper;
 import de.braintags.netrelay.impl.NetRelayExtended;
+import de.braintags.netrelay.init.Settings;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.file.FileSystem;
@@ -36,13 +38,14 @@ public class TestSettings {
       + NetRelayExtended.class.getName() + ".settings.json";
   private static String localSettingsFileNameTmpDir = System.getProperty("java.io.tmpdir") + "/"
       + NetRelayExtended.class.getName() + ".settings.json";
-  private static Vertx vertx = Vertx.vertx();
+  private static Vertx vertx = Vertx.vertx(TestHelper.getOptions());
 
   /**
    * creates new Settings and stores them inside the local user directory
    */
   @Test
   public void testInitSettingsNewInUserDir(TestContext context) {
+
     context.remove(Settings.SETTINGS_LOCATION_PROPERTY);
     context.assertNotNull(vertx);
     FileSystem fs = vertx.fileSystem();
@@ -52,7 +55,8 @@ public class TestSettings {
     vertx.deployVerticle(NetRelayExtended.class.getName(), result -> {
       try {
         if (result.failed()) {
-          context.assertTrue(fs.existsBlocking(localSettingsFileNameUserDir));
+          context.assertTrue(fs.existsBlocking(localSettingsFileNameUserDir),
+              "does not exist: " + localSettingsFileNameUserDir);
         } else {
           context.fail("This test expects to fail, cause the settings were created new on disc");
         }
@@ -61,7 +65,7 @@ public class TestSettings {
       }
     });
 
-    async.awaitSuccess(2000);
+    async.awaitSuccess();
 
     final Async async2 = context.async();
     vertx.deployVerticle(NetRelayExtended.class.getName(), result -> {
@@ -92,7 +96,8 @@ public class TestSettings {
     vertx.deployVerticle(NetRelayExtended.class.getName(), options, result -> {
       try {
         if (result.failed()) {
-          context.assertTrue(fs.existsBlocking(localSettingsFileNameUserDir));
+          context.assertTrue(fs.existsBlocking(localSettingsFileNameUserDir),
+              "does not exist: " + localSettingsFileNameUserDir);
         } else {
           context.fail("This test expects to fail, cause the settings were created new on disc");
         }

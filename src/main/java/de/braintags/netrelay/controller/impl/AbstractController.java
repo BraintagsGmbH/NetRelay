@@ -1,9 +1,3 @@
-package de.braintags.netrelay;
-
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
-
 /*
  * #%L
  * netrelay
@@ -16,15 +10,22 @@ import org.junit.runners.Suite.SuiteClasses;
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
+package de.braintags.netrelay.controller.impl;
+
+import de.braintags.netrelay.controller.IController;
 
 /**
- * 
+ * An abstract implementation of {@link IController}
  * 
  * @author Michael Remme
  * 
  */
-@RunWith(Suite.class)
-@SuiteClasses({ TestSettings.class })
-public class AllTestsNetRelay {
+public abstract class AbstractController implements IController {
+
+  /**
+   * 
+   */
+  public AbstractController() {
+  }
 
 }
