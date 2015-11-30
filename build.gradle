@@ -1,7 +1,10 @@
+plugins {
+    id 'java'
+    id 'org.asciidoctor.gradle.asciidoctor' version '1.5.1'
+}
+
 group 'de.braintags'
 version '10.0.0-SNAPSHOT'
-
-apply plugin: 'java'
 
 sourceCompatibility = 1.8
 
@@ -18,4 +21,11 @@ dependencies {
 
 task wrapper(type: Wrapper) {
     gradleVersion = '2.9'
+}
+
+asciidoctor {
+    outputDir 'docs'
+    options doctype: 'book'
+
+    attributes 'source-highlighter': 'coderay'
 }
