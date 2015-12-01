@@ -15,6 +15,7 @@ package de.braintags.netrelay.init;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.braintags.io.vertx.pojomapper.init.DataStoreSettings;
 import de.braintags.netrelay.NetRelay;
 import de.braintags.netrelay.routing.RouterDefinition;
 import io.vertx.core.Context;
