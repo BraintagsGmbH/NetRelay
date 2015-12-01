@@ -3,7 +3,9 @@
  * :toc: left
  * :toclevels: 3
  * 
- * = NetRelay
+ * = NetRelay^(R)^
+ * Braintags GmbH
+ * Version {version}
  * 
  * web application framework based on vertx
  * 
