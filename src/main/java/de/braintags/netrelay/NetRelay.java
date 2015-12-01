@@ -15,6 +15,8 @@ package de.braintags.netrelay;
 import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.init.IDataStoreInit;
+import de.braintags.io.vertx.pojomapper.mongo.init.MongoDataStoreInit;
 import de.braintags.netrelay.controller.impl.FailureController;
 import de.braintags.netrelay.controller.impl.RedirectController;
 import de.braintags.netrelay.controller.impl.StaticController;
@@ -23,7 +25,9 @@ import de.braintags.netrelay.init.Settings;
 import de.braintags.netrelay.routing.RouterDefinition;
 import de.braintags.netrelay.routing.RoutingInit;
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.ext.web.Router;
@@ -57,6 +61,20 @@ public abstract class NetRelay extends AbstractVerticle {
   public void start(Future<Void> startFuture) {
     try {
       settings = initSettings();
+      initDataStore(dsInitResult -> {
+        if (dsInitResult.failed()) {
+          startFuture.fail(dsInitResult.cause());
+        } else {
+          init(startFuture);
+        }
+      });
+    } catch (Exception e) {
+      startFuture.fail(e);
+    }
+  }
+
+  private void init(Future<Void> startFuture) {
+    try {
       Router router = initRouter();
       initControlller(router);
       initHttpServer(router);
@@ -94,10 +112,24 @@ public abstract class NetRelay extends AbstractVerticle {
 
   /**
    * Create an instance of {@link IDataStore} which will be used by the current instance of NetRelay.
+   * The init is performed by using the {@link Settings#getDatastoreSettings()}
    * 
    * @return the {@link IDataStore} to be used
+   * @throws IllegalAccessException
+   * @throws InstantiationException
    */
-  public abstract IDataStore initDataStore();
+  public final void initDataStore(Handler<AsyncResult<Void>> handler)
+      throws InstantiationException, IllegalAccessException {
+    IDataStoreInit dsInit = settings.getDatastoreSettings().getDatastoreInit().newInstance();
+    dsInit.initDataStore(vertx, settings.getDatastoreSettings(), dsInitResult -> {
+      if (dsInitResult.failed()) {
+        handler.handle(Future.failedFuture(dsInitResult.cause()));
+      } else {
+        datastore = dsInitResult.result();
+        handler.handle(Future.succeededFuture());
+      }
+    });
+  }
 
   private Router initRouter() {
     return Router.router(vertx);
@@ -112,11 +144,18 @@ public abstract class NetRelay extends AbstractVerticle {
   /*
    * (non-Javadoc)
    * 
-   * @see io.vertx.core.AbstractVerticle#stop()
+   * @see io.vertx.core.AbstractVerticle#stop(io.vertx.core.Future)
    */
   @Override
-  public void stop() throws Exception {
-    super.stop();
+  public void stop(Future<Void> stopFuture) throws Exception {
+    super.stop(stopFuture);
+    getDatastore().shutdown(result -> {
+      if (result.failed()) {
+        stopFuture.fail(result.cause());
+      } else {
+        stopFuture.complete();
+      }
+    });
   }
 
   /**
@@ -127,6 +166,7 @@ public abstract class NetRelay extends AbstractVerticle {
   public Settings createDefaultSettings() {
     Settings settings = new Settings();
     addDefaultRouterDefinitions(settings);
+    settings.setDatastoreSettings(MongoDataStoreInit.createDefaultSettings());
     return settings;
   }
 
@@ -135,6 +175,15 @@ public abstract class NetRelay extends AbstractVerticle {
     settings.getRouterDefinitions().add(StaticController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(ThymeleafTemplateController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(FailureController.createDefaultRouterDefinition());
+  }
+
+  /**
+   * Get the {@link IDataStore} for the current instance
+   * 
+   * @return the datastore
+   */
+  public final IDataStore getDatastore() {
+    return datastore;
   }
 
 }
