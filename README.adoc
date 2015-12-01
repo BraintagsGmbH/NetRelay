@@ -38,7 +38,7 @@ KLÄRUNG nachher: Sind die aufgelösten, dynamischen Parts der URl tatsächlich 
 * mimetypes +
 comma separated list von Mimetypes, wenn welche angewendet werden sollen 
 * AuthHandler +
-tbd
+tbd tbd
 
 
 == CONTROLLER:
