@@ -16,6 +16,7 @@ import java.util.Properties;
 
 import de.braintags.netrelay.controller.IController;
 import de.braintags.netrelay.init.Settings;
+import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.web.Route;
 import io.vertx.ext.web.Router;
@@ -41,9 +42,9 @@ public class RouterDefinition {
    * 
    * @return the intialized IController
    */
-  public IController instantiateController() throws Exception {
+  public IController instantiateController(Vertx vertx) throws Exception {
     IController controller = getController().newInstance();
-    controller.init(getHandlerProperties());
+    controller.init(vertx, getHandlerProperties());
     return controller;
   }
 

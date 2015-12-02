@@ -35,6 +35,27 @@ public class ThymeleafTemplateController extends AbstractController {
    * The property, by which the mode of Thymeleaf is defined.
    */
   public static final String TEMPLATE_MODE_PROPERTY = "mode";
+
+  /**
+   * The property, by which the directory is defined, where templates are residing
+   */
+  public static final String TEMPLATE_DIRECTORY_PROPERTY = "templateDirectory";
+
+  /**
+   * The default directory for templates
+   */
+  public static final String DEFAULT_TEMPLATE_DIRECTORY = TemplateHandler.DEFAULT_TEMPLATE_DIRECTORY;
+
+  /**
+   * The property, which defines the content type to be handled
+   */
+  public static final String CONTENT_TYPE_PROPERTY = "contentType";
+
+  /**
+   * The default content type to be managed
+   */
+  public static final String DEFAULT_CONTENT_TYPE = TemplateHandler.DEFAULT_CONTENT_TYPE;
+
   /**
    * The property, by which one can switch on / off the caching of templates. Switching off can be useful in development
    * systems to get changes as soon
@@ -49,18 +70,20 @@ public class ThymeleafTemplateController extends AbstractController {
   public ThymeleafTemplateController() {
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.netrelay.controller.IController#init(io.vertx.core.json.JsonObject)
-   */
   @Override
-  public void init(Properties properties) {
+  public void initProperties(Properties properties) {
     ThymeleafTemplateEngine thEngine = ThymeleafTemplateEngine.create();
     thEngine.setMode(properties.getProperty(TEMPLATE_MODE_PROPERTY, ThymeleafTemplateEngine.DEFAULT_TEMPLATE_MODE));
     setCachable(thEngine, properties);
-    templateHandler = TemplateHandler.create(thEngine);
+    templateHandler = TemplateHandler.create(thEngine, getTemplateDirectory(properties), getContentType(properties));
+  }
 
+  private String getTemplateDirectory(Properties props) {
+    return (String) props.getOrDefault(TEMPLATE_DIRECTORY_PROPERTY, DEFAULT_TEMPLATE_DIRECTORY);
+  }
+
+  private String getContentType(Properties props) {
+    return (String) props.getOrDefault(CONTENT_TYPE_PROPERTY, DEFAULT_CONTENT_TYPE);
   }
 
   private void setCachable(ThymeleafTemplateEngine thEngine, Properties properties) {
@@ -98,6 +121,8 @@ public class ThymeleafTemplateController extends AbstractController {
     Properties json = new Properties();
     json.put(TEMPLATE_MODE_PROPERTY, ThymeleafTemplateEngine.DEFAULT_TEMPLATE_MODE);
     json.put(CACHE_ENABLED_PROPERTY, "true");
+    json.put(CONTENT_TYPE_PROPERTY, DEFAULT_CONTENT_TYPE);
+    json.put(TEMPLATE_DIRECTORY_PROPERTY, DEFAULT_TEMPLATE_DIRECTORY);
     return json;
   }
 

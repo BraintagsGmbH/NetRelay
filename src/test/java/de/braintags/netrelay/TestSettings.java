@@ -16,7 +16,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import de.braintags.io.vertx.pojomapper.testdatastore.TestHelper;
-import de.braintags.netrelay.impl.NetRelayExtended;
+import de.braintags.netrelay.impl.NetRelayExt_FileBasedSettings;
 import de.braintags.netrelay.init.Settings;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
@@ -35,9 +35,9 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 @RunWith(VertxUnitRunner.class)
 public class TestSettings {
   private static String localSettingsFileNameUserDir = Settings.LOCAL_USER_DIRECTORY + "/"
-      + NetRelayExtended.class.getName() + ".settings.json";
+      + NetRelayExt_FileBasedSettings.class.getName() + ".settings.json";
   private static String localSettingsFileNameTmpDir = System.getProperty("java.io.tmpdir") + "/"
-      + NetRelayExtended.class.getName() + ".settings.json";
+      + NetRelayExt_FileBasedSettings.class.getName() + ".settings.json";
   private static Vertx vertx = Vertx.vertx(TestHelper.getOptions());
 
   /**
@@ -52,7 +52,7 @@ public class TestSettings {
     deleteFileInDir(context, fs, localSettingsFileNameUserDir);
 
     Async async = context.async();
-    vertx.deployVerticle(NetRelayExtended.class.getName(), result -> {
+    vertx.deployVerticle(NetRelayExt_FileBasedSettings.class.getName(), result -> {
       try {
         if (result.failed()) {
           context.assertTrue(fs.existsBlocking(localSettingsFileNameUserDir),
@@ -68,7 +68,7 @@ public class TestSettings {
     async.awaitSuccess();
 
     final Async async2 = context.async();
-    vertx.deployVerticle(NetRelayExtended.class.getName(), result -> {
+    vertx.deployVerticle(NetRelayExt_FileBasedSettings.class.getName(), result -> {
       if (result.failed()) {
         context.fail(result.cause());
       } else {
@@ -86,14 +86,14 @@ public class TestSettings {
   public void testInitSettingsFromOtherDir(TestContext context) {
     context.assertNotNull(vertx);
     FileSystem fs = vertx.fileSystem();
-    Settings setting = new NetRelayExtended().createDefaultSettings();
+    Settings setting = new NetRelayExt_FileBasedSettings().createDefaultSettings();
 
     deleteFileInDir(context, fs, localSettingsFileNameTmpDir);
     Async async = context.async();
 
     DeploymentOptions options = new DeploymentOptions();
     options.setConfig(new JsonObject().put(Settings.SETTINGS_LOCATION_PROPERTY, localSettingsFileNameTmpDir));
-    vertx.deployVerticle(NetRelayExtended.class.getName(), options, result -> {
+    vertx.deployVerticle(NetRelayExt_FileBasedSettings.class.getName(), options, result -> {
       try {
         if (result.failed()) {
           context.assertTrue(fs.existsBlocking(localSettingsFileNameUserDir),
@@ -108,7 +108,7 @@ public class TestSettings {
     async.awaitSuccess(2000);
 
     final Async async2 = context.async();
-    vertx.deployVerticle(NetRelayExtended.class.getName(), options, result -> {
+    vertx.deployVerticle(NetRelayExt_FileBasedSettings.class.getName(), options, result -> {
       if (result.failed()) {
         context.fail(result.cause());
       } else {

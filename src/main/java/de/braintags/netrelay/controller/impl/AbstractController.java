@@ -12,7 +12,10 @@
  */
 package de.braintags.netrelay.controller.impl;
 
+import java.util.Properties;
+
 import de.braintags.netrelay.controller.IController;
+import io.vertx.core.Vertx;
 
 /**
  * An abstract implementation of {@link IController}
@@ -21,6 +24,7 @@ import de.braintags.netrelay.controller.IController;
  * 
  */
 public abstract class AbstractController implements IController {
+  private Vertx vertx;
 
   /**
    * 
@@ -28,4 +32,29 @@ public abstract class AbstractController implements IController {
   public AbstractController() {
   }
 
+  /**
+   * @return the vertx
+   */
+  public final Vertx getVertx() {
+    return vertx;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.netrelay.controller.IController#init(io.vertx.core.Vertx, java.util.Properties)
+   */
+  @Override
+  public final void init(Vertx vertx, Properties properties) {
+    this.vertx = vertx;
+    initProperties(properties);
+  }
+
+  /**
+   * Initialize the controller by using the definitions inside the {@link Properties}
+   * 
+   * @param properties
+   *          the properties to be used for init
+   */
+  public abstract void initProperties(Properties properties);
 }

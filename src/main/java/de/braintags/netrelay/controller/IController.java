@@ -15,6 +15,7 @@ package de.braintags.netrelay.controller;
 import java.util.Properties;
 
 import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
@@ -30,8 +31,10 @@ public interface IController extends Handler<RoutingContext> {
    * Initialize the current controller by the defined properties inside the given {@link JsonObject}.
    * Possible properties are defined inside the implementation of IController
    * 
+   * @param vertx
+   *          the instance of vertx the system is running under.
    * @param properties
    */
-  void init(Properties properties);
+  void init(Vertx vertx, Properties properties);
 
 }

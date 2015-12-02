@@ -81,6 +81,21 @@ public class Settings {
   }
 
   /**
+   * Get the {@link RouterDefinition} with the specified name
+   * 
+   * @param name
+   * @return
+   */
+  public RouterDefinition getNamedDefinition(String name) {
+    for (RouterDefinition def : routerDefinitions) {
+      if (def.getName().equals(name)) {
+        return def;
+      }
+    }
+    return null;
+  }
+
+  /**
    * @return the routerDefinitions
    */
   public final List<RouterDefinition> getRouterDefinitions() {

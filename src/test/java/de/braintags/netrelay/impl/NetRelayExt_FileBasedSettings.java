@@ -16,17 +16,17 @@ import de.braintags.netrelay.NetRelay;
 import de.braintags.netrelay.init.Settings;
 
 /**
- * 
+ * An extension of NetRelay which is loading the Settings from a file
  * 
  * @author Michael Remme
  * 
  */
-public class NetRelayExtended extends NetRelay {
+public class NetRelayExt_FileBasedSettings extends NetRelay {
 
   /**
    * 
    */
-  public NetRelayExtended() {
+  public NetRelayExt_FileBasedSettings() {
   }
 
   /*

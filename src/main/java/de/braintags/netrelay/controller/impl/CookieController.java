@@ -14,39 +14,28 @@ package de.braintags.netrelay.controller.impl;
 
 import java.util.Properties;
 
-import de.braintags.netrelay.RequestUtil;
-import de.braintags.netrelay.exception.PropertyRequiredException;
 import de.braintags.netrelay.routing.RouterDefinition;
-import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.handler.CookieHandler;
 
 /**
- * The RedirectController redirects fitting rules to the page, specified by property
- * {@link RedirectController#DESTINATION_PROPERTY}
+ * 
  * 
  * @author mremme
  * 
  */
-public class RedirectController extends AbstractController {
-  /**
-   * The propertyname to define the destination, where the current instance is redirecting to
-   */
-  public static final String DESTINATION_PROPERTY = "destination";
-
-  private String destination;
+public class CookieController extends AbstractController {
+  private CookieHandler cookieHandler;
 
   /**
    * 
    */
-  public RedirectController() {
+  public CookieController() {
   }
 
   @Override
   public void initProperties(Properties properties) {
-    if (!properties.containsKey(DESTINATION_PROPERTY)) {
-      throw new PropertyRequiredException(DESTINATION_PROPERTY);
-    }
-    destination = properties.getProperty(DESTINATION_PROPERTY);
+    cookieHandler = CookieHandler.create();
   }
 
   /*
@@ -55,9 +44,8 @@ public class RedirectController extends AbstractController {
    * @see io.vertx.core.Handler#handle(java.lang.Object)
    */
   @Override
-  public void handle(RoutingContext context) {
-    HttpServerResponse response = context.response();
-    RequestUtil.sendRedirect(response, destination);
+  public void handle(RoutingContext event) {
+    cookieHandler.handle(event);
   }
 
   /**
@@ -67,11 +55,10 @@ public class RedirectController extends AbstractController {
    */
   public static RouterDefinition createDefaultRouterDefinition() {
     RouterDefinition def = new RouterDefinition();
-    def.setName("RedirectController");
+    def.setName("CookieController");
     def.setBlocking(false);
-    def.setController(RedirectController.class);
+    def.setController(CookieController.class);
     def.setHandlerProperties(getDefaultProperties());
-    def.setRoutes(new String[] { "/" });
     return def;
   }
 
@@ -82,7 +69,7 @@ public class RedirectController extends AbstractController {
    */
   public static Properties getDefaultProperties() {
     Properties json = new Properties();
-    json.put(DESTINATION_PROPERTY, "/index.html");
     return json;
   }
+
 }

@@ -34,13 +34,8 @@ public class FailureController extends AbstractController {
   public FailureController() {
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.netrelay.controller.IController#init(io.vertx.core.json.JsonObject)
-   */
   @Override
-  public void init(Properties properties) {
+  public void initProperties(Properties properties) {
   }
 
   /*

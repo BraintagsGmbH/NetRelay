@@ -42,13 +42,8 @@ public class StaticController extends AbstractController {
   public StaticController() {
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.netrelay.controller.IController#init(io.vertx.core.json.JsonObject)
-   */
   @Override
-  public void init(Properties properties) {
+  public void initProperties(Properties properties) {
     staticHandler = StaticHandler.create();
     if (properties.containsKey(CACHE_ENABLED_PROPERTY)) {
       staticHandler.setCachingEnabled(Boolean.valueOf(properties.getProperty(CACHE_ENABLED_PROPERTY, "true")));

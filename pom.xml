@@ -49,6 +49,15 @@
 			<artifactId>vertx-web</artifactId>
 			<version>${vertx.web.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-web</artifactId>
+			<version>${vertx.web.version}</version>
+			<scope>test</scope>
+        	<type>test-jar</type>
+		</dependency>
+		
 		<dependency>
 			<groupId>io.vertx</groupId>
 			<artifactId>vertx-web-templ-thymeleaf</artifactId>

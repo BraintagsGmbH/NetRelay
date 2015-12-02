@@ -17,8 +17,11 @@ import java.util.List;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.init.IDataStoreInit;
 import de.braintags.io.vertx.pojomapper.mongo.init.MongoDataStoreInit;
+import de.braintags.netrelay.controller.impl.AuthenticationController;
+import de.braintags.netrelay.controller.impl.CookieController;
 import de.braintags.netrelay.controller.impl.FailureController;
 import de.braintags.netrelay.controller.impl.RedirectController;
+import de.braintags.netrelay.controller.impl.SessionController;
 import de.braintags.netrelay.controller.impl.StaticController;
 import de.braintags.netrelay.controller.impl.ThymeleafTemplateController;
 import de.braintags.netrelay.init.Settings;
@@ -92,7 +95,7 @@ public abstract class NetRelay extends AbstractVerticle {
   protected void initControlller(Router router) throws Exception {
     List<RouterDefinition> rd = settings.getRouterDefinitions();
     for (RouterDefinition def : rd) {
-      RoutingInit.initRoutingDefinition(router, def);
+      RoutingInit.initRoutingDefinition(vertx, router, def);
     }
   }
 
@@ -171,9 +174,13 @@ public abstract class NetRelay extends AbstractVerticle {
   }
 
   private void addDefaultRouterDefinitions(Settings settings) {
+    settings.getRouterDefinitions().add(CookieController.createDefaultRouterDefinition());
+    settings.getRouterDefinitions().add(SessionController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(RedirectController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(StaticController.createDefaultRouterDefinition());
+    settings.getRouterDefinitions().add(AuthenticationController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(ThymeleafTemplateController.createDefaultRouterDefinition());
+
     settings.getRouterDefinitions().add(FailureController.createDefaultRouterDefinition());
   }
 
