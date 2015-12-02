@@ -1,9 +1,3 @@
-package de.braintags.netrelay;
-
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
-
 /*
  * #%L
  * netrelay
@@ -16,6 +10,11 @@ import org.junit.runners.Suite.SuiteClasses;
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
+package de.braintags.netrelay;
+
+import org.junit.runner.RunWith;
+import org.junit.runners.Suite;
+import org.junit.runners.Suite.SuiteClasses;
 
 /**
  * 
@@ -25,6 +24,6 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(Suite.class)
 @SuiteClasses({ TestSettings.class })
-public class AllTestsNetRelay {
+public class TestAllNetRelay {
 
 }
