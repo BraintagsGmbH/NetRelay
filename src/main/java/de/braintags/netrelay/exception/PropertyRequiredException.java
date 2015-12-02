@@ -21,7 +21,7 @@ package de.braintags.netrelay.exception;
 public class PropertyRequiredException extends RuntimeException {
 
   /**
-   * @param message
+   * @param propertyName
    */
   public PropertyRequiredException(String propertyName) {
     super("Property was not found: " + propertyName);
