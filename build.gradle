@@ -1,53 +1,27 @@
 plugins {
     id 'java'
+    id 'maven'
+    id 'signing'
     id 'org.asciidoctor.gradle.asciidoctor' version '1.5.1'
     id 'org.sonarqube' version '1.1'
 }
 
 group 'de.braintags'
 version '10.0.0-SNAPSHOT'
+description "Webframework based on Vertx"
 
-sourceCompatibility = 1.8
-
-repositories {
-    maven {
-        url "http://maven.bt-wl.net/nexus/content/groups/public/"
-    }
-    mavenCentral()
-    jcenter()
-}
+apply from: 'config.gradle'
 
 dependencies {
     compile group: 'io.vertx', name: 'vertx-core', version: '3+'
     compile group: 'io.vertx', name: 'vertx-web', version: '3+'
+    compile group: 'io.vertx', name: 'vertx-web-templ-thymeleaf', version: '3+'
+    compile group: 'org.thymeleaf', name: 'thymeleaf', version: '2.1+'
+
+    compile group: 'de.braintags', name: 'vertx-pojongo', version: '1.0+'
+
     testCompile group: 'junit', name: 'junit', version: '4.11'
-}
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.9'
-}
-
-sonarqube {
-    properties {
-        property "sonar.host.url", "http://sqube.bt-rz.net"
-        property "sonar.scm.provider", "git"
-        property "sonar.sourceEncoding", "UTF-8"
-
-    }
-}
-
-// asciidoctor is used to create html-(or pdf)-documentation.
-asciidoctor {
-    sourceDir 'src/main/asciidoc'
-    outputDir 'build/docs'
-    separateOutputDirs false
-
-    backends 'html5'
-    options doctype: 'book'
-
-    attributes 'source-highlighter': 'coderay',
-            numbered: '',
-            toc: 'left',
-            toclevels: '3',
-            'version': project.version
+    compile group: 'io.vertx', name: 'vertx-docgen', version: '3+'
+    compile group: 'io.vertx', name: 'vertx-codegen', version: '3+'
 }

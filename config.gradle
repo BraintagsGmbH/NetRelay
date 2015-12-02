@@ -1,0 +1,132 @@
+sourceCompatibility = 1.8 // java language level
+
+repositories {
+    // private company repo makes no sense in an opensource environment
+    mavenCentral()
+    jcenter()
+}
+
+wrapper {
+    gradleVersion '2.9' // minimum version of gradle
+}
+
+sonarqube { // sonarqube configuration
+    properties {
+        property "sonar.host.url", "http://sqube.bt-rz.net"
+        property "sonar.scm.provider", "git"
+        property "sonar.sourceEncoding", "UTF-8"
+
+    }
+}
+
+task cleanAsciidoc(type: Delete) {
+    delete new File(projectDir, 'src/main/asciidoc/java')
+    delete new File(projectDir, 'src/main/asciidoc/ruby')
+    delete new File(projectDir, 'src/main/asciidoc/scala')
+    delete new File(projectDir, 'src/main/asciidoc/js')
+}
+clean.dependsOn << cleanAsciidoc
+
+task codegen(type: JavaCompile) {
+    source = sourceSets.main.allJava
+    classpath = configurations.compile
+    options.compilerArgs = [
+            '-proc:only',
+            '-processor', 'io.vertx.codegen.CodeGenProcessor,io.vertx.docgen.JavaDocGenProcessor,io.vertx.docgen.DocGenProcessor',
+            '-Adocgen.output=' + new File(projectDir, 'src/main/asciidoc/$lang').absolutePath,
+    ]
+    destinationDir = new File(buildDir, 'generated')
+}
+
+javadoc {
+    dependsOn codegen
+    failOnError false
+}
+
+// asciidoctor is used to create html-(or pdf)-documentation.
+asciidoctor {
+    dependsOn codegen
+
+    sourceDir 'src/main/asciidoc'
+    outputDir 'build/docs'
+    separateOutputDirs false
+
+    backends 'html5'
+    options doctype: 'book'
+
+    attributes 'source-highlighter': 'coderay',
+            numbered: '',
+            toc: 'left',
+            toclevels: '3',
+            'version': project.version
+}
+
+task packageJavadoc(type: Jar, dependsOn: javadoc) {
+    from javadoc.destinationDir
+    classifier = 'javadoc'
+}
+
+task packageSources(type: Jar) {
+    from sourceSets.main.allSource
+    classifier = 'sources'
+}
+
+artifacts {
+    archives packageJavadoc
+    archives packageSources
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            // sign artifacts before upload
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            // upload to sonatype OSS
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2") {
+                authentication(userName: this.hasProperty('sonatypeUsername') ? sonatypeUsername : '',
+                        password: this.hasProperty('sonatypePassword') ? sonatypePassword : '')
+            }
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots") {
+                authentication(userName: this.hasProperty('sonatypeUsername') ? sonatypeUsername : '',
+                        password: this.hasProperty('sonatypePassword') ? sonatypePassword : '')
+            }
+
+            // pom file details
+            pom.project {
+                name rootProject.name
+                packaging 'jar'
+                description rootProject.description
+                url 'https://github.com/BraintagsGmbH/' + rootProject.name
+
+                scm {
+                    url 'https://github.com/BraintagsGmbH/' + rootProject.name
+                    connection 'scm:git:https://github.com/BraintagsGmbH/' + rootProject.name + '.git'
+                    developerConnection 'scm:git:ssh:git@github.com:BraintagsGmbH/' + rootProject.name + '.git'
+                }
+
+                licenses {
+                    license {
+                        name 'Eclipse Public License v1.0'
+                        url 'http://www.eclipse.org/legal/epl-v10.html'
+                        distribution 'repo'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'mremme'
+                        name 'Michel Remme'
+                        email 'mremme@braintags.de'
+                    }
+                    developer {
+                        id 'marrau'
+                        name 'Martin Rau'
+                        email 'martin.rau@braintags.de'
+                    }
+                }
+            }
+        }
+    }
+}
+
