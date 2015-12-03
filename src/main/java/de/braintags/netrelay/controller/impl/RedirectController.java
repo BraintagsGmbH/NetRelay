@@ -67,7 +67,7 @@ public class RedirectController extends AbstractController {
    */
   public static RouterDefinition createDefaultRouterDefinition() {
     RouterDefinition def = new RouterDefinition();
-    def.setName("RedirectController");
+    def.setName(RedirectController.class.getSimpleName());
     def.setBlocking(false);
     def.setController(RedirectController.class);
     def.setHandlerProperties(getDefaultProperties());

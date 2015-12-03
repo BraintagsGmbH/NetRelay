@@ -2,6 +2,21 @@
 
 NetRelay is a Web-Application Framework based on vertx
 
+== Init
+Standard: +
+load der Settings aus user.home/.netrelay/NetRelay.class.getName.settings.json
+
+ODER +
+Setzen der Datei per Deployment-Options von Vertx:
+
+
+    DeploymentOptions options = new DeploymentOptions();
+    options.setConfig(new JsonObject().put(Settings.SETTINGS_LOCATION_PROPERTY, localSettingsFileNameTmpDir));
+    vertx.deployVerticle(NetRelayExt_FileBasedSettings.class.getName(), options, result -> {
+
+Existiert Datei nicht, wird Default-Datei angelegt und Exception geworfen. Dies ändern auf geänderte Frontend-Anzeige für jeden Request.
+
+
 == Router-Definitions
 Routendefinition auslagern in Datei, incl. Auth-Definitionen
 enthält auch Standard-Extension z.B. „HTML“
@@ -87,4 +102,6 @@ Standardpackage: model
 Admins Rollen und Rechte: Auth 1
 Customer etc.: Auth 2
 
+== Definition erforderlich
+Definition von Dev / Integration / Prod in Projektumfeld und Einbindung in Deployment
 

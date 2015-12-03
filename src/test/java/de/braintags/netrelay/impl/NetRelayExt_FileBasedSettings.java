@@ -22,11 +22,16 @@ import de.braintags.netrelay.init.Settings;
  * 
  */
 public class NetRelayExt_FileBasedSettings extends NetRelay {
+  private boolean settingsEdited = false;
+
+  public NetRelayExt_FileBasedSettings() {
+  }
 
   /**
    * 
    */
-  public NetRelayExt_FileBasedSettings() {
+  public NetRelayExt_FileBasedSettings(boolean settingsEdited) {
+    this.settingsEdited = settingsEdited;
   }
 
   /*
@@ -38,6 +43,20 @@ public class NetRelayExt_FileBasedSettings extends NetRelay {
   public Settings createDefaultSettings() {
     Settings settings = super.createDefaultSettings();
     settings.getDatastoreSettings().setDatabaseName("NetRelayExtended_DB");
+    return settings;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.netrelay.NetRelay#initSettings()
+   */
+  @Override
+  protected Settings initSettings() {
+    Settings settings = super.initSettings();
+    if (settingsEdited) {
+      settings.setEdited(true);
+    }
     return settings;
   }
 

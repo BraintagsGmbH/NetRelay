@@ -51,7 +51,7 @@ public class AuthenticationController extends AbstractController {
    */
   public static RouterDefinition createDefaultRouterDefinition() {
     RouterDefinition def = new RouterDefinition();
-    def.setName("AuthenticationController");
+    def.setName(AuthenticationController.class.getSimpleName());
     def.setBlocking(false);
     def.setController(AuthenticationController.class);
     def.setHandlerProperties(getDefaultProperties());

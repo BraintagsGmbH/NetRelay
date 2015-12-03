@@ -15,6 +15,7 @@ package de.braintags.netrelay;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import de.braintags.io.vertx.pojomapper.exception.InitException;
 import de.braintags.io.vertx.pojomapper.testdatastore.TestHelper;
 import de.braintags.netrelay.impl.NetRelayExt_FileBasedSettings;
 import de.braintags.netrelay.init.Settings;
@@ -70,12 +71,28 @@ public class TestSettings {
     final Async async2 = context.async();
     vertx.deployVerticle(NetRelayExt_FileBasedSettings.class.getName(), result -> {
       if (result.failed()) {
-        context.fail(result.cause());
+        context.assertEquals(InitException.class, result.cause().getClass());
+        context.assertTrue(result.cause().getMessage().contains("The settings are not yet edited."),
+            "Expected errormessage which contains 'The settings are not yet edited.'");
+        async2.complete();
       } else {
-        context.assertTrue(fs.existsBlocking(localSettingsFileNameUserDir));
+        context.fail("This test expects to fail, cause the settings were not edited yet");
         async2.complete();
       }
     });
+    async2.awaitSuccess();
+
+    // final Async async3 = context.async();
+    // NetRelayExt_FileBasedSettings netRelay = new NetRelayExt_FileBasedSettings(true);
+    // vertx.deployVerticle(netRelay, result -> {
+    // if (result.failed()) {
+    // context.fail(result.cause());
+    // } else {
+    // context.assertTrue(fs.existsBlocking(localSettingsFileNameUserDir));
+    // async3.complete();
+    // }
+    // });
+
   }
 
   /**
@@ -110,9 +127,13 @@ public class TestSettings {
     final Async async2 = context.async();
     vertx.deployVerticle(NetRelayExt_FileBasedSettings.class.getName(), options, result -> {
       if (result.failed()) {
-        context.fail(result.cause());
-      } else {
+        context.assertEquals(InitException.class, result.cause().getClass());
+        context.assertTrue(result.cause().getMessage().contains("The settings are not yet edited."),
+            "Expected errormessage which contains 'The settings are not yet edited.'");
         context.assertTrue(fs.existsBlocking(localSettingsFileNameUserDir));
+        async2.complete();
+      } else {
+        context.fail("This test expects to fail, cause the settings were not edited yet");
         async2.complete();
       }
     });
