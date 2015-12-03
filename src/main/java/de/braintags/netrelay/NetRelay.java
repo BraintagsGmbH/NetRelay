@@ -15,6 +15,7 @@ package de.braintags.netrelay;
 import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.exception.InitException;
 import de.braintags.io.vertx.pojomapper.init.IDataStoreInit;
 import de.braintags.io.vertx.pojomapper.mongo.init.MongoDataStoreInit;
 import de.braintags.netrelay.controller.impl.AuthenticationController;
@@ -106,7 +107,12 @@ public abstract class NetRelay extends AbstractVerticle {
    */
   protected Settings initSettings() {
     try {
-      return Settings.loadSettings(this, vertx, context);
+      Settings settings = Settings.loadSettings(this, vertx, context);
+      if (!settings.isEdited()) {
+        throw new InitException(
+            "The settings are not yet edited. Change the value of property 'edited' to true inside the appropriate file");
+      }
+      return settings;
     } catch (Exception e) {
       LOGGER.error("", e);
       throw e;
