@@ -1,0 +1,27 @@
+Ideensammlung zur Neuentwicklung
+
+- NetRelay als Main-Class -- startet Vertx als Embedded
+- Settings in Dateien -- Auflösen auf Klassen für bessere Lesbarkeit
+- Templates in Dateien -- Thymeleaf als Template-Engine
+- Templates können aus Git-Repo geladen werden -- zusätzlich können weitere Settings enthalten sein
+- Für Subpfade lassen sich andere Git-Repos definieren -- z.B. admin/ zeigt auf Backend-Git-Repo
+- Comiled Templates für bestimmte Typen, wie css oder js -- ermöglicht die Nutzung von LESS, SASS oder Typescript, und mehr
+- Sessionless, Keine traditionellen Sessions -- Dies erhöht die Skalierbarkeit (selbst ClusteredSessions schränken ein)
+- Service-Module -- z.B. für Shop-, CMS-System
+- NetRelay soll sich auf das wesentliche beschränken und Funktionen über Module erhalten -- Kernfunktion: dynamische Webseiten ausliefern
+- REST-Like Urls -- einheitlicheres Schema beim Aufruf
+- CleanURL-System -- Möglichkeit das für die CleanURL benötigte Feld pro Tabelle zu definieren. Vielleicht mit Annotations?
+- Groovy oder Kotlin-änhliche Sprachen integrieren -- Lesbarkeit des Codes erhöhen. Kotlin ist in der Interoperabilität vielleicht besser: prüfen
+- Integration von Pagespeed-Optimization-Mechanismen -- z.B. Resourcenhandling
+- Resourcenmechanismus -- Durch einfache Syntag Resourcen definieren und verwenden: Gibt es passende Konventionen?
+- Virtual-Domain-Support für Static Resources -- ggfs. in Verbindung mit dem Resourcenmechanismus. Soll Cookieless-Domains erlauben
+- Ausnutzen bekannter Strategien zur Feature-Detection -- z.B. ServiceLoader
+- Einsatz von alternativen Datenbanken -- z.B. NoSQL
+
+Allgemeines:
+- Sauberer Programmcode -- Codeconventions durchsetzen, mit z.B. Sonarqube
+- Testabdeckung muss ausreichen
+- Docker-Image -- NetRelay als Docker-Basis-Image nutzen um Anwendungen zu deployen??? Das würde vermutlich die GIT-Repos unnötig machen, bei den URLs. Müsste man mal klären was besser ist.
+- Einsatz von Gradle als Buildtool -- einfacher, flexibler Build
+- Einsatz von Asciidoc (in Verbindung mit Vertx-Docgen) -- Ermöglicht konventionelle Dokumentation mit Javadoc-naher Dokumentation
+- Einsatz von GO als Buildserver?? -- Müsste man klären. Travis CI und andere bieten sich für OpenSource-Projekte auch an.
