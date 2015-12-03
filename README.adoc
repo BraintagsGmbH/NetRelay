@@ -59,7 +59,8 @@ tbd tbd
 == CONTROLLER:
 
 === DefaultPersistenceController
-Objekte sollen weitestgehend standardisiert persisitiert werden durch Auswertung der URI durch capturing path parameter ( s.o. ). Der Controller erwartet die Definition von Capturing Path Parametern ( s.o.), mindestens von EntityParameterName.
+Objekte sollen weitestgehend standardisiert persisitiert werden durch Auswertung der URI durch capturing path parameter ( s.o. ). 
+Der Controller erwartet die Definition von Capturing Path Parametern ( s.o.), mindestens von EntityParameterName.
 Die informationen aus den Parmatern EntityParameterName, IdParameterName und ActionParameterName führen dann zur entsprechenden Anwendung wie laden, löschen, anlegen eines Einzeldatensatzes oder Laden einer Selection
 Die dynamische Struktur der URI wird durch die Routing-Definition vorgegeben
 

@@ -15,6 +15,8 @@ package de.braintags.netrelay.controller.impl;
 import java.util.Properties;
 
 import de.braintags.netrelay.controller.IController;
+import de.braintags.netrelay.routing.CaptureCollection;
+import de.braintags.netrelay.routing.RouterDefinition;
 import io.vertx.core.Vertx;
 
 /**
@@ -25,6 +27,7 @@ import io.vertx.core.Vertx;
  */
 public abstract class AbstractController implements IController {
   private Vertx vertx;
+  private CaptureCollection[] captureCollection;
 
   /**
    * 
@@ -33,6 +36,8 @@ public abstract class AbstractController implements IController {
   }
 
   /**
+   * The instance of {@link Vertx} which is used to initialize NetRelay
+   * 
    * @return the vertx
    */
   public final Vertx getVertx() {
@@ -45,9 +50,20 @@ public abstract class AbstractController implements IController {
    * @see de.braintags.netrelay.controller.IController#init(io.vertx.core.Vertx, java.util.Properties)
    */
   @Override
-  public final void init(Vertx vertx, Properties properties) {
+  public final void init(Vertx vertx, Properties properties, CaptureCollection[] captureCollection) {
     this.vertx = vertx;
     initProperties(properties);
+    initCaptureCollection(captureCollection);
+  }
+
+  /**
+   * Initialize the given {@link CaptureCollection}. The default implementation just stores it inside the current
+   * instance
+   * 
+   * @param captureCollection
+   */
+  public void initCaptureCollection(CaptureCollection[] captureCollection) {
+    this.captureCollection = captureCollection;
   }
 
   /**
@@ -57,4 +73,13 @@ public abstract class AbstractController implements IController {
    *          the properties to be used for init
    */
   public abstract void initProperties(Properties properties);
+
+  /**
+   * The {@link CaptureCollection} which was defined inside the {@link RouterDefinition}
+   * 
+   * @return the captureCollection
+   */
+  public final CaptureCollection[] getCaptureCollections() {
+    return captureCollection;
+  }
 }

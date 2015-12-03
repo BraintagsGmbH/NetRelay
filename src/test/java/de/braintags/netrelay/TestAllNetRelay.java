@@ -23,7 +23,7 @@ import org.junit.runners.Suite.SuiteClasses;
  * 
  */
 @RunWith(Suite.class)
-@SuiteClasses({ TestSettings.class })
+@SuiteClasses({ TestSettings.class, TTemplateController.class, TCaptureParameters.class })
 public class TestAllNetRelay {
 
 }

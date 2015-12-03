@@ -144,60 +144,60 @@ public class NetRelayBaseTest {
     def.getHandlerProperties().setProperty(ThymeleafTemplateController.TEMPLATE_DIRECTORY_PROPERTY, "testTemplates");
   }
 
-  protected void testRequest(TestContext context, HttpMethod method, String path, int statusCode, String statusMessage)
-      throws Exception {
+  protected final void testRequest(TestContext context, HttpMethod method, String path, int statusCode,
+      String statusMessage) throws Exception {
     testRequest(context, method, path, null, statusCode, statusMessage, null);
   }
 
-  protected void testRequest(TestContext context, HttpMethod method, String path, int statusCode, String statusMessage,
-      String responseBody) throws Exception {
+  protected final void testRequest(TestContext context, HttpMethod method, String path, int statusCode,
+      String statusMessage, String responseBody) throws Exception {
     testRequest(context, method, path, null, statusCode, statusMessage, responseBody);
   }
 
-  protected void testRequest(TestContext context, HttpMethod method, String path, int statusCode, String statusMessage,
-      Buffer responseBody) throws Exception {
+  protected final void testRequest(TestContext context, HttpMethod method, String path, int statusCode,
+      String statusMessage, Buffer responseBody) throws Exception {
     testRequestBuffer(context, method, path, null, null, statusCode, statusMessage, responseBody);
   }
 
-  protected void testRequestWithContentType(TestContext context, HttpMethod method, String path, String contentType,
-      int statusCode, String statusMessage) throws Exception {
+  protected final void testRequestWithContentType(TestContext context, HttpMethod method, String path,
+      String contentType, int statusCode, String statusMessage) throws Exception {
     testRequest(context, method, path, req -> req.putHeader("content-type", contentType), statusCode, statusMessage,
         null);
   }
 
-  protected void testRequestWithAccepts(TestContext context, HttpMethod method, String path, String accepts,
+  protected final void testRequestWithAccepts(TestContext context, HttpMethod method, String path, String accepts,
       int statusCode, String statusMessage) throws Exception {
     testRequest(context, method, path, req -> req.putHeader("accept", accepts), statusCode, statusMessage, null);
   }
 
-  protected void testRequestWithCookies(TestContext context, HttpMethod method, String path, String cookieHeader,
+  protected final void testRequestWithCookies(TestContext context, HttpMethod method, String path, String cookieHeader,
       int statusCode, String statusMessage) throws Exception {
     testRequest(context, method, path, req -> req.putHeader("cookie", cookieHeader), statusCode, statusMessage, null);
   }
 
-  protected void testRequest(TestContext context, HttpMethod method, String path,
+  protected final void testRequest(TestContext context, HttpMethod method, String path,
       Consumer<HttpClientRequest> requestAction, int statusCode, String statusMessage, String responseBody)
           throws Exception {
     testRequest(context, method, path, requestAction, null, statusCode, statusMessage, responseBody);
   }
 
-  protected void testRequest(TestContext context, HttpMethod method, String path,
+  protected final void testRequest(TestContext context, HttpMethod method, String path,
       Consumer<HttpClientRequest> requestAction, Consumer<HttpClientResponse> responseAction, int statusCode,
       String statusMessage, String responseBody) throws Exception {
     testRequestBuffer(context, method, path, requestAction, responseAction, statusCode, statusMessage,
         responseBody != null ? Buffer.buffer(responseBody) : null);
   }
 
-  protected void testRequestBuffer(TestContext context, HttpMethod method, String path,
+  protected final void testRequestBuffer(TestContext context, HttpMethod method, String path,
       Consumer<HttpClientRequest> requestAction, Consumer<HttpClientResponse> responseAction, int statusCode,
       String statusMessage, Buffer responseBodyBuffer) throws Exception {
     testRequestBuffer(context, client, method, 8080, path, requestAction, responseAction, statusCode, statusMessage,
         responseBodyBuffer);
   }
 
-  protected void testRequestBuffer(TestContext context, HttpClient client, HttpMethod method, int port, String path,
-      Consumer<HttpClientRequest> requestAction, Consumer<HttpClientResponse> responseAction, int statusCode,
-      String statusMessage, Buffer responseBodyBuffer) throws Exception {
+  protected final void testRequestBuffer(TestContext context, HttpClient client, HttpMethod method, int port,
+      String path, Consumer<HttpClientRequest> requestAction, Consumer<HttpClientResponse> responseAction,
+      int statusCode, String statusMessage, Buffer responseBodyBuffer) throws Exception {
     Async async = context.async();
     HttpClientRequest req = client.request(method, port, "localhost", path, resp -> {
       context.assertEquals(statusCode, resp.statusCode());

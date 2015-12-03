@@ -36,6 +36,7 @@ public class RouterDefinition {
   private Class<? extends IController> controller;
   private HttpMethod httpMethod;
   private Properties handlerProperties = new Properties();
+  private CaptureCollection[] captureCollection;
 
   /**
    * Create an instance of the defined IController and init it with the defined properties
@@ -44,7 +45,7 @@ public class RouterDefinition {
    */
   public IController instantiateController(Vertx vertx) throws Exception {
     IController controller = getController().newInstance();
-    controller.init(vertx, getHandlerProperties());
+    controller.init(vertx, getHandlerProperties(), captureCollection);
     return controller;
   }
 
@@ -186,6 +187,25 @@ public class RouterDefinition {
 
   public final void setFailureDefinition(boolean failureDefinition) {
     this.failureDefinition = failureDefinition;
+  }
+
+  /**
+   * The {@link CaptureCollection} which is defined for the current RouterDefinition
+   * 
+   * @return the captureCollection
+   */
+  public final CaptureCollection[] getCaptureCollection() {
+    return captureCollection;
+  }
+
+  /**
+   * The {@link CaptureCollection} which is defined for the current RouterDefinition
+   * 
+   * @param captureCollection
+   *          the captureCollection to set
+   */
+  public final void setCaptureCollection(CaptureCollection[] captureCollection) {
+    this.captureCollection = captureCollection;
   }
 
 }
