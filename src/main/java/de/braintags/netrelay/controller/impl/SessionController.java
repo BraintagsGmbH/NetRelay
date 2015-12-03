@@ -109,7 +109,7 @@ public class SessionController extends AbstractController {
    */
   public static RouterDefinition createDefaultRouterDefinition() {
     RouterDefinition def = new RouterDefinition();
-    def.setName("SessionController");
+    def.setName(SessionController.class.getSimpleName());
     def.setBlocking(false);
     def.setController(SessionController.class);
     def.setHandlerProperties(getDefaultProperties());

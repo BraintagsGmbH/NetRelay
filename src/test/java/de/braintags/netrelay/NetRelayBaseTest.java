@@ -18,13 +18,14 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
-import org.junit.Test;
 import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 
 import de.braintags.io.vertx.pojomapper.testdatastore.TestHelper;
+import de.braintags.netrelay.controller.impl.ThymeleafTemplateController;
 import de.braintags.netrelay.impl.NetRelayExt_InternalSettings;
 import de.braintags.netrelay.init.Settings;
+import de.braintags.netrelay.routing.RouterDefinition;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.buffer.Buffer;
@@ -39,7 +40,8 @@ import io.vertx.ext.unit.junit.Timeout;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 
 /**
- * 
+ * NetRelayBaseTest is initializing an internal instance of NetRelay with the default settings.
+ * If you want to modifiy the settings, overwrite the method {@link #modifySettings(Settings)}
  * 
  * @author Michael Remme
  * 
@@ -57,11 +59,6 @@ public class NetRelayBaseTest {
   public Timeout rule = Timeout.seconds(Integer.parseInt(System.getProperty("testTimeout", "5")));
   @Rule
   public TestName name = new TestName();
-
-  @Test
-  public void testSimpleRoute(TestContext context) throws Exception {
-    testRequest(context, HttpMethod.GET, "/index.html", 200, "OK");
-  }
 
   @Before
   public final void initBeforeTest(TestContext context) {
@@ -118,13 +115,10 @@ public class NetRelayBaseTest {
       Async async = context.async();
       netRelay = createNetRelay();
       vertx.deployVerticle(netRelay, result -> {
-        try {
-          if (result.failed()) {
-            context.fail(result.cause());
-          } else {
-
-          }
-        } finally {
+        if (result.failed()) {
+          context.fail(result.cause());
+          async.complete();
+        } else {
           async.complete();
         }
       });
@@ -138,9 +132,16 @@ public class NetRelayBaseTest {
     return netrelay;
   }
 
+  /**
+   * This method is modifying the {@link Settings} which are used to init NetRelay. Here it defines the
+   * template directory as "testTemplates"
+   * 
+   * @param settings
+   */
   protected void modifySettings(Settings settings) {
     settings.getDatastoreSettings().setDatabaseName(getClass().getSimpleName());
-    settings.getRouterDefinitions()
+    RouterDefinition def = settings.getNamedDefinition(ThymeleafTemplateController.class.getSimpleName());
+    def.getHandlerProperties().setProperty(ThymeleafTemplateController.TEMPLATE_DIRECTORY_PROPERTY, "testTemplates");
   }
 
   protected void testRequest(TestContext context, HttpMethod method, String path, int statusCode, String statusMessage)

@@ -84,7 +84,8 @@ public class Settings {
    * Get the {@link RouterDefinition} with the specified name
    * 
    * @param name
-   * @return
+   *          the name of the definition to search for
+   * @return a definition with the given name or null
    */
   public RouterDefinition getNamedDefinition(String name) {
     for (RouterDefinition def : routerDefinitions) {

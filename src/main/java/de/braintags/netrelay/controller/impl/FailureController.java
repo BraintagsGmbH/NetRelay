@@ -64,7 +64,7 @@ public class FailureController extends AbstractController {
    */
   public static RouterDefinition createDefaultRouterDefinition() {
     RouterDefinition def = new RouterDefinition();
-    def.setName("FailureController");
+    def.setName(FailureController.class.getSimpleName());
     def.setBlocking(false);
     def.setFailureDefinition(true);
     def.setController(FailureController.class);
