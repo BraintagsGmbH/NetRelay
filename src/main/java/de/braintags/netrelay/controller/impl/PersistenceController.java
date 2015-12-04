@@ -12,6 +12,7 @@
  */
 package de.braintags.netrelay.controller.impl;
 
+import java.util.List;
 import java.util.Properties;
 
 import io.vertx.ext.web.RoutingContext;
@@ -22,7 +23,7 @@ import io.vertx.ext.web.RoutingContext;
  * @author Michael Remme
  * 
  */
-public class PersistenceController extends AbstractController {
+public class PersistenceController extends AbstractCaptureController {
 
   /**
    * 
@@ -30,18 +31,23 @@ public class PersistenceController extends AbstractController {
   public PersistenceController() {
   }
 
-  /* (non-Javadoc)
-   * @see io.vertx.core.Handler#handle(java.lang.Object)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.netrelay.controller.impl.AbstractCaptureController#handle(io.vertx.ext.web.RoutingContext,
+   * java.util.List)
    */
   @Override
-  public void handle(RoutingContext event) {
+  protected void handle(RoutingContext context, List<CaptureMap> resolvedCaptureCollections) {
   }
 
-  /* (non-Javadoc)
-   * @see de.braintags.netrelay.controller.impl.AbstractController#initProperties(java.util.Properties)
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.netrelay.controller.impl.AbstractCaptureController#internalInitProperties(java.util.Properties)
    */
   @Override
-  public void initProperties(Properties properties) {
+  protected void internalInitProperties(Properties properties) {
   }
 
 }

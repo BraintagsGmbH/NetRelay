@@ -87,4 +87,31 @@ public class RequestUtil {
     return value;
   }
 
+  /**
+   * Clean one value element of the path within one "/".
+   * "/path/2/template.html" - "2" = "/path/template.html"
+   * 
+   * @param value
+   *          the prure value to be removed
+   * @param path
+   *          the path to be cleaned
+   * @return the cleaned path
+   * @throws IllegalArgumentException
+   *           if element with one "/" before or after the value wasn't found
+   */
+  public static String cleanPathElement(String value, String path) {
+    int index = path.indexOf("/" + value + "/");
+    if (index < 0) {
+      index = path.indexOf("/" + value);
+    }
+    if (index < 0) {
+      index = path.indexOf(value + "/");
+    }
+    if (index < 0) {
+      throw new IllegalArgumentException("Could not clean url from value '" + value + "'");
+    }
+    String rpath = path.substring(0, index) + path.substring(index + value.length() + 1);
+    return rpath;
+  }
+
 }

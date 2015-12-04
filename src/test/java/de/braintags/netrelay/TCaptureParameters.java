@@ -31,14 +31,16 @@ import io.vertx.ext.unit.TestContext;
 public class TCaptureParameters extends NetRelayBaseTest {
 
   @Test
-  public void testParameters(TestContext context) throws Exception {
+  public void testParameters1(TestContext context) throws Exception {
     CaptureTestController.resolvedCaptureCollections = null;
-    testRequest(context, HttpMethod.GET, "/products/nase/12/tuEs", 200, "OK");
+    testRequest(context, HttpMethod.GET, "/products/nase/12/tuEs/detail.html", 200, "OK");
+    context.assertNotNull(CaptureTestController.resolvedCaptureCollections);
     context.assertEquals(1, CaptureTestController.resolvedCaptureCollections.size());
     CaptureMap cm = CaptureTestController.resolvedCaptureCollections.get(0);
     context.assertEquals("nase", cm.get(CaptureTestController.MAPPER_KEY));
     context.assertEquals("12", cm.get(CaptureTestController.ID_KEY));
     context.assertEquals("tuEs", cm.get(CaptureTestController.ACTION_KEY));
+    context.assertEquals("/products/detail.html", CaptureTestController.cleanedPath);
   }
 
   /*
@@ -49,15 +51,22 @@ public class TCaptureParameters extends NetRelayBaseTest {
   @Override
   protected void modifySettings(Settings settings) {
     super.modifySettings(settings);
+    settings.getRouterDefinitions().add(0, defineRouterDefinition1());
+  }
+
+  private RouterDefinition defineRouterDefinition1() {
     RouterDefinition rd = new RouterDefinition();
     rd.setName(CaptureTestController.class.getSimpleName());
     rd.setController(CaptureTestController.class);
-    rd.setRoutes(new String[] { "/products/:entity/:ID/:action" });
+    rd.setRoutes(new String[] { "/products/:entity/:ID/:action/detail.html" });
     CaptureDefinition[] defs = new CaptureDefinition[3];
     defs[0] = new CaptureDefinition("entity", CaptureTestController.MAPPER_KEY, false);
     defs[1] = new CaptureDefinition("ID", CaptureTestController.ID_KEY, false);
     defs[2] = new CaptureDefinition("action", CaptureTestController.ACTION_KEY, false);
-
-    settings.getRouterDefinitions().add(rd);
+    CaptureCollection collection = new CaptureCollection();
+    collection.setCaptureDefinitions(defs);
+    CaptureCollection[] cc = new CaptureCollection[] { collection };
+    rd.setCaptureCollection(cc);
+    return rd;
   }
 }

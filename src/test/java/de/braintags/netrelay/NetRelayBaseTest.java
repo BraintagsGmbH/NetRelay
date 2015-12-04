@@ -53,7 +53,7 @@ public class NetRelayBaseTest {
 
   protected static Vertx vertx;
   protected static HttpClient client;
-  private static NetRelay netRelay;
+  protected static NetRelay netRelay;
 
   @Rule
   public Timeout rule = Timeout.seconds(Integer.parseInt(System.getProperty("testTimeout", "5")));

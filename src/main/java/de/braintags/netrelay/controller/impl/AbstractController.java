@@ -82,4 +82,5 @@ public abstract class AbstractController implements IController {
   public final CaptureCollection[] getCaptureCollections() {
     return captureCollection;
   }
+
 }
