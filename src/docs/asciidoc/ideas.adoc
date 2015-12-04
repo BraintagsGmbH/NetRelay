@@ -1,4 +1,4 @@
-Ideensammlung zur Neuentwicklung
+= Ideensammlung zur Neuentwicklung
 
 - NetRelay als Main-Class -- startet Vertx als Embedded
 - Settings in Dateien -- Auflösen auf Klassen für bessere Lesbarkeit
@@ -19,9 +19,11 @@ Ideensammlung zur Neuentwicklung
 - Einsatz von alternativen Datenbanken -- z.B. NoSQL
 
 Allgemeines:
+
 - Sauberer Programmcode -- Codeconventions durchsetzen, mit z.B. Sonarqube
 - Testabdeckung muss ausreichen
 - Docker-Image -- NetRelay als Docker-Basis-Image nutzen um Anwendungen zu deployen??? Das würde vermutlich die GIT-Repos unnötig machen, bei den URLs. Müsste man mal klären was besser ist.
 - Einsatz von Gradle als Buildtool -- einfacher, flexibler Build
 - Einsatz von Asciidoc (in Verbindung mit Vertx-Docgen) -- Ermöglicht konventionelle Dokumentation mit Javadoc-naher Dokumentation
 - Einsatz von GO als Buildserver?? -- Müsste man klären. Travis CI und andere bieten sich für OpenSource-Projekte auch an.
+- Einsatz von Gauge oder Cucumber als Testtool? -- Erlaubt die Definition von Szenarien, die dann implementiert werden.
