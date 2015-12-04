@@ -14,6 +14,7 @@ package de.braintags.netrelay.controller.impl;
 
 import java.util.Properties;
 
+import de.braintags.netrelay.NetRelay;
 import de.braintags.netrelay.controller.IController;
 import de.braintags.netrelay.routing.CaptureCollection;
 import de.braintags.netrelay.routing.RouterDefinition;
@@ -28,6 +29,7 @@ import io.vertx.core.Vertx;
 public abstract class AbstractController implements IController {
   private Vertx vertx;
   private CaptureCollection[] captureCollection;
+  private NetRelay netRelay;
 
   /**
    * 
@@ -50,8 +52,9 @@ public abstract class AbstractController implements IController {
    * @see de.braintags.netrelay.controller.IController#init(io.vertx.core.Vertx, java.util.Properties)
    */
   @Override
-  public final void init(Vertx vertx, Properties properties, CaptureCollection[] captureCollection) {
+  public final void init(Vertx vertx, NetRelay netRelay, Properties properties, CaptureCollection[] captureCollection) {
     this.vertx = vertx;
+    this.netRelay = netRelay;
     initProperties(properties);
     initCaptureCollection(captureCollection);
   }
@@ -81,6 +84,15 @@ public abstract class AbstractController implements IController {
    */
   public final CaptureCollection[] getCaptureCollections() {
     return captureCollection;
+  }
+
+  /**
+   * Get the parent instance of {@link NetRelay}
+   * 
+   * @return the netRelay
+   */
+  protected final NetRelay getNetRelay() {
+    return netRelay;
   }
 
 }

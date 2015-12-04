@@ -14,6 +14,7 @@ package de.braintags.netrelay.routing;
 
 import java.util.Properties;
 
+import de.braintags.netrelay.NetRelay;
 import de.braintags.netrelay.controller.IController;
 import de.braintags.netrelay.init.Settings;
 import io.vertx.core.Vertx;
@@ -38,14 +39,18 @@ public class RouterDefinition {
   private Properties handlerProperties = new Properties();
   private CaptureCollection[] captureCollection;
 
+  public RouterDefinition() {
+
+  }
+
   /**
    * Create an instance of the defined IController and init it with the defined properties
    * 
    * @return the intialized IController
    */
-  public IController instantiateController(Vertx vertx) throws Exception {
+  public IController instantiateController(Vertx vertx, NetRelay netRelay) throws Exception {
     IController controller = getController().newInstance();
-    controller.init(vertx, getHandlerProperties(), null);
+    controller.init(vertx, netRelay, getHandlerProperties(), captureCollection);
     return controller;
   }
 

@@ -97,7 +97,7 @@ public abstract class NetRelay extends AbstractVerticle {
   protected void initControlller(Router router) throws Exception {
     List<RouterDefinition> rd = settings.getRouterDefinitions();
     for (RouterDefinition def : rd) {
-      RoutingInit.initRoutingDefinition(vertx, router, def);
+      RoutingInit.initRoutingDefinition(vertx, this, router, def);
     }
   }
 
