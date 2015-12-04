@@ -45,7 +45,7 @@ public class RouterDefinition {
    */
   public IController instantiateController(Vertx vertx) throws Exception {
     IController controller = getController().newInstance();
-    controller.init(vertx, getHandlerProperties(), captureCollection);
+    controller.init(vertx, getHandlerProperties(), null);
     return controller;
   }
 
@@ -105,7 +105,19 @@ public class RouterDefinition {
    *          the routes to set
    */
   public final void setRoutes(String[] routes) {
+    if (routes != null) {
+      for (String route : routes) {
+        verifyRoute(route);
+      }
+    }
     this.routes = routes;
+  }
+
+  private void verifyRoute(String route) {
+    if (route.contains("/:") && route.contains("*")) {
+      throw new IllegalArgumentException(
+          "Routes with capturing parameters AND asterisk are not working. Use regex or declare multiple routes");
+    }
   }
 
   /**
@@ -191,7 +203,7 @@ public class RouterDefinition {
 
   /**
    * The {@link CaptureCollection} which is defined for the current RouterDefinition
-   * 
+   *
    * @return the captureCollection
    */
   public final CaptureCollection[] getCaptureCollection() {
@@ -200,7 +212,7 @@ public class RouterDefinition {
 
   /**
    * The {@link CaptureCollection} which is defined for the current RouterDefinition
-   * 
+   *
    * @param captureCollection
    *          the captureCollection to set
    */

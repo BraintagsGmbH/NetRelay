@@ -36,10 +36,7 @@ public class TCaptureParameters extends NetRelayBaseTest {
     testRequest(context, HttpMethod.GET, "/products/nase/12/tuEs/detail.html", 200, "OK");
     context.assertNotNull(CaptureTestController.resolvedCaptureCollections);
     context.assertEquals(1, CaptureTestController.resolvedCaptureCollections.size());
-    CaptureMap cm = CaptureTestController.resolvedCaptureCollections.get(0);
-    context.assertEquals("nase", cm.get(CaptureTestController.MAPPER_KEY));
-    context.assertEquals("12", cm.get(CaptureTestController.ID_KEY));
-    context.assertEquals("tuEs", cm.get(CaptureTestController.ACTION_KEY));
+    assertValues(context, 0, "nase", "tuEs", "12");
     context.assertEquals("/products/detail.html", CaptureTestController.cleanedPath);
   }
 
@@ -49,16 +46,38 @@ public class TCaptureParameters extends NetRelayBaseTest {
    * @see de.braintags.netrelay.NetRelayBaseTest#modifySettings(de.braintags.netrelay.init.Settings)
    */
   @Override
-  protected void modifySettings(Settings settings) {
-    super.modifySettings(settings);
-    settings.getRouterDefinitions().add(0, defineRouterDefinition1());
+  protected void modifySettings(TestContext context, Settings settings) {
+    super.modifySettings(context, settings);
+    settings.getRouterDefinitions().add(0, defineRouterDefinition("/products/:entity/:ID/:action/detail.html"));
+    boolean exceptionRaised = false;
+    try {
+      // capture parameters and asterisk are not possible
+      settings.getRouterDefinitions().add(0, defineRouterDefinition("/animal/:entity/:ID/:action/*"));
+    } catch (IllegalArgumentException e) {
+      exceptionRaised = true;
+    }
+    if (!exceptionRaised) {
+      context.fail("Expected an Exception, which wasn't thrown");
+    }
   }
 
-  private RouterDefinition defineRouterDefinition1() {
+  private void assertValues(TestContext context, int position, String mapper, String action, String id) {
+    CaptureMap cm = CaptureTestController.resolvedCaptureCollections.get(position);
+    context.assertEquals(mapper, cm.get(CaptureTestController.MAPPER_KEY));
+    context.assertEquals(id, cm.get(CaptureTestController.ID_KEY));
+    context.assertEquals(action, cm.get(CaptureTestController.ACTION_KEY));
+  }
+
+  private RouterDefinition defineRouterDefinition(String route) {
     RouterDefinition rd = new RouterDefinition();
     rd.setName(CaptureTestController.class.getSimpleName());
     rd.setController(CaptureTestController.class);
-    rd.setRoutes(new String[] { "/products/:entity/:ID/:action/detail.html" });
+    rd.setRoutes(new String[] { route });
+    rd.setCaptureCollection(createDefaultCaptureCollection());
+    return rd;
+  }
+
+  private CaptureCollection[] createDefaultCaptureCollection() {
     CaptureDefinition[] defs = new CaptureDefinition[3];
     defs[0] = new CaptureDefinition("entity", CaptureTestController.MAPPER_KEY, false);
     defs[1] = new CaptureDefinition("ID", CaptureTestController.ID_KEY, false);
@@ -66,7 +85,6 @@ public class TCaptureParameters extends NetRelayBaseTest {
     CaptureCollection collection = new CaptureCollection();
     collection.setCaptureDefinitions(defs);
     CaptureCollection[] cc = new CaptureCollection[] { collection };
-    rd.setCaptureCollection(cc);
-    return rd;
+    return cc;
   }
 }

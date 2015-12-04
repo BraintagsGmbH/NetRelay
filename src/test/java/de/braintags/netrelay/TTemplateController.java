@@ -52,8 +52,8 @@ public class TTemplateController extends NetRelayBaseTest {
    * @see de.braintags.netrelay.NetRelayBaseTest#modifySettings(de.braintags.netrelay.init.Settings)
    */
   @Override
-  protected void modifySettings(Settings settings) {
-    super.modifySettings(settings);
+  protected void modifySettings(TestContext context, Settings settings) {
+    super.modifySettings(context, settings);
   }
 
 }

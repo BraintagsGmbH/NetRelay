@@ -34,7 +34,7 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
  * 
  */
 @RunWith(VertxUnitRunner.class)
-public class TestSettings {
+public class TSettings {
   private static String localSettingsFileNameUserDir = Settings.LOCAL_USER_DIRECTORY + "/"
       + NetRelayExt_FileBasedSettings.class.getName() + ".settings.json";
   private static String localSettingsFileNameTmpDir = System.getProperty("java.io.tmpdir") + "/"
