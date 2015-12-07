@@ -12,7 +12,7 @@
  */
 package de.braintags.netrelay.routing;
 
-import de.braintags.netrelay.controller.impl.PersistenceController;
+import de.braintags.netrelay.controller.impl.persistence.PersistenceController;
 
 /**
  * A CaptureCollection defines all captures for one action, which are belonging together.

@@ -14,36 +14,27 @@ package de.braintags.netrelay;
 
 import org.junit.Test;
 
+import de.braintags.netrelay.controller.impl.persistence.PersistenceController;
 import de.braintags.netrelay.init.Settings;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.unit.TestContext;
 
 /**
- * Test the TemplateController of NetRelay
+ * 
  * 
  * @author Michael Remme
  * 
  */
-public class TTemplateController extends NetRelayBaseTest {
+public class TPersistenceController extends AbstractCaptureParameterTest {
 
   @Test
-  public void testIndex(TestContext context) throws Exception {
-    testRequest(context, HttpMethod.GET, "/index.html", 200, "OK");
-  }
-
-  @Test
-  public void testRedirect(TestContext context) throws Exception {
-    testRequest(context, HttpMethod.GET, "/", 302, "Found");
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.netrelay.NetRelayBaseTest#initTest()
-   */
-  @Override
-  public void initTest() {
-    super.initTest();
+  public void testInsert(TestContext context) throws Exception {
+    CaptureTestController.resolvedCaptureCollections = null;
+    testRequest(context, HttpMethod.GET, "/products/nase/12/INSERT/detail.html", 200, "OK");
+    context.assertNotNull(CaptureTestController.resolvedCaptureCollections);
+    context.assertEquals(1, CaptureTestController.resolvedCaptureCollections.size());
+    assertValues(context, 0, "nase", "tuEs", "12");
+    context.assertEquals("/products/detail.html", CaptureTestController.cleanedPath);
   }
 
   /*
@@ -54,6 +45,8 @@ public class TTemplateController extends NetRelayBaseTest {
   @Override
   protected void modifySettings(TestContext context, Settings settings) {
     super.modifySettings(context, settings);
+    settings.getRouterDefinitions().add(0,
+        defineRouterDefinition(PersistenceController.class, "/products/:entity/:ID/:action/detail.html"));
   }
 
 }

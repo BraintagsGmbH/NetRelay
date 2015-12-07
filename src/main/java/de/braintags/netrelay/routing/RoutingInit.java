@@ -15,6 +15,7 @@ package de.braintags.netrelay.routing;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.braintags.netrelay.NetRelay;
 import de.braintags.netrelay.controller.IController;
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpMethod;
@@ -35,25 +36,28 @@ public class RoutingInit {
   private RoutingInit() {
   }
 
-  public static void initRoutingDefinition(Vertx vertx, Router router, RouterDefinition def) throws Exception {
+  public static void initRoutingDefinition(Vertx vertx, NetRelay netRelay, Router router, RouterDefinition def)
+      throws Exception {
     if (def.isFailureDefinition()) {
-      initFailureDefinition(vertx, router, def);
+      initFailureDefinition(vertx, netRelay, router, def);
     } else {
-      initRegularDefinition(vertx, router, def);
+      initRegularDefinition(vertx, netRelay, router, def);
     }
 
   }
 
-  private static void initRegularDefinition(Vertx vertx, Router router, RouterDefinition def) throws Exception {
-    IController controller = def.instantiateController(vertx);
+  private static void initRegularDefinition(Vertx vertx, NetRelay netRelay, Router router, RouterDefinition def)
+      throws Exception {
+    IController controller = def.instantiateController(vertx, netRelay);
     List<Route> routes = getRoutes(router, def);
     for (Route route : routes) {
       route.handler(controller);
     }
   }
 
-  private static void initFailureDefinition(Vertx vertx, Router router, RouterDefinition def) throws Exception {
-    IController controller = def.instantiateController(vertx);
+  private static void initFailureDefinition(Vertx vertx, NetRelay netRelay, Router router, RouterDefinition def)
+      throws Exception {
+    IController controller = def.instantiateController(vertx, netRelay);
     List<Route> routes = getRoutes(router, def);
     for (Route route : routes) {
       route.failureHandler(controller);

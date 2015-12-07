@@ -53,7 +53,7 @@ public class NetRelayBaseTest {
 
   protected static Vertx vertx;
   protected static HttpClient client;
-  private static NetRelay netRelay;
+  protected static NetRelay netRelay;
 
   @Rule
   public Timeout rule = Timeout.seconds(Integer.parseInt(System.getProperty("testTimeout", "5")));
@@ -113,7 +113,7 @@ public class NetRelayBaseTest {
     if (netRelay == null) {
       LOGGER.info("init NetRelay");
       Async async = context.async();
-      netRelay = createNetRelay();
+      netRelay = createNetRelay(context);
       vertx.deployVerticle(netRelay, result -> {
         if (result.failed()) {
           context.fail(result.cause());
@@ -126,9 +126,9 @@ public class NetRelayBaseTest {
     }
   }
 
-  public NetRelay createNetRelay() {
+  public NetRelay createNetRelay(TestContext context) {
     NetRelayExt_InternalSettings netrelay = new NetRelayExt_InternalSettings();
-    modifySettings(netrelay.getSettings());
+    modifySettings(context, netrelay.getSettings());
     return netrelay;
   }
 
@@ -138,7 +138,7 @@ public class NetRelayBaseTest {
    * 
    * @param settings
    */
-  protected void modifySettings(Settings settings) {
+  protected void modifySettings(TestContext context, Settings settings) {
     settings.getDatastoreSettings().setDatabaseName(getClass().getSimpleName());
     RouterDefinition def = settings.getNamedDefinition(ThymeleafTemplateController.class.getSimpleName());
     def.getHandlerProperties().setProperty(ThymeleafTemplateController.TEMPLATE_DIRECTORY_PROPERTY, "testTemplates");

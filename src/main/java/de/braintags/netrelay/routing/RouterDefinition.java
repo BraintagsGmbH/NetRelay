@@ -14,6 +14,7 @@ package de.braintags.netrelay.routing;
 
 import java.util.Properties;
 
+import de.braintags.netrelay.NetRelay;
 import de.braintags.netrelay.controller.IController;
 import de.braintags.netrelay.init.Settings;
 import io.vertx.core.Vertx;
@@ -38,14 +39,18 @@ public class RouterDefinition {
   private Properties handlerProperties = new Properties();
   private CaptureCollection[] captureCollection;
 
+  public RouterDefinition() {
+
+  }
+
   /**
    * Create an instance of the defined IController and init it with the defined properties
    * 
    * @return the intialized IController
    */
-  public IController instantiateController(Vertx vertx) throws Exception {
+  public IController instantiateController(Vertx vertx, NetRelay netRelay) throws Exception {
     IController controller = getController().newInstance();
-    controller.init(vertx, getHandlerProperties(), captureCollection);
+    controller.init(vertx, netRelay, getHandlerProperties(), captureCollection);
     return controller;
   }
 
@@ -105,7 +110,19 @@ public class RouterDefinition {
    *          the routes to set
    */
   public final void setRoutes(String[] routes) {
+    if (routes != null) {
+      for (String route : routes) {
+        verifyRoute(route);
+      }
+    }
     this.routes = routes;
+  }
+
+  private void verifyRoute(String route) {
+    if (route.contains("/:") && route.contains("*")) {
+      throw new IllegalArgumentException(
+          "Routes with capturing parameters AND asterisk are not working. Use regex or declare multiple routes");
+    }
   }
 
   /**
@@ -191,7 +208,7 @@ public class RouterDefinition {
 
   /**
    * The {@link CaptureCollection} which is defined for the current RouterDefinition
-   * 
+   *
    * @return the captureCollection
    */
   public final CaptureCollection[] getCaptureCollection() {
@@ -200,7 +217,7 @@ public class RouterDefinition {
 
   /**
    * The {@link CaptureCollection} which is defined for the current RouterDefinition
-   * 
+   *
    * @param captureCollection
    *          the captureCollection to set
    */

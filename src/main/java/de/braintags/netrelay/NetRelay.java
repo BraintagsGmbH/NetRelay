@@ -25,6 +25,7 @@ import de.braintags.netrelay.controller.impl.RedirectController;
 import de.braintags.netrelay.controller.impl.SessionController;
 import de.braintags.netrelay.controller.impl.StaticController;
 import de.braintags.netrelay.controller.impl.ThymeleafTemplateController;
+import de.braintags.netrelay.controller.impl.persistence.PersistenceController;
 import de.braintags.netrelay.init.Settings;
 import de.braintags.netrelay.routing.RouterDefinition;
 import de.braintags.netrelay.routing.RoutingInit;
@@ -96,7 +97,7 @@ public abstract class NetRelay extends AbstractVerticle {
   protected void initControlller(Router router) throws Exception {
     List<RouterDefinition> rd = settings.getRouterDefinitions();
     for (RouterDefinition def : rd) {
-      RoutingInit.initRoutingDefinition(vertx, router, def);
+      RoutingInit.initRoutingDefinition(vertx, this, router, def);
     }
   }
 
@@ -185,6 +186,7 @@ public abstract class NetRelay extends AbstractVerticle {
     settings.getRouterDefinitions().add(RedirectController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(StaticController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(AuthenticationController.createDefaultRouterDefinition());
+    settings.getRouterDefinitions().add(PersistenceController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(ThymeleafTemplateController.createDefaultRouterDefinition());
 
     settings.getRouterDefinitions().add(FailureController.createDefaultRouterDefinition());

@@ -14,6 +14,7 @@ package de.braintags.netrelay.controller;
 
 import java.util.Properties;
 
+import de.braintags.netrelay.NetRelay;
 import de.braintags.netrelay.routing.CaptureCollection;
 import de.braintags.netrelay.routing.CaptureDefinition;
 import io.vertx.core.Handler;
@@ -35,11 +36,13 @@ public interface IController extends Handler<RoutingContext> {
    * 
    * @param vertx
    *          the instance of vertx the system is running under.
+   * @param netRelay
+   *          the parent instance of {@link NetRelay}
    * @param properties
    * @param captureCollection
    *          the {@link CaptureCollection}s for of the current definition. The controller itself decides, wether it
    *          should use it and how to interprete entries of type {@link CaptureDefinition}
    */
-  void init(Vertx vertx, Properties properties, CaptureCollection[] captureCollection);
+  void init(Vertx vertx, NetRelay netRelay, Properties properties, CaptureCollection[] captureCollection);
 
 }

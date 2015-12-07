@@ -24,6 +24,7 @@ public class CaptureTestController extends AbstractCaptureController {
   public static final String ACTION_KEY = "action";
 
   public static List<CaptureMap> resolvedCaptureCollections;
+  public static String cleanedPath;
 
   /*
    * (non-Javadoc)
@@ -34,15 +35,29 @@ public class CaptureTestController extends AbstractCaptureController {
   @Override
   protected void handle(RoutingContext context, List<CaptureMap> resolvedCaptureCollections) {
     CaptureTestController.resolvedCaptureCollections = resolvedCaptureCollections;
+    if (!isDoReroute())
+      context.next();
   }
 
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.netrelay.controller.impl.AbstractController#initProperties(java.util.Properties)
+   * @see de.braintags.netrelay.controller.impl.AbstractCaptureController#internalInitProperties(java.util.Properties)
    */
   @Override
-  public void initProperties(Properties properties) {
+  protected void internalInitProperties(Properties properties) {
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.netrelay.controller.impl.AbstractCaptureController#cleanPath(io.vertx.ext.web.RoutingContext,
+   * java.util.List)
+   */
+  @Override
+  protected String cleanPath(RoutingContext context, List<CaptureMap> resolvedCaptureCollections) {
+    cleanedPath = super.cleanPath(context, resolvedCaptureCollections);
+    return cleanedPath;
   }
 
 }

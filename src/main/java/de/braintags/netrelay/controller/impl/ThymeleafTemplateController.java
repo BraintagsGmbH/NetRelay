@@ -31,6 +31,9 @@ import io.vertx.ext.web.templ.ThymeleafTemplateEngine;
  * 
  */
 public class ThymeleafTemplateController extends AbstractController {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(ThymeleafTemplateController.class);
+
   /**
    * The property, by which the mode of Thymeleaf is defined.
    */
@@ -133,6 +136,7 @@ public class ThymeleafTemplateController extends AbstractController {
    */
   @Override
   public void handle(RoutingContext event) {
+    LOGGER.info("handling template for url " + event.normalisedPath() + " | " + event.request().path());
     templateHandler.handle(event);
   }
 
