@@ -10,12 +10,15 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.netrelay.controller.impl;
+package de.braintags.netrelay.controller.impl.persistence;
 
 import java.util.List;
 import java.util.Properties;
 
+import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.netrelay.CaptureTestController;
+import de.braintags.netrelay.controller.Action;
+import de.braintags.netrelay.controller.impl.AbstractCaptureController;
 import de.braintags.netrelay.routing.CaptureCollection;
 import de.braintags.netrelay.routing.CaptureDefinition;
 import de.braintags.netrelay.routing.RouterDefinition;
@@ -28,12 +31,23 @@ import io.vertx.ext.web.RoutingContext;
  * 
  */
 public class PersistenceController extends AbstractCaptureController {
-
   /**
-   * 
+   * The name of a the property in the request, which specifies the mapper
    */
-  public PersistenceController() {
-  }
+  public static final String MAPPER_KEY = "mapper";
+  /**
+   * The name of the property in the request, which specifies the ID of a record
+   */
+  public static final String ID_KEY = "ID";
+  /**
+   * The name of the property in the request, which specifies the action
+   */
+  public static final String ACTION_KEY = "action";
+
+  private DisplayAction displayAction;
+  private InsertAction insertAction;
+  private UpdateAction updateAction;
+  private DeleteAction deleteAction;
 
   /*
    * (non-Javadoc)
@@ -43,6 +57,39 @@ public class PersistenceController extends AbstractCaptureController {
    */
   @Override
   protected void handle(RoutingContext context, List<CaptureMap> resolvedCaptureCollections) {
+    for (CaptureMap map : resolvedCaptureCollections) {
+      handle(context, map);
+    }
+  }
+
+  IMapper getMapper(String mapperName) {
+    throw new UnsupportedOperationException();
+    // return getNetRelay().getDatastore().getMapperFactory().
+  }
+
+  private void handle(RoutingContext context, CaptureMap map) {
+    String actionKey = map.get(ACTION_KEY);
+    Action action = actionKey == null ? Action.DISPLAY : Action.valueOf(actionKey);
+    switch (action) {
+    case DISPLAY:
+      displayAction.handle(context, map);
+      break;
+
+    case INSERT:
+      insertAction.handle(context, map);
+      break;
+
+    case UPDATE:
+      updateAction.handle(context, map);
+      break;
+
+    case DELETE:
+      deleteAction.handle(context, map);
+      break;
+
+    default:
+      throw new UnsupportedOperationException("unknown action: " + action);
+    }
   }
 
   /*
@@ -52,6 +99,10 @@ public class PersistenceController extends AbstractCaptureController {
    */
   @Override
   protected void internalInitProperties(Properties properties) {
+    displayAction = new DisplayAction(this);
+    insertAction = new InsertAction(this);
+    updateAction = new UpdateAction(this);
+    deleteAction = new DeleteAction(this);
   }
 
   /**
@@ -92,5 +143,4 @@ public class PersistenceController extends AbstractCaptureController {
     json.put(AUTO_CLEAN_PATH_PROPERTY, "true");
     return json;
   }
-
 }

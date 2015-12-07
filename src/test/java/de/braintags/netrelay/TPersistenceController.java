@@ -14,23 +14,23 @@ package de.braintags.netrelay;
 
 import org.junit.Test;
 
+import de.braintags.netrelay.controller.impl.persistence.PersistenceController;
 import de.braintags.netrelay.init.Settings;
-import de.braintags.netrelay.routing.CaptureCollection;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.unit.TestContext;
 
 /**
- * TEst the functions of {@link CaptureCollection}
+ * 
  * 
  * @author Michael Remme
  * 
  */
-public class TCaptureParameters extends AbstractCaptureParameterTest {
+public class TPersistenceController extends AbstractCaptureParameterTest {
 
   @Test
-  public void testParameters1(TestContext context) throws Exception {
+  public void testInsert(TestContext context) throws Exception {
     CaptureTestController.resolvedCaptureCollections = null;
-    testRequest(context, HttpMethod.GET, "/products/nase/12/tuEs/detail.html", 200, "OK");
+    testRequest(context, HttpMethod.GET, "/products/nase/12/INSERT/detail.html", 200, "OK");
     context.assertNotNull(CaptureTestController.resolvedCaptureCollections);
     context.assertEquals(1, CaptureTestController.resolvedCaptureCollections.size());
     assertValues(context, 0, "nase", "tuEs", "12");
@@ -46,18 +46,7 @@ public class TCaptureParameters extends AbstractCaptureParameterTest {
   protected void modifySettings(TestContext context, Settings settings) {
     super.modifySettings(context, settings);
     settings.getRouterDefinitions().add(0,
-        defineRouterDefinition(CaptureTestController.class, "/products/:entity/:ID/:action/detail.html"));
-    boolean exceptionRaised = false;
-    try {
-      // capture parameters and asterisk are not possible
-      settings.getRouterDefinitions().add(0,
-          defineRouterDefinition(CaptureTestController.class, "/animal/:entity/:ID/:action/*"));
-    } catch (IllegalArgumentException e) {
-      exceptionRaised = true;
-    }
-    if (!exceptionRaised) {
-      context.fail("Expected an Exception, which wasn't thrown");
-    }
+        defineRouterDefinition(PersistenceController.class, "/products/:entity/:ID/:action/detail.html"));
   }
 
 }
