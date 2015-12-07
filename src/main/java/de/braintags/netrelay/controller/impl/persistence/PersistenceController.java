@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Properties;
 
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
-import de.braintags.netrelay.CaptureTestController;
 import de.braintags.netrelay.controller.Action;
 import de.braintags.netrelay.controller.impl.AbstractCaptureController;
 import de.braintags.netrelay.routing.CaptureCollection;
@@ -123,9 +122,9 @@ public class PersistenceController extends AbstractCaptureController {
 
   private static CaptureCollection[] createDefaultCaptureCollection() {
     CaptureDefinition[] defs = new CaptureDefinition[3];
-    defs[0] = new CaptureDefinition("entity", CaptureTestController.MAPPER_KEY, false);
-    defs[1] = new CaptureDefinition("ID", CaptureTestController.ID_KEY, false);
-    defs[2] = new CaptureDefinition("action", CaptureTestController.ACTION_KEY, false);
+    defs[0] = new CaptureDefinition("entity", PersistenceController.MAPPER_KEY, false);
+    defs[1] = new CaptureDefinition("ID", PersistenceController.ID_KEY, false);
+    defs[2] = new CaptureDefinition("action", PersistenceController.ACTION_KEY, false);
     CaptureCollection collection = new CaptureCollection();
     collection.setCaptureDefinitions(defs);
     CaptureCollection[] cc = new CaptureCollection[] { collection };
