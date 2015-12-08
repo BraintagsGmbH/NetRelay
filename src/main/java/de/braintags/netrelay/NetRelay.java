@@ -201,4 +201,13 @@ public abstract class NetRelay extends AbstractVerticle {
     return datastore;
   }
 
+  /**
+   * Get the {@link Settings} which are configuring NetRelay
+   * 
+   * @return the settings
+   */
+  public Settings getSettings() {
+    return settings;
+  }
+
 }

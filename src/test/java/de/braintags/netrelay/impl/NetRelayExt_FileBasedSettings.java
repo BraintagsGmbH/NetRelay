@@ -14,6 +14,7 @@ package de.braintags.netrelay.impl;
 
 import de.braintags.netrelay.NetRelay;
 import de.braintags.netrelay.init.Settings;
+import de.braintags.netrelay.mapper.SimpleNetRelayMapper;
 
 /**
  * An extension of NetRelay which is loading the Settings from a file
@@ -22,6 +23,7 @@ import de.braintags.netrelay.init.Settings;
  * 
  */
 public class NetRelayExt_FileBasedSettings extends NetRelay {
+  public static final String SIMPLEMAPPER_NAME = "SimpleNetRelayMapper";
   private boolean settingsEdited = false;
 
   public NetRelayExt_FileBasedSettings() {
@@ -43,6 +45,7 @@ public class NetRelayExt_FileBasedSettings extends NetRelay {
   public Settings createDefaultSettings() {
     Settings settings = super.createDefaultSettings();
     settings.getDatastoreSettings().setDatabaseName("NetRelayExtended_DB");
+    settings.getMappingDefinitions().addMapperDefinition(SIMPLEMAPPER_NAME, SimpleNetRelayMapper.class);
     return settings;
   }
 
@@ -53,11 +56,25 @@ public class NetRelayExt_FileBasedSettings extends NetRelay {
    */
   @Override
   protected Settings initSettings() {
-    Settings settings = super.initSettings();
+    Settings settings = null;
+    if (settingsEdited) {
+      settings = initSettingsWithoutEditCheck();
+    } else {
+      settings = super.initSettings();
+    }
     if (settingsEdited) {
       settings.setEdited(true);
     }
     return settings;
+  }
+
+  protected Settings initSettingsWithoutEditCheck() {
+    try {
+      Settings settings = Settings.loadSettings(this, vertx, context);
+      return settings;
+    } catch (Exception e) {
+      throw e;
+    }
   }
 
 }

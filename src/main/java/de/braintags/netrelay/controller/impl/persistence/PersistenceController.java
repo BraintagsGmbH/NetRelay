@@ -15,9 +15,15 @@ package de.braintags.netrelay.controller.impl.persistence;
 import java.util.List;
 import java.util.Properties;
 
+import de.braintags.io.vertx.pojomapper.exception.InitException;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
+import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 import de.braintags.netrelay.controller.Action;
 import de.braintags.netrelay.controller.impl.AbstractCaptureController;
+import de.braintags.netrelay.exception.NoSuchMapperException;
+import de.braintags.netrelay.init.MappingDefinitions;
+import de.braintags.netrelay.init.Settings;
+import de.braintags.netrelay.mapping.NetRelayMapperFactory;
 import de.braintags.netrelay.routing.CaptureCollection;
 import de.braintags.netrelay.routing.CaptureDefinition;
 import de.braintags.netrelay.routing.RouterDefinition;
@@ -30,6 +36,14 @@ import io.vertx.ext.web.RoutingContext;
  * 
  */
 public class PersistenceController extends AbstractCaptureController {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(PersistenceController.class);
+
+  /**
+   * Get the name of the property, by which the class of the {@link IMapperFactory} can be defined.
+   */
+  public static final String MAPPERFACTORY_PROP = "mapperfactory";
+
   /**
    * The name of a the property in the request, which specifies the mapper
    */
@@ -42,6 +56,8 @@ public class PersistenceController extends AbstractCaptureController {
    * The name of the property in the request, which specifies the action
    */
   public static final String ACTION_KEY = "action";
+
+  private IMapperFactory mapperFactory;
 
   private DisplayAction displayAction;
   private InsertAction insertAction;
@@ -61,29 +77,44 @@ public class PersistenceController extends AbstractCaptureController {
     }
   }
 
+  /**
+   * Retrive the {@link IMapper} which is specified by the given mapperName.
+   * 
+   * @param mapperName
+   *          the name of the mapper. This name mus exist as definition inside the {@link MappingDefinitions} of the
+   *          {@link Settings}
+   * @return a mapper from the internal {@link IMapperFactory}
+   */
   IMapper getMapper(String mapperName) {
-    throw new UnsupportedOperationException();
-    // return getNetRelay().getDatastore().getMapperFactory().
+    Class mapperClass = getNetRelay().getSettings().getMappingDefinitions().getMapperClass(mapperName);
+    if (mapperClass == null) {
+      throw new NoSuchMapperException(mapperName);
+    }
+    return mapperFactory.getMapper(mapperClass);
   }
 
   private void handle(RoutingContext context, CaptureMap map) {
     String actionKey = map.get(ACTION_KEY);
     Action action = actionKey == null ? Action.DISPLAY : Action.valueOf(actionKey);
+    String mapperName = map.get(PersistenceController.MAPPER_KEY);
+    LOGGER.info(String.format("handling action %s on mapper %s", action, mapperName));
+    IMapper mapper = getMapper(mapperName);
+
     switch (action) {
     case DISPLAY:
-      displayAction.handle(context, map);
+      displayAction.handle(mapper, context, map);
       break;
 
     case INSERT:
-      insertAction.handle(context, map);
+      insertAction.handle(mapper, context, map);
       break;
 
     case UPDATE:
-      updateAction.handle(context, map);
+      updateAction.handle(mapper, context, map);
       break;
 
     case DELETE:
-      deleteAction.handle(context, map);
+      deleteAction.handle(mapper, context, map);
       break;
 
     default:
@@ -102,6 +133,12 @@ public class PersistenceController extends AbstractCaptureController {
     insertAction = new InsertAction(this);
     updateAction = new UpdateAction(this);
     deleteAction = new DeleteAction(this);
+    String mfName = properties.getProperty(MAPPERFACTORY_PROP, NetRelayMapperFactory.class.getName());
+    try {
+      mapperFactory = (IMapperFactory) Class.forName(mfName).newInstance();
+    } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+      throw new InitException(e);
+    }
   }
 
   /**
@@ -140,6 +177,7 @@ public class PersistenceController extends AbstractCaptureController {
     Properties json = new Properties();
     json.put(REROUTE_PROPERTY, "true");
     json.put(AUTO_CLEAN_PATH_PROPERTY, "true");
+    json.put(MAPPERFACTORY_PROP, NetRelayMapperFactory.class.getName());
     return json;
   }
 }

@@ -19,6 +19,7 @@ import de.braintags.io.vertx.pojomapper.exception.InitException;
 import de.braintags.io.vertx.pojomapper.testdatastore.TestHelper;
 import de.braintags.netrelay.impl.NetRelayExt_FileBasedSettings;
 import de.braintags.netrelay.init.Settings;
+import de.braintags.netrelay.mapper.SimpleNetRelayMapper;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.file.FileSystem;
@@ -82,16 +83,26 @@ public class TSettings {
     });
     async2.awaitSuccess();
 
-    // final Async async3 = context.async();
-    // NetRelayExt_FileBasedSettings netRelay = new NetRelayExt_FileBasedSettings(true);
-    // vertx.deployVerticle(netRelay, result -> {
-    // if (result.failed()) {
-    // context.fail(result.cause());
-    // } else {
-    // context.assertTrue(fs.existsBlocking(localSettingsFileNameUserDir));
-    // async3.complete();
-    // }
-    // });
+    final Async async3 = context.async();
+    NetRelayExt_FileBasedSettings netRelay = new NetRelayExt_FileBasedSettings(true);
+    vertx.deployVerticle(netRelay, result -> {
+      if (result.failed()) {
+        context.fail(result.cause());
+      } else {
+        context.assertTrue(fs.existsBlocking(localSettingsFileNameUserDir));
+        context.assertNotNull(netRelay.getSettings(), "Settings are null");
+        context.assertNotNull(netRelay.getSettings().getDatastoreSettings(), "Settings.datastoreSettings are null");
+        context.assertNotNull(netRelay.getSettings().getRouterDefinitions(), "Settings.getRouterDefinitions are null");
+        context.assertNotNull(netRelay.getSettings().getMappingDefinitions(),
+            "Settings.getMappingDefinitions are null");
+        Class definedMapperClass = netRelay.getSettings().getMappingDefinitions()
+            .getMapperClass(NetRelayExt_FileBasedSettings.SIMPLEMAPPER_NAME);
+        context.assertNotNull(definedMapperClass,
+            "mapperclass is null for key " + NetRelayExt_FileBasedSettings.SIMPLEMAPPER_NAME);
+        context.assertEquals(SimpleNetRelayMapper.class, definedMapperClass);
+        async3.complete();
+      }
+    });
 
   }
 

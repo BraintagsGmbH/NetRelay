@@ -74,7 +74,7 @@ public class NetRelayBaseTest {
   @BeforeClass
   public static void startup(TestContext context) throws Exception {
     LOGGER.debug("starting class");
-    vertx = Vertx.vertx(getOptions());
+    vertx = Vertx.vertx(getVertxOptions());
     client = vertx.createHttpClient(new HttpClientOptions().setDefaultPort(8080));
   }
 
@@ -105,7 +105,7 @@ public class NetRelayBaseTest {
     }
   }
 
-  protected static VertxOptions getOptions() {
+  protected static VertxOptions getVertxOptions() {
     return TestHelper.getOptions();
   }
 
