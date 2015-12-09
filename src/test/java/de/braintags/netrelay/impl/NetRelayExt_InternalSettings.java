@@ -14,6 +14,7 @@ package de.braintags.netrelay.impl;
 
 import de.braintags.netrelay.NetRelay;
 import de.braintags.netrelay.init.Settings;
+import de.braintags.netrelay.mapper.SimpleNetRelayMapper;
 
 /**
  * An extension of NetRelay which is getting the {@link Settings} from external
@@ -22,14 +23,16 @@ import de.braintags.netrelay.init.Settings;
  * 
  */
 public class NetRelayExt_InternalSettings extends NetRelay {
+  public static final String SIMPLEMAPPER_NAME = "SimpleNetRelayMapper";
   private Settings settings;
-  private boolean settingsLocked = false;
 
   /**
    * 
    */
   public NetRelayExt_InternalSettings() {
     settings = createDefaultSettings();
+    settings.getDatastoreSettings().setDatabaseName("NetRelayExtended_DB");
+    settings.getMappingDefinitions().addMapperDefinition(SIMPLEMAPPER_NAME, SimpleNetRelayMapper.class);
   }
 
   /*
@@ -39,7 +42,6 @@ public class NetRelayExt_InternalSettings extends NetRelay {
    */
   @Override
   protected Settings initSettings() {
-    settingsLocked = true;
     return settings;
   }
 
@@ -48,9 +50,8 @@ public class NetRelayExt_InternalSettings extends NetRelay {
    * 
    * @return
    */
+  @Override
   public Settings getSettings() {
-    if (settingsLocked)
-      throw new IllegalArgumentException("Settings were used already, no more possible to modify external");
     return settings;
   }
 }

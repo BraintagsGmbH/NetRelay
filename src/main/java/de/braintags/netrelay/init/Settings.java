@@ -59,6 +59,7 @@ public class Settings {
   private List<RouterDefinition> routerDefinitions = new ArrayList<>();
   private DataStoreSettings datastoreSettings;
   private boolean edited = false;
+  private MappingDefinitions mappingDefinitions = new MappingDefinitions();
 
   /**
    * 
@@ -195,6 +196,22 @@ public class Settings {
    */
   public final void setEdited(boolean edited) {
     this.edited = edited;
+  }
+
+  /**
+   * The {@link MappingDefinitions} used by this instance
+   * @return the mappingDefinitions
+   */
+  public MappingDefinitions getMappingDefinitions() {
+    return mappingDefinitions;
+  }
+
+  /**
+   * The {@link MappingDefinitions} used by this instance
+   * @param mappingDefinitions the mappingDefinitions to set
+   */
+  public void setMappingDefinitions(MappingDefinitions mappingDefinitions) {
+    this.mappingDefinitions = mappingDefinitions;
   }
 
 }

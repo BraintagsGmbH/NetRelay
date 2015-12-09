@@ -15,7 +15,9 @@ package de.braintags.netrelay;
 import org.junit.Test;
 
 import de.braintags.netrelay.controller.impl.persistence.PersistenceController;
+import de.braintags.netrelay.impl.NetRelayExt_FileBasedSettings;
 import de.braintags.netrelay.init.Settings;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.unit.TestContext;
 
@@ -29,12 +31,45 @@ public class TPersistenceController extends AbstractCaptureParameterTest {
 
   @Test
   public void testInsert(TestContext context) throws Exception {
-    CaptureTestController.resolvedCaptureCollections = null;
-    testRequest(context, HttpMethod.GET, "/products/nase/12/INSERT/detail.html", 200, "OK");
-    context.assertNotNull(CaptureTestController.resolvedCaptureCollections);
-    context.assertEquals(1, CaptureTestController.resolvedCaptureCollections.size());
-    assertValues(context, 0, "nase", "tuEs", "12");
-    context.assertEquals("/products/detail.html", CaptureTestController.cleanedPath);
+    try {
+      String url = String.format("/products/%s/INSERT/detail.html", NetRelayExt_FileBasedSettings.SIMPLEMAPPER_NAME);
+      testRequest(context, HttpMethod.POST, url, req -> {
+        Buffer buffer = Buffer.buffer();
+        buffer.appendString("origin=junit-testUserAlias&login=admin%40foo.bar&pass+word=admin");
+        buffer.appendString("&").appendString(NetRelayExt_FileBasedSettings.SIMPLEMAPPER_NAME)
+            .appendString(".name=myFirstName");
+        req.headers().set("content-length", String.valueOf(buffer.length()));
+        req.headers().set("content-type", "application/x-www-form-urlencoded");
+        req.write(buffer);
+      } , 200, "OK", null);
+
+      // testRequest(context, HttpMethod.GET, "/products/nase/INSERT/detail.html", 200, "OK");
+      //
+      // testRequest(HttpMethod.POST, "/", rq -> {
+      // Buffer buffer = Buffer.buffer();
+      // buffer.appendString("origin=junit-testUserAlias&login=admin%40foo.bar&pass+word=admin");
+      // rq.headers().set("content-length", String.valueOf(buffer.length()));
+      // rq.headers().set("content-type", "application/x-www-form-urlencoded");
+      // rq.write(buffer);
+      // } , 200, "OK", null);
+      //
+      // testRequest(HttpMethod.POST, "/?p1=foo", req -> {
+      // String boundary = "dLV9Wyq26L_-JQxk6ferf-RT153LhOO";
+      // Buffer buffer = Buffer.buffer();
+      // String str = "--" + boundary + "\r\n" + "Content-Disposition: form-data; name=\"attr1\"\r\n\r\nTim\r\n" + "--"
+      // + boundary + "\r\n" + "Content-Disposition: form-data; name=\"attr2\"\r\n\r\nJulien\r\n" + "--" + boundary
+      // + "--\r\n";
+      // buffer.appendString(str);
+      // req.headers().set("content-length", String.valueOf(buffer.length()));
+      // req.headers().set("content-type", "multipart/form-data; boundary=" + boundary);
+      // req.write(buffer);
+      // } , 200, "OK", null);
+      //
+      // assertValues(context, 0, "nase", "tuEs", "12");
+      // context.assertEquals("/products/detail.html", CaptureTestController.cleanedPath);
+    } catch (Exception e) {
+      context.fail(e);
+    }
   }
 
   /*
@@ -46,7 +81,7 @@ public class TPersistenceController extends AbstractCaptureParameterTest {
   protected void modifySettings(TestContext context, Settings settings) {
     super.modifySettings(context, settings);
     settings.getRouterDefinitions().add(0,
-        defineRouterDefinition(PersistenceController.class, "/products/:entity/:ID/:action/detail.html"));
+        defineRouterDefinition(PersistenceController.class, "/products/:entity/:action/detail.html"));
   }
 
 }

@@ -12,6 +12,7 @@
  */
 package de.braintags.netrelay.controller.impl.persistence;
 
+import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.netrelay.controller.impl.AbstractCaptureController.CaptureMap;
 import io.vertx.ext.web.RoutingContext;
 
@@ -37,7 +38,7 @@ public class DisplayAction extends AbstractAction {
    * de.braintags.netrelay.controller.impl.AbstractCaptureController.CaptureMap)
    */
   @Override
-  void handle(RoutingContext context, CaptureMap map) {
+  void handle(IMapper mapper, RoutingContext context, CaptureMap map) {
     throw new UnsupportedOperationException();
   }
 
