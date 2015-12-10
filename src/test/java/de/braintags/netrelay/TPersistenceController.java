@@ -40,6 +40,9 @@ public class TPersistenceController extends AbstractCaptureParameterTest {
         buffer.appendString("origin=junit-testUserAlias&login=admin%40foo.bar&pass+word=admin");
         buffer.appendString("&").appendString(NetRelayExt_FileBasedSettings.SIMPLEMAPPER_NAME)
             .appendString(".name=myFirstName");
+        buffer.appendString("&").appendString(NetRelayExt_FileBasedSettings.SIMPLEMAPPER_NAME).appendString(".age=18");
+        buffer.appendString("&").appendString(NetRelayExt_FileBasedSettings.SIMPLEMAPPER_NAME)
+            .appendString(".child=true");
         req.headers().set("content-length", String.valueOf(buffer.length()));
         req.headers().set("content-type", "application/x-www-form-urlencoded");
         req.write(buffer);

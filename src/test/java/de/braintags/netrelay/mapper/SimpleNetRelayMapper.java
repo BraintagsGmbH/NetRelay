@@ -24,5 +24,7 @@ import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRec
 @Entity
 public class SimpleNetRelayMapper extends BaseRecord {
   public String name;
+  public int age;
+  public boolean child;
 
 }
