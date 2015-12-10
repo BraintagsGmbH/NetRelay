@@ -101,6 +101,21 @@ public class RouterDefinitions {
   }
 
   /**
+   * Remove the {@link RouterDefinition} with the specified name
+   * 
+   * @param defName
+   *          the name of the definition to be removed
+   * @return the removed {@link RouterDefinition} or null
+   */
+  public RouterDefinition remove(String defName) {
+    int position = getPosition(defName);
+    if (position >= 0) {
+      return routerDefinitions.remove(position);
+    }
+    return null;
+  }
+
+  /**
    * Get the {@link RouterDefinition} with the specified name
    * 
    * @param name

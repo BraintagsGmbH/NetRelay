@@ -14,9 +14,11 @@ package de.braintags.netrelay;
 
 import org.junit.Test;
 
+import de.braintags.netrelay.controller.impl.BodyController;
 import de.braintags.netrelay.controller.impl.persistence.PersistenceController;
 import de.braintags.netrelay.impl.NetRelayExt_FileBasedSettings;
 import de.braintags.netrelay.init.Settings;
+import de.braintags.netrelay.routing.RouterDefinition;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.unit.TestContext;
@@ -80,8 +82,9 @@ public class TPersistenceController extends AbstractCaptureParameterTest {
   @Override
   protected void modifySettings(TestContext context, Settings settings) {
     super.modifySettings(context, settings);
-    settings.getRouterDefinitions().add(0,
-        defineRouterDefinition(PersistenceController.class, "/products/:entity/:action/detail.html"));
+    RouterDefinition def = settings.getRouterDefinitions().remove(PersistenceController.class.getSimpleName());
+    def.setRoutes(new String[] { "/products/:entity/:action/detail.html" });
+    settings.getRouterDefinitions().addAfter(BodyController.class.getSimpleName(), def);
   }
 
 }

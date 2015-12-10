@@ -142,13 +142,13 @@ public class Settings {
   private static Settings loadSettings(NetRelay netRelay, Vertx vertx, String path) {
     FileSystem fs = vertx.fileSystem();
     if (fs.existsBlocking(path)) {
-      LOGGER.debug("going to load settings from " + path);
+      LOGGER.info("going to load settings from " + path);
       Buffer buffer = fs.readFileBlocking(path);
       Settings settings = Json.decodeValue(buffer.toString(), Settings.class);
-      LOGGER.debug("settings successfully loaded from " + path);
+      LOGGER.info("settings successfully loaded from " + path);
       return settings;
     } else {
-      LOGGER.debug("creating default settings and store them in " + path);
+      LOGGER.info("creating default settings and store them in " + path);
       Settings settings = netRelay.createDefaultSettings();
       fs.writeFileBlocking(path, Buffer.buffer(Json.encode(settings)));
       throw new FileSystemException("File did not exist and was created new in path " + path);

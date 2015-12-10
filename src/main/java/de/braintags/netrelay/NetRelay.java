@@ -193,12 +193,13 @@ public abstract class NetRelay extends AbstractVerticle {
     settings.getRouterDefinitions().add(SessionController.createDefaultRouterDefinition());
     // settings.getRouterDefinitions().add(UserSessionController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(TimeoutController.createDefaultRouterDefinition());
+    settings.getRouterDefinitions().add(BodyController.createDefaultRouterDefinition());
 
     settings.getRouterDefinitions().add(RedirectController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(StaticController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(AuthenticationController.createDefaultRouterDefinition());
-    settings.getRouterDefinitions().add(PersistenceController.createDefaultRouterDefinition());
-    settings.getRouterDefinitions().add(BodyController.createDefaultRouterDefinition());
+    settings.getRouterDefinitions().addAfter(BodyController.class.getSimpleName(),
+        PersistenceController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(ThymeleafTemplateController.createDefaultRouterDefinition());
 
     settings.getRouterDefinitions().add(FailureController.createDefaultRouterDefinition());
