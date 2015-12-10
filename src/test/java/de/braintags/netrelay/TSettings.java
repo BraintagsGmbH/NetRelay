@@ -47,7 +47,6 @@ public class TSettings {
    */
   @Test
   public void testInitSettingsNewInUserDir(TestContext context) {
-
     context.remove(Settings.SETTINGS_LOCATION_PROPERTY);
     context.assertNotNull(vertx);
     FileSystem fs = vertx.fileSystem();
@@ -110,7 +109,7 @@ public class TSettings {
    * Check for a file inside another location.
    * 
    */
-  @Test
+  // @Test
   public void testInitSettingsFromOtherDir(TestContext context) {
     context.assertNotNull(vertx);
     FileSystem fs = vertx.fileSystem();

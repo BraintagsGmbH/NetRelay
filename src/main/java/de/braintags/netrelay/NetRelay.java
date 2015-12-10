@@ -166,10 +166,9 @@ public abstract class NetRelay extends AbstractVerticle {
    */
   @Override
   public void stop(Future<Void> stopFuture) throws Exception {
-    super.stop(stopFuture);
     getDatastore().shutdown(result -> {
       if (result.failed()) {
-        stopFuture.fail(result.cause());
+        stopFuture.fail(new RuntimeException(result.cause()));
       } else {
         stopFuture.complete();
       }

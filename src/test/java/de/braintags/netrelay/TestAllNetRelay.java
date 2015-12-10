@@ -17,14 +17,14 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 /**
- * 
+ * LET TSettings the last class
  * 
  * @author Michael Remme
  * 
  */
 @RunWith(Suite.class)
-@SuiteClasses({ TRequestUtil.class, TSettings.class, TStandardRequests.class, TTemplateController.class,
-    TCaptureParameters.class, TPersistenceController.class })
+@SuiteClasses({ TRequestUtil.class, TStandardRequests.class, TTemplateController.class, TCaptureParameters.class,
+    TPersistenceController.class, TSettings.class })
 public class TestAllNetRelay {
   // -DBlockedThreadCheckInterval=10000000 -DWarningExceptionTime=10000000 -DtestTimeout=5
   // -Djava.util.logging.config.file=src/main/resources/logging.properties
