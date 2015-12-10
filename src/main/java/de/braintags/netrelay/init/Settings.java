@@ -12,12 +12,9 @@
  */
 package de.braintags.netrelay.init;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import de.braintags.io.vertx.pojomapper.init.DataStoreSettings;
 import de.braintags.netrelay.NetRelay;
-import de.braintags.netrelay.routing.RouterDefinition;
+import de.braintags.netrelay.routing.RouterDefinitions;
 import io.vertx.core.Context;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
@@ -56,18 +53,14 @@ public class Settings {
   public static final String LOCAL_USER_DIRECTORY = System.getProperty("user.home") + "/" + ".netrelay";
 
   private int serverPort = 8080;
-  private List<RouterDefinition> routerDefinitions = new ArrayList<>();
+  private RouterDefinitions routerDefinitions = new RouterDefinitions();
   private DataStoreSettings datastoreSettings;
   private boolean edited = false;
   private MappingDefinitions mappingDefinitions = new MappingDefinitions();
 
   /**
+   * The port, where the server shall run on
    * 
-   */
-  public Settings() {
-  }
-
-  /**
    * @return the serverPort
    */
   public final int getServerPort() {
@@ -75,6 +68,8 @@ public class Settings {
   }
 
   /**
+   * The port, where the server shall run on
+   * 
    * @param serverPort
    *          the serverPort to set
    */
@@ -83,33 +78,21 @@ public class Settings {
   }
 
   /**
-   * Get the {@link RouterDefinition} with the specified name
+   * the {@link RouterDefinitions} for the current settings
    * 
-   * @param name
-   *          the name of the definition to search for
-   * @return a definition with the given name or null
-   */
-  public RouterDefinition getNamedDefinition(String name) {
-    for (RouterDefinition def : routerDefinitions) {
-      if (def.getName().equals(name)) {
-        return def;
-      }
-    }
-    return null;
-  }
-
-  /**
    * @return the routerDefinitions
    */
-  public final List<RouterDefinition> getRouterDefinitions() {
+  public final RouterDefinitions getRouterDefinitions() {
     return routerDefinitions;
   }
 
   /**
+   * the {@link RouterDefinitions} for the current settings
+   * 
    * @param routerDefinitions
    *          the routerDefinitions to set
    */
-  public final void setRouterDefinitions(List<RouterDefinition> routerDefinitions) {
+  public final void setRouterDefinitions(RouterDefinitions routerDefinitions) {
     this.routerDefinitions = routerDefinitions;
   }
 
@@ -200,6 +183,7 @@ public class Settings {
 
   /**
    * The {@link MappingDefinitions} used by this instance
+   * 
    * @return the mappingDefinitions
    */
   public MappingDefinitions getMappingDefinitions() {
@@ -208,7 +192,9 @@ public class Settings {
 
   /**
    * The {@link MappingDefinitions} used by this instance
-   * @param mappingDefinitions the mappingDefinitions to set
+   * 
+   * @param mappingDefinitions
+   *          the mappingDefinitions to set
    */
   public void setMappingDefinitions(MappingDefinitions mappingDefinitions) {
     this.mappingDefinitions = mappingDefinitions;

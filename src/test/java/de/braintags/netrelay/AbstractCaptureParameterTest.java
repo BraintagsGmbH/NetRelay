@@ -12,6 +12,7 @@
  */
 package de.braintags.netrelay;
 
+import de.braintags.netrelay.controller.CaptureTestController;
 import de.braintags.netrelay.controller.impl.AbstractCaptureController.CaptureMap;
 import de.braintags.netrelay.routing.CaptureCollection;
 import de.braintags.netrelay.routing.CaptureDefinition;

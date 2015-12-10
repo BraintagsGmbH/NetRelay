@@ -20,6 +20,7 @@
 		<thymeleaf.version>2.1.4.RELEASE</thymeleaf.version>
 		<pojomapper.version>1.0.1-SNAPSHOT</pojomapper.version>
 		<vertx.web.version>3.2.0-SNAPSHOT</vertx.web.version>
+		<asciidoc.dir>${project.basedir}/src/docs/asciidoc</asciidoc.dir>
 	</properties>
 
 	<dependencies>
@@ -27,6 +28,12 @@
 			<groupId>de.braintags</groupId>
 			<artifactId>vertx-pojo-mapper-mysql</artifactId>
 			<version>${pojomapper.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>netty-all</artifactId>
+					<groupId>io.netty</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>de.braintags</groupId>

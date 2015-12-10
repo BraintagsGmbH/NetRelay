@@ -10,7 +10,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.netrelay;
+package de.braintags.netrelay.controller;
 
 import java.util.List;
 import java.util.Properties;
