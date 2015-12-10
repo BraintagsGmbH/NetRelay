@@ -12,11 +12,8 @@
  */
 package de.braintags.netrelay.controller.impl.persistence;
 
-import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.netrelay.controller.impl.AbstractCaptureController.CaptureMap;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
 import io.vertx.ext.web.RoutingContext;
 
 /**
@@ -35,7 +32,7 @@ public class UpdateAction extends AbstractAction {
   }
 
   @Override
-  void handle(IDataStore datastore, String entity, IMapper mapper, RoutingContext context, CaptureMap map, Handler<AsyncResult<Void>> handler) {
+  void handle(IMapper mapper, RoutingContext context, CaptureMap map) {
     throw new UnsupportedOperationException();
   }
 

@@ -82,7 +82,6 @@ public class NetRelayBaseTest {
   public static void shutdown(TestContext context) throws Exception {
     LOGGER.debug("performing shutdown");
     netRelay.stop();
-    netRelay = null;
 
     // Async as = context.async();
     // Future<Void> stopFuture = Future.future();
@@ -100,7 +99,6 @@ public class NetRelayBaseTest {
     if (vertx != null) {
       Async async = context.async();
       vertx.close(ar -> {
-        vertx = null;
         async.complete();
       });
       async.awaitSuccess();
@@ -142,11 +140,8 @@ public class NetRelayBaseTest {
    */
   protected void modifySettings(TestContext context, Settings settings) {
     settings.getDatastoreSettings().setDatabaseName(getClass().getSimpleName());
-    RouterDefinition def = settings.getRouterDefinitions()
-        .getNamedDefinition(ThymeleafTemplateController.class.getSimpleName());
-    if (def != null) {
-      def.getHandlerProperties().setProperty(ThymeleafTemplateController.TEMPLATE_DIRECTORY_PROPERTY, "testTemplates");
-    }
+    RouterDefinition def = settings.getNamedDefinition(ThymeleafTemplateController.class.getSimpleName());
+    def.getHandlerProperties().setProperty(ThymeleafTemplateController.TEMPLATE_DIRECTORY_PROPERTY, "testTemplates");
   }
 
   protected final void testRequest(TestContext context, HttpMethod method, String path, int statusCode,

@@ -28,12 +28,6 @@
 			<groupId>de.braintags</groupId>
 			<artifactId>vertx-pojo-mapper-mysql</artifactId>
 			<version>${pojomapper.version}</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>netty-all</artifactId>
-					<groupId>io.netty</groupId>
-				</exclusion>
-			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>de.braintags</groupId>

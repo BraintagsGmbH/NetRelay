@@ -19,14 +19,12 @@ import de.braintags.io.vertx.pojomapper.exception.InitException;
 import de.braintags.io.vertx.pojomapper.init.IDataStoreInit;
 import de.braintags.io.vertx.pojomapper.mongo.init.MongoDataStoreInit;
 import de.braintags.netrelay.controller.impl.AuthenticationController;
-import de.braintags.netrelay.controller.impl.BodyController;
 import de.braintags.netrelay.controller.impl.CookieController;
 import de.braintags.netrelay.controller.impl.FailureController;
 import de.braintags.netrelay.controller.impl.RedirectController;
 import de.braintags.netrelay.controller.impl.SessionController;
 import de.braintags.netrelay.controller.impl.StaticController;
 import de.braintags.netrelay.controller.impl.ThymeleafTemplateController;
-import de.braintags.netrelay.controller.impl.TimeoutController;
 import de.braintags.netrelay.controller.impl.persistence.PersistenceController;
 import de.braintags.netrelay.init.Settings;
 import de.braintags.netrelay.routing.RouterDefinition;
@@ -52,7 +50,6 @@ public abstract class NetRelay extends AbstractVerticle {
   // to be able to handle multiple datastores, an IDatastoreCollection will come from pojo-mapper later
   private IDataStore datastore;
   private Settings settings;
-  private Router router;
 
   /**
    * 
@@ -83,7 +80,7 @@ public abstract class NetRelay extends AbstractVerticle {
 
   private void init(Future<Void> startFuture) {
     try {
-      router = Router.router(vertx);
+      Router router = initRouter();
       initControlller(router);
       initHttpServer(router);
       startFuture.complete();
@@ -93,21 +90,12 @@ public abstract class NetRelay extends AbstractVerticle {
   }
 
   /**
-   * Get the router, which is used by NetRelay
-   * 
-   * @return the router
-   */
-  private Router getRouter() {
-    return router;
-  }
-
-  /**
    * Init the definitions inside {@link Settings#getRouterDefinitions()}
    * 
    * @throws Exception
    */
   protected void initControlller(Router router) throws Exception {
-    List<RouterDefinition> rd = settings.getRouterDefinitions().getRouterDefinitions();
+    List<RouterDefinition> rd = settings.getRouterDefinitions();
     for (RouterDefinition def : rd) {
       RoutingInit.initRoutingDefinition(vertx, this, router, def);
     }
@@ -153,6 +141,10 @@ public abstract class NetRelay extends AbstractVerticle {
     });
   }
 
+  private Router initRouter() {
+    return Router.router(vertx);
+  }
+
   private void initHttpServer(Router router) {
     HttpServerOptions options = new HttpServerOptions().setPort(settings.getServerPort());
     HttpServer server = vertx.createHttpServer(options);
@@ -188,17 +180,13 @@ public abstract class NetRelay extends AbstractVerticle {
     return settings;
   }
 
-  protected void addDefaultRouterDefinitions(Settings settings) {
+  private void addDefaultRouterDefinitions(Settings settings) {
     settings.getRouterDefinitions().add(CookieController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(SessionController.createDefaultRouterDefinition());
-    // settings.getRouterDefinitions().add(UserSessionController.createDefaultRouterDefinition());
-    settings.getRouterDefinitions().add(TimeoutController.createDefaultRouterDefinition());
-
     settings.getRouterDefinitions().add(RedirectController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(StaticController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(AuthenticationController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(PersistenceController.createDefaultRouterDefinition());
-    settings.getRouterDefinitions().add(BodyController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(ThymeleafTemplateController.createDefaultRouterDefinition());
 
     settings.getRouterDefinitions().add(FailureController.createDefaultRouterDefinition());
@@ -222,13 +210,4 @@ public abstract class NetRelay extends AbstractVerticle {
     return settings;
   }
 
-  /**
-   * Resets and rebuilds the routes by using the {@link Settings#getRouterDefinitions()}
-   * 
-   * @throws Exception
-   */
-  public void resetRoutes() throws Exception {
-    getRouter().clear();
-    initControlller(router);
-  }
 }

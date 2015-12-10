@@ -15,7 +15,6 @@ package de.braintags.netrelay.controller.impl.persistence;
 import java.util.List;
 import java.util.Properties;
 
-import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.exception.InitException;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
@@ -95,36 +94,28 @@ public class PersistenceController extends AbstractCaptureController {
   }
 
   private void handle(RoutingContext context, CaptureMap map) {
-    AbstractAction action = resolveAction(map);
+    String actionKey = map.get(ACTION_KEY);
+    Action action = actionKey == null ? Action.DISPLAY : Action.valueOf(actionKey);
     String mapperName = map.get(PersistenceController.MAPPER_KEY);
     LOGGER.info(String.format("handling action %s on mapper %s", action, mapperName));
     IMapper mapper = getMapper(mapperName);
-    IDataStore datastore = getNetRelay().getDatastore();
-    action.handle(datastore, mapperName, mapper, context, map, result -> {
-      if (result.failed()) {
-        context.fail(result.cause());
-      } else {
-        context.next();
-      }
-    });
 
-  }
-
-  private AbstractAction resolveAction(CaptureMap map) {
-    String actionKey = map.get(ACTION_KEY);
-    Action action = actionKey == null ? Action.DISPLAY : Action.valueOf(actionKey);
     switch (action) {
     case DISPLAY:
-      return displayAction;
+      displayAction.handle(mapper, context, map);
+      break;
 
     case INSERT:
-      return insertAction;
+      insertAction.handle(mapper, context, map);
+      break;
 
     case UPDATE:
-      return updateAction;
+      updateAction.handle(mapper, context, map);
+      break;
 
     case DELETE:
-      return deleteAction;
+      deleteAction.handle(mapper, context, map);
+      break;
 
     default:
       throw new UnsupportedOperationException("unknown action: " + action);
