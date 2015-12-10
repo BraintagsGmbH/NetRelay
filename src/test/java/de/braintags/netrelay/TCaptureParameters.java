@@ -14,6 +14,7 @@ package de.braintags.netrelay;
 
 import org.junit.Test;
 
+import de.braintags.netrelay.controller.CaptureTestController;
 import de.braintags.netrelay.init.Settings;
 import de.braintags.netrelay.routing.CaptureCollection;
 import io.vertx.core.http.HttpMethod;

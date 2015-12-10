@@ -1,6 +1,6 @@
 /*
  * #%L
- * netrelay
+ * vertx-pojongo
  * %%
  * Copyright (C) 2015 Braintags GmbH
  * %%
@@ -16,21 +16,16 @@ import java.util.Properties;
 
 import de.braintags.netrelay.routing.RouterDefinition;
 import io.vertx.ext.web.RoutingContext;
-import io.vertx.ext.web.handler.CookieHandler;
 
 /**
  * 
  * 
- * @author mremme
+ * @author Michael Remme
  * 
  */
-public class CookieController extends AbstractController {
-  private CookieHandler cookieHandler;
+public class UserSessionController extends AbstractController {
 
-  @Override
-  public void initProperties(Properties properties) {
-    cookieHandler = CookieHandler.create();
-  }
+  public static final String AUTHPROVIDER_PROP = "authProvider";
 
   /*
    * (non-Javadoc)
@@ -39,7 +34,16 @@ public class CookieController extends AbstractController {
    */
   @Override
   public void handle(RoutingContext event) {
-    cookieHandler.handle(event);
+    throw new UnsupportedOperationException();
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.netrelay.controller.impl.AbstractController#initProperties(java.util.Properties)
+   */
+  @Override
+  public void initProperties(Properties properties) {
   }
 
   /**
@@ -49,9 +53,9 @@ public class CookieController extends AbstractController {
    */
   public static RouterDefinition createDefaultRouterDefinition() {
     RouterDefinition def = new RouterDefinition();
-    def.setName(CookieController.class.getSimpleName());
+    def.setName(UserSessionController.class.getSimpleName());
     def.setBlocking(false);
-    def.setController(CookieController.class);
+    def.setController(UserSessionController.class);
     def.setHandlerProperties(getDefaultProperties());
     return def;
   }
