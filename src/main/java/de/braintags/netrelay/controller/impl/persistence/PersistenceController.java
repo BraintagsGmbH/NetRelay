@@ -17,12 +17,17 @@ import java.util.Properties;
 
 import de.braintags.io.vertx.pojomapper.exception.InitException;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
+import de.braintags.io.vertx.util.CounterObject;
+import de.braintags.io.vertx.util.ErrorObject;
 import de.braintags.netrelay.controller.Action;
 import de.braintags.netrelay.controller.impl.AbstractCaptureController;
 import de.braintags.netrelay.mapping.NetRelayMapperFactory;
 import de.braintags.netrelay.routing.CaptureCollection;
 import de.braintags.netrelay.routing.CaptureDefinition;
 import de.braintags.netrelay.routing.RouterDefinition;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.ext.web.RoutingContext;
 
 /**
@@ -67,24 +72,33 @@ public class PersistenceController extends AbstractCaptureController {
    * java.util.List)
    */
   @Override
-  protected void handle(RoutingContext context, List<CaptureMap> resolvedCaptureCollections) {
+  protected void handle(RoutingContext context, List<CaptureMap> resolvedCaptureCollections,
+      Handler<AsyncResult<Void>> handler) {
+    ErrorObject<Void> err = new ErrorObject<>(handler);
+    CounterObject co = new CounterObject(resolvedCaptureCollections.size());
+
     for (CaptureMap map : resolvedCaptureCollections) {
-      handle(context, map);
+      handle(context, map, result -> {
+        if (result.failed()) {
+          err.setThrowable(result.cause());
+        } else {
+          if (co.reduce()) {
+            handler.handle(Future.succeededFuture());
+          }
+        }
+      });
+      if (err.isError()) {
+        return;
+      }
     }
   }
 
-  private void handle(RoutingContext context, CaptureMap map) {
+  private void handle(RoutingContext context, CaptureMap map, Handler<AsyncResult<Void>> handler) {
     AbstractAction action = resolveAction(map);
     String mapperName = map.get(PersistenceController.MAPPER_KEY);
-    LOGGER.info(String.format("handling action %s on mapper %s", action, mapperName));
-    action.handle(mapperName, context, map, result -> {
-      if (result.failed()) {
-        context.fail(result.cause());
-      } else {
-        context.next();
-      }
-    });
 
+    LOGGER.info(String.format("handling action %s on mapper %s", action, mapperName));
+    action.handle(mapperName, context, map, handler);
   }
 
   private AbstractAction resolveAction(CaptureMap map) {
@@ -135,7 +149,7 @@ public class PersistenceController extends AbstractCaptureController {
   public static RouterDefinition createDefaultRouterDefinition() {
     RouterDefinition def = new RouterDefinition();
     def.setName(PersistenceController.class.getSimpleName());
-    def.setBlocking(false);
+    def.setBlocking(true);
     def.setController(PersistenceController.class);
     def.setHandlerProperties(getDefaultProperties());
     def.setRoutes(new String[] { "/persistenceController/:entity/:ID/:action/read.html" });

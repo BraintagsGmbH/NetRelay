@@ -16,6 +16,9 @@ import java.util.List;
 import java.util.Properties;
 
 import de.braintags.netrelay.controller.impl.AbstractCaptureController;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.ext.web.RoutingContext;
 
 public class CaptureTestController extends AbstractCaptureController {
@@ -33,10 +36,11 @@ public class CaptureTestController extends AbstractCaptureController {
    * java.util.List)
    */
   @Override
-  protected void handle(RoutingContext context, List<CaptureMap> resolvedCaptureCollections) {
+  protected void handle(RoutingContext context, List<CaptureMap> resolvedCaptureCollections,
+      Handler<AsyncResult<Void>> handler) {
     CaptureTestController.resolvedCaptureCollections = resolvedCaptureCollections;
-    if (!isDoReroute())
-      context.next();
+    handler.handle(Future.succeededFuture());
+    ;
   }
 
   /*

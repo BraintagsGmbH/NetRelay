@@ -18,6 +18,7 @@ import de.braintags.io.vertx.pojomapper.mapping.impl.AbstractStoreObjectFactory;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.ext.web.RoutingContext;
 
 /**
  * The {@link NetRelayStoreObjectFactory} is used, when instances shall be created from the information of a request.
@@ -27,33 +28,28 @@ import io.vertx.core.Handler;
  */
 public class NetRelayStoreObjectFactory extends AbstractStoreObjectFactory {
 
-  /**
-   * 
-   */
-  public NetRelayStoreObjectFactory() {
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * de.braintags.io.vertx.pojomapper.mapping.IStoreObjectFactory#createStoreObject(de.braintags.io.vertx.pojomapper.
-   * mapping.IMapper, java.lang.Object, io.vertx.core.Handler)
-   */
   @Override
   public void createStoreObject(IMapper mapper, Object entity, Handler<AsyncResult<IStoreObject<?>>> handler) {
-    handler.handle(Future.failedFuture(new UnsupportedOperationException()));
+    NetRelayStoreObject storeObject = new NetRelayStoreObject(mapper, entity);
+    storeObject.initFromEntity(initResult -> {
+      if (initResult.failed()) {
+        handler.handle(Future.failedFuture(initResult.cause()));
+      } else {
+        handler.handle(Future.succeededFuture(storeObject));
+      }
+    });
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IStoreObjectFactory#createStoreObject(java.lang.Object,
-   * de.braintags.io.vertx.pojomapper.mapping.IMapper, io.vertx.core.Handler)
-   */
   @Override
   public void createStoreObject(Object storedObject, IMapper mapper, Handler<AsyncResult<IStoreObject<?>>> handler) {
-    handler.handle(Future.failedFuture(new UnsupportedOperationException()));
+    NetRelayStoreObject storeObject = new NetRelayStoreObject((RoutingContext) storedObject, mapper);
+    storeObject.initToEntity(result -> {
+      if (result.failed()) {
+        handler.handle(Future.failedFuture(result.cause()));
+      } else {
+        handler.handle(Future.succeededFuture(storeObject));
+      }
+    });
   }
 
 }

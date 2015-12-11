@@ -23,6 +23,8 @@ import de.braintags.netrelay.RequestUtil;
 import de.braintags.netrelay.controller.IController;
 import de.braintags.netrelay.routing.CaptureCollection;
 import de.braintags.netrelay.routing.CaptureDefinition;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
 import io.vertx.ext.web.RoutingContext;
 
 /**
@@ -83,15 +85,31 @@ public abstract class AbstractCaptureController extends AbstractController {
   @Override
   public final void handle(RoutingContext context) {
     List<CaptureMap> resolvedCaptureCollections = resolveCaptureCollections(context);
-    handle(context, resolvedCaptureCollections);
-    handleReroute(context, resolvedCaptureCollections);
+    handle(context, resolvedCaptureCollections, result -> {
+      if (result.failed()) {
+        context.fail(result.cause());
+      } else {
+        handleReroute(context, resolvedCaptureCollections);
+      }
+    });
   }
 
+  /**
+   * If reroute is true, then a reroute to the normalized path is called, otherwise {@link RoutingContext#next()} is
+   * called
+   * 
+   * @param context
+   *          the context of the current request
+   * @param resolvedCaptureCollections
+   *          the resolved data to clean the path
+   */
   protected void handleReroute(RoutingContext context, List<CaptureMap> resolvedCaptureCollections) {
     if (doReroute) {
       String cleanedPath = cleanPath(context, resolvedCaptureCollections);
       LOGGER.info("rerouting to " + cleanedPath);
       context.reroute(cleanedPath);
+    } else {
+      context.next();
     }
   }
 
@@ -126,8 +144,11 @@ public abstract class AbstractCaptureController extends AbstractController {
    * @param resolvedCaptureCollections
    *          the parameters, which are resolved from the current request
    *          into the parameter names like they are supported from the current instance
+   * @param handler
+   *          the handler to be informed if finished
    */
-  protected abstract void handle(RoutingContext context, List<CaptureMap> resolvedCaptureCollections);
+  protected abstract void handle(RoutingContext context, List<CaptureMap> resolvedCaptureCollections,
+      Handler<AsyncResult<Void>> handler);
 
   /**
    * Resolves all defined {@link CaptureCollection} from the current request.
