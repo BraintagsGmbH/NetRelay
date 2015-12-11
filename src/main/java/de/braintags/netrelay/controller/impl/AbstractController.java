@@ -91,7 +91,7 @@ public abstract class AbstractController implements IController {
    * 
    * @return the netRelay
    */
-  protected final NetRelay getNetRelay() {
+  public final NetRelay getNetRelay() {
     return netRelay;
   }
 

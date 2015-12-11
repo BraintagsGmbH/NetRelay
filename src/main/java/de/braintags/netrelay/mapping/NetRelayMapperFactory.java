@@ -28,7 +28,7 @@ import de.braintags.io.vertx.pojomapper.typehandler.stringbased.StringTypeHandle
 public class NetRelayMapperFactory extends MapperFactory {
 
   public NetRelayMapperFactory() {
-    super(null, new StringTypeHandlerFactory(), new JsonPropertyMapperFactory());
+    super(null, new StringTypeHandlerFactory(), new JsonPropertyMapperFactory(), new NetRelayStoreObjectFactory());
   }
 
 }

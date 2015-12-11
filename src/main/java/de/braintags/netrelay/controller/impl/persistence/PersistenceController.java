@@ -15,15 +15,10 @@ package de.braintags.netrelay.controller.impl.persistence;
 import java.util.List;
 import java.util.Properties;
 
-import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.exception.InitException;
-import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 import de.braintags.netrelay.controller.Action;
 import de.braintags.netrelay.controller.impl.AbstractCaptureController;
-import de.braintags.netrelay.exception.NoSuchMapperException;
-import de.braintags.netrelay.init.MappingDefinitions;
-import de.braintags.netrelay.init.Settings;
 import de.braintags.netrelay.mapping.NetRelayMapperFactory;
 import de.braintags.netrelay.routing.CaptureCollection;
 import de.braintags.netrelay.routing.CaptureDefinition;
@@ -78,29 +73,11 @@ public class PersistenceController extends AbstractCaptureController {
     }
   }
 
-  /**
-   * Retrive the {@link IMapper} which is specified by the given mapperName.
-   * 
-   * @param mapperName
-   *          the name of the mapper. This name mus exist as definition inside the {@link MappingDefinitions} of the
-   *          {@link Settings}
-   * @return a mapper from the internal {@link IMapperFactory}
-   */
-  IMapper getMapper(String mapperName) {
-    Class mapperClass = getNetRelay().getSettings().getMappingDefinitions().getMapperClass(mapperName);
-    if (mapperClass == null) {
-      throw new NoSuchMapperException(mapperName);
-    }
-    return mapperFactory.getMapper(mapperClass);
-  }
-
   private void handle(RoutingContext context, CaptureMap map) {
     AbstractAction action = resolveAction(map);
     String mapperName = map.get(PersistenceController.MAPPER_KEY);
     LOGGER.info(String.format("handling action %s on mapper %s", action, mapperName));
-    IMapper mapper = getMapper(mapperName);
-    IDataStore datastore = getNetRelay().getDatastore();
-    action.handle(datastore, mapperName, mapper, context, map, result -> {
+    action.handle(mapperName, context, map, result -> {
       if (result.failed()) {
         context.fail(result.cause());
       } else {
@@ -188,5 +165,12 @@ public class PersistenceController extends AbstractCaptureController {
     json.put(AUTO_CLEAN_PATH_PROPERTY, "true");
     json.put(MAPPERFACTORY_PROP, NetRelayMapperFactory.class.getName());
     return json;
+  }
+
+  /**
+   * @return the mapperFactory
+   */
+  public final IMapperFactory getMapperFactory() {
+    return mapperFactory;
   }
 }

@@ -17,7 +17,6 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
@@ -47,8 +46,12 @@ public class InsertAction extends AbstractAction {
 
   @SuppressWarnings({ "rawtypes", "unchecked" })
   @Override
-  void handle(IDataStore datastore, String entityName, IMapper mapper, RoutingContext context, CaptureMap map,
-      Handler<AsyncResult<Void>> handler) {
+  void handle(String entityName, RoutingContext context, CaptureMap map, Handler<AsyncResult<Void>> handler) {
+    IMapper mapper = getMapper(entityName);
+    getPersistenceController().getMapperFactory().getStoreObjectFactory().createStoreObject(mapper, context, result -> {
+
+    });
+
     Map<String, String> valueMap = extractProperties(entityName, context);
     Object mo = mapper.getObjectFactory().createInstance(mapper.getMapperClass());
     Iterator<String> it = valueMap.keySet().iterator();
@@ -62,7 +65,7 @@ public class InsertAction extends AbstractAction {
 
       field.getPropertyAccessor().writeData(mo, value);
     }
-    IWrite write = datastore.createWrite(mapper.getMapperClass());
+    IWrite write = netrelay.getDatastore().createWrite(mapper.getMapperClass());
     write.add(mo);
     write.save(res -> {
       AsyncResult<IWriteResult> result = (AsyncResult<IWriteResult>) res;

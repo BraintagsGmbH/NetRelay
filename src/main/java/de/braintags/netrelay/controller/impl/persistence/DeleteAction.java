@@ -12,8 +12,6 @@
  */
 package de.braintags.netrelay.controller.impl.persistence;
 
-import de.braintags.io.vertx.pojomapper.IDataStore;
-import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.netrelay.controller.impl.AbstractCaptureController.CaptureMap;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
@@ -35,7 +33,7 @@ public class DeleteAction extends AbstractAction {
   }
 
   @Override
-  void handle(IDataStore datastore, String entityName, IMapper mapper, RoutingContext context, CaptureMap map, Handler<AsyncResult<Void>> handler) {
+  void handle(String entityName, RoutingContext context, CaptureMap map, Handler<AsyncResult<Void>> handler) {
     throw new UnsupportedOperationException();
   }
 
