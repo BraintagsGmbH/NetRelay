@@ -46,6 +46,7 @@ public class TCaptureParameters extends AbstractCaptureParameterTest {
   @Override
   protected void modifySettings(TestContext context, Settings settings) {
     super.modifySettings(context, settings);
+    // defineRouterDefinitions adds the default key-definitions
     settings.getRouterDefinitions().add(0,
         defineRouterDefinition(CaptureTestController.class, "/products/:entity/:ID/:action/detail.html"));
     boolean exceptionRaised = false;

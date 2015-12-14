@@ -12,6 +12,8 @@
  */
 package de.braintags.netrelay.controller.impl.persistence;
 
+import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
+import de.braintags.io.vertx.pojomapper.dataaccess.write.IWriteResult;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 import de.braintags.netrelay.controller.impl.AbstractCaptureController.CaptureMap;
@@ -19,6 +21,7 @@ import de.braintags.netrelay.exception.NoSuchMapperException;
 import de.braintags.netrelay.init.MappingDefinitions;
 import de.braintags.netrelay.init.Settings;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.ext.web.RoutingContext;
 
@@ -30,6 +33,8 @@ import io.vertx.ext.web.RoutingContext;
  */
 public abstract class AbstractAction {
   private PersistenceController persitenceController;
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(AbstractAction.class);
 
   /**
    * 
@@ -57,6 +62,23 @@ public abstract class AbstractAction {
       throw new NoSuchMapperException(mapperName);
     }
     return persitenceController.getMapperFactory().getMapper(mapperClass);
+  }
+
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  protected void store(Object ob, String entityName, RoutingContext context, IMapper mapper,
+      Handler<AsyncResult<Void>> handler) {
+    IWrite write = getPersistenceController().getNetRelay().getDatastore().createWrite(mapper.getMapperClass());
+    write.add(ob);
+    write.save(res -> {
+      AsyncResult<IWriteResult> result = (AsyncResult<IWriteResult>) res;
+      if (result.failed()) {
+        handler.handle(Future.failedFuture(result.cause()));
+      } else {
+        LOGGER.info("adding new entity to context with key " + entityName);
+        context.put(entityName, ob);
+        handler.handle(Future.succeededFuture());
+      }
+    });
   }
 
   /**
