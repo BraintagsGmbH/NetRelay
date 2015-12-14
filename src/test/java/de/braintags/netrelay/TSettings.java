@@ -36,6 +36,9 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
  */
 @RunWith(VertxUnitRunner.class)
 public class TSettings {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(TSettings.class);
+
   private static String localSettingsFileNameUserDir = Settings.LOCAL_USER_DIRECTORY + "/"
       + NetRelayExt_FileBasedSettings.class.getName() + ".settings.json";
   private static String localSettingsFileNameTmpDir = System.getProperty("java.io.tmpdir") + "/"
@@ -109,11 +112,12 @@ public class TSettings {
    * Check for a file inside another location.
    * 
    */
-  // @Test
+  @Test
   public void testInitSettingsFromOtherDir(TestContext context) {
     context.assertNotNull(vertx);
     FileSystem fs = vertx.fileSystem();
     Settings setting = new NetRelayExt_FileBasedSettings().createDefaultSettings();
+    LOGGER.info("handling in " + localSettingsFileNameTmpDir);
 
     deleteFileInDir(context, fs, localSettingsFileNameTmpDir);
     Async async = context.async();

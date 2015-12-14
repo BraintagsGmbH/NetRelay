@@ -12,6 +12,7 @@
  */
 package de.braintags.netrelay.init;
 
+import de.braintags.io.vertx.pojomapper.exception.InitException;
 import de.braintags.io.vertx.pojomapper.init.DataStoreSettings;
 import de.braintags.netrelay.NetRelay;
 import de.braintags.netrelay.routing.RouterDefinitions;
@@ -19,7 +20,6 @@ import io.vertx.core.Context;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.file.FileSystem;
-import io.vertx.core.file.FileSystemException;
 import io.vertx.core.json.Json;
 
 /**
@@ -150,8 +150,11 @@ public class Settings {
     } else {
       LOGGER.info("creating default settings and store them in " + path);
       Settings settings = netRelay.createDefaultSettings();
-      fs.writeFileBlocking(path, Buffer.buffer(Json.encode(settings)));
-      throw new FileSystemException("File did not exist and was created new in path " + path);
+      fs.writeFileBlocking(path, Buffer.buffer(Json.encodePrettily(settings)));
+      String message = String.format(
+          "Settings file did not exist and was created new in path %s. NOTE: edit the file, set edited to true and restart the server",
+          path);
+      throw new InitException(message);
     }
 
   }
