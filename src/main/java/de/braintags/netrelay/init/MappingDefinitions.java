@@ -13,7 +13,6 @@
 package de.braintags.netrelay.init;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import de.braintags.netrelay.controller.IController;
 
@@ -27,7 +26,7 @@ import de.braintags.netrelay.controller.IController;
  * 
  */
 public class MappingDefinitions {
-  private Map<String, Class> mapperMap = new HashMap();
+  private HashMap<String, Class> mapperMap = new HashMap();
 
   /**
    * The mappermap contains the key, by which a template for instance can refer to a mapper and the mapper class as
@@ -35,7 +34,7 @@ public class MappingDefinitions {
    *
    * @return the mapperMap
    */
-  public Map<String, Class> getMapperMap() {
+  public HashMap<String, Class> getMapperMap() {
     return mapperMap;
   }
 
@@ -46,7 +45,7 @@ public class MappingDefinitions {
    * @param mapperMap
    *          the mapperMap to set
    */
-  public void setMapperMap(Map<String, Class> mapperMap) {
+  public void setMapperMap(HashMap<String, Class> mapperMap) {
     this.mapperMap = mapperMap;
   }
 

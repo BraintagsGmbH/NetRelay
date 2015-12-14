@@ -13,7 +13,6 @@
 package de.braintags.netrelay.routing;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import de.braintags.netrelay.init.Settings;
 
@@ -25,7 +24,7 @@ import de.braintags.netrelay.init.Settings;
  */
 public class RouterDefinitions {
 
-  private List<RouterDefinition> routerDefinitions = new ArrayList<>();
+  private ArrayList<RouterDefinition> routerDefinitions = new ArrayList<>();
 
   /**
    * Add a new definition at the end of the definitions
@@ -88,7 +87,7 @@ public class RouterDefinitions {
   /**
    * @return the routerDefinitions
    */
-  public final List<RouterDefinition> getRouterDefinitions() {
+  public final ArrayList<RouterDefinition> getRouterDefinitions() {
     return routerDefinitions;
   }
 
@@ -96,7 +95,7 @@ public class RouterDefinitions {
    * @param routerDefinitions
    *          the routerDefinitions to set
    */
-  public final void setRouterDefinitions(List<RouterDefinition> routerDefinitions) {
+  public final void setRouterDefinitions(ArrayList<RouterDefinition> routerDefinitions) {
     this.routerDefinitions = routerDefinitions;
   }
 
