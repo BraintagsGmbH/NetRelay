@@ -55,9 +55,10 @@ public abstract class AbstractAction {
    *          {@link Settings}
    * @return a mapper from the internal {@link IMapperFactory}
    */
+  @SuppressWarnings("rawtypes")
   protected IMapper getMapper(String mapperName) {
-    Class mapperClass = persitenceController.getNetRelay().getSettings().getMappingDefinitions()
-        .getMapperClass(mapperName);
+    MappingDefinitions defs = persitenceController.getNetRelay().getSettings().getMappingDefinitions();
+    Class mapperClass = defs.getMapperClass(mapperName);
     if (mapperClass == null) {
       throw new NoSuchMapperException(mapperName);
     }

@@ -50,12 +50,30 @@ public class MappingDefinitions {
     this.mapperMap = mapperMap;
   }
 
+  /**
+   * add a new entry into the mapper definition. The name is the name, like it is used later inside templates and links
+   * to
+   * reference the mapper
+   * 
+   * @param name
+   *          the name of the mapper
+   * @param mapperClass
+   *          the class of the mapper
+   */
   public void addMapperDefinition(String name, Class mapperClass) {
-    mapperMap.put(name.toLowerCase(), mapperClass);
+    mapperMap.put(name, mapperClass);
   }
 
+  /**
+   * Get the mapper class for the specified name
+   * 
+   * @param name
+   *          the name of the mapper
+   * 
+   * @return the mapper class or null, if none found
+   */
   public Class getMapperClass(String name) {
-    return mapperMap.get(name.toLowerCase());
+    return mapperMap.get(name);
   }
 
 }
