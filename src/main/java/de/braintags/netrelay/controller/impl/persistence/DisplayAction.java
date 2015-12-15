@@ -12,6 +12,8 @@
  */
 package de.braintags.netrelay.controller.impl.persistence;
 
+import java.util.Arrays;
+
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
 import de.braintags.io.vertx.pojomapper.exception.NoSuchRecordException;
@@ -57,7 +59,22 @@ public class DisplayAction extends AbstractAction {
 
   protected void handleList(String entityName, RoutingContext context, IMapper mapper, String id,
       Handler<AsyncResult<Void>> handler) {
-    handler.handle(Future.failedFuture(new UnsupportedOperationException()));
+    IQuery<?> query = getPersistenceController().getNetRelay().getDatastore().createQuery(mapper.getMapperClass());
+    query.execute(result -> {
+      if (result.failed()) {
+        handler.handle(Future.failedFuture(result.cause()));
+      } else {
+        IQueryResult<?> qr = result.result();
+        qr.toArray(arr -> {
+          if (arr.failed()) {
+            handler.handle(Future.failedFuture(arr.cause()));
+          } else {
+            addToContext(context, entityName, Arrays.asList(arr.result()));
+            handler.handle(Future.succeededFuture());
+          }
+        });
+      }
+    });
   }
 
   protected void handleSingleRecord(String entityName, RoutingContext context, IMapper mapper, String id,
@@ -76,7 +93,7 @@ public class DisplayAction extends AbstractAction {
             if (ir.failed()) {
               handler.handle(Future.failedFuture(ir.cause()));
             } else {
-              store(ir.result(), entityName, context, mapper, handler);
+              saveObjectInDatastore(ir.result(), entityName, context, mapper, handler);
             }
           });
         }

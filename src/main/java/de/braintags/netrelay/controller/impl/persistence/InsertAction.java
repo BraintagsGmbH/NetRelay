@@ -44,7 +44,7 @@ public class InsertAction extends AbstractAction {
         handler.handle(Future.failedFuture(result.cause()));
       } else {
         Object ob = result.result().getEntity();
-        store(ob, entityName, context, mapper, handler);
+        saveObjectInDatastore(ob, entityName, context, mapper, handler);
       }
     });
   }

@@ -12,19 +12,13 @@
  */
 package de.braintags.netrelay;
 
-import org.junit.Test;
-
-import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
-import de.braintags.io.vertx.util.ResultObject;
 import de.braintags.netrelay.controller.impl.BodyController;
 import de.braintags.netrelay.controller.impl.persistence.PersistenceController;
 import de.braintags.netrelay.impl.NetRelayExt_FileBasedSettings;
 import de.braintags.netrelay.init.Settings;
-import de.braintags.netrelay.mapper.SimpleNetRelayMapper;
 import de.braintags.netrelay.routing.RouterDefinition;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpMethod;
-import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 
 /**
@@ -33,9 +27,9 @@ import io.vertx.ext.unit.TestContext;
  * @author Michael Remme
  * 
  */
-public class TPersistenceController extends AbstractCaptureParameterTest {
+public class TPersistenceController_Insert extends AbstractCaptureParameterTest {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
-      .getLogger(TPersistenceController.class);
+      .getLogger(TPersistenceController_Insert.class);
 
   // @Test
   public void testInsert(TestContext context) throws Exception {
@@ -64,44 +58,6 @@ public class TPersistenceController extends AbstractCaptureParameterTest {
     }
   }
 
-  @Test
-  public void testDisplay(TestContext context) {
-    Async async = context.async();
-    IWrite<SimpleNetRelayMapper> write = netRelay.getDatastore().createWrite(SimpleNetRelayMapper.class);
-    SimpleNetRelayMapper mapper = new SimpleNetRelayMapper();
-    mapper.age = 13;
-    mapper.child = false;
-    mapper.name = "testmapper for display";
-    write.add(mapper);
-    ResultObject<SimpleNetRelayMapper> ro = new ResultObject<>(null);
-    write.save(result -> {
-      if (result.failed()) {
-        context.fail(result.cause());
-        async.complete();
-      } else {
-        // all fine, ID should be set in mapper
-        LOGGER.info("ID: " + mapper.id);
-        async.complete();
-      }
-    });
-    async.await();
-
-    try {
-      String id = mapper.id;
-      String url = String.format("/products/%s/DISPLAY/%s/detail.html", NetRelayExt_FileBasedSettings.SIMPLEMAPPER_NAME,
-          id);
-      testRequest(context, HttpMethod.POST, url, null, resp -> {
-        resp.bodyHandler(buff -> {
-          LOGGER.info("RESPONSE: " + buff);
-          context.assertTrue(buff.toString().contains("testmapper for display"), "Expected name not found");
-        });
-      } , 200, "OK", null);
-    } catch (Exception e) {
-      context.fail(e);
-    }
-
-  }
-
   /*
    * (non-Javadoc)
    * 
@@ -111,9 +67,7 @@ public class TPersistenceController extends AbstractCaptureParameterTest {
   protected void modifySettings(TestContext context, Settings settings) {
     super.modifySettings(context, settings);
     RouterDefinition def = settings.getRouterDefinitions().remove(PersistenceController.class.getSimpleName());
-    def.setRoutes(
-        new String[] { "/products/:entity/:action/insert.html", "/products/:entity/:action/:ID/detail.html" });
-
+    def.setRoutes(new String[] { "/products/:entity/:action/insert.html" });
     settings.getRouterDefinitions().addAfter(BodyController.class.getSimpleName(), def);
   }
 
