@@ -86,8 +86,13 @@ public abstract class NetRelay extends AbstractVerticle {
     try {
       router = Router.router(vertx);
       initControlller(router);
-      initHttpServer(router);
-      startFuture.complete();
+      initHttpServer(router, result -> {
+        if (result.failed()) {
+          startFuture.fail(result.cause());
+        } else {
+          startFuture.complete();
+        }
+      });
     } catch (Exception e) {
       startFuture.fail(e);
     }
@@ -154,10 +159,16 @@ public abstract class NetRelay extends AbstractVerticle {
     });
   }
 
-  private void initHttpServer(Router router) {
+  private void initHttpServer(Router router, Handler<AsyncResult<Void>> handler) {
     HttpServerOptions options = new HttpServerOptions().setPort(settings.getServerPort());
     HttpServer server = vertx.createHttpServer(options);
-    server.requestHandler(router::accept).listen();
+    server.requestHandler(router::accept).listen(result -> {
+      if (result.failed()) {
+        handler.handle(Future.failedFuture(result.cause()));
+      } else {
+        handler.handle(Future.succeededFuture());
+      }
+    });
   }
 
   /*

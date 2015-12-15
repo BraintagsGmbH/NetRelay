@@ -54,10 +54,8 @@ public class TPersistenceController_Display extends AbstractPersistenceControlle
         req.headers().set("content-type", "application/x-www-form-urlencoded");
         req.write(buffer);
       } , resp -> {
-        resp.bodyHandler(buff -> {
-          LOGGER.info("RESPONSE: " + buff);
-          context.assertTrue(buff.toString().contains("myFirstName"), "Expected name not found");
-        });
+        LOGGER.info("RESPONSE: " + resp.content);
+        context.assertTrue(resp.content.toString().contains("myFirstName"), "Expected name not found");
       } , 200, "OK", null);
     } catch (Exception e) {
       context.fail(e);
@@ -91,10 +89,8 @@ public class TPersistenceController_Display extends AbstractPersistenceControlle
       String url = String.format("/products/%s/DISPLAY/%s/detail.html", NetRelayExt_FileBasedSettings.SIMPLEMAPPER_NAME,
           id);
       testRequest(context, HttpMethod.POST, url, null, resp -> {
-        resp.bodyHandler(buff -> {
-          LOGGER.info("RESPONSE: " + buff);
-          context.assertTrue(buff.toString().contains("testmapper for display"), "Expected name not found");
-        });
+        LOGGER.info("RESPONSE: " + resp.content);
+        context.assertTrue(resp.content.toString().contains("testmapper for display"), "Expected name not found");
       } , 200, "OK", null);
     } catch (Exception e) {
       context.fail(e);
@@ -107,10 +103,8 @@ public class TPersistenceController_Display extends AbstractPersistenceControlle
     try {
       String url = String.format("/products/%s/DISPLAY/list.html", NetRelayExt_FileBasedSettings.SIMPLEMAPPER_NAME);
       testRequest(context, HttpMethod.POST, url, null, resp -> {
-        resp.bodyHandler(buff -> {
-          LOGGER.info("RESPONSE: " + buff);
-          context.assertTrue(buff.toString().contains("success"), "Expected name not found");
-        });
+        LOGGER.info("RESPONSE: " + resp.content);
+        context.assertTrue(resp.content.toString().contains("success"), "Expected name not found");
       } , 200, "OK", null);
     } catch (Exception e) {
       context.fail(e);

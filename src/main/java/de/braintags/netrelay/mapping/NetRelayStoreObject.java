@@ -18,12 +18,16 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
+import de.braintags.io.vertx.pojomapper.exception.NoSuchRecordException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IObjectReference;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.ErrorObject;
+import de.braintags.netrelay.NetRelay;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -42,6 +46,7 @@ public class NetRelayStoreObject implements IStoreObject<Map<String, String>> {
   private Object entity = null;
   private Collection<IObjectReference> objectReferences = new ArrayList<IObjectReference>();
   private Map<String, String> requestMap;
+  private NetRelay netRelay;
 
   /**
    * Constructor to create an instance from a mapper
@@ -66,11 +71,12 @@ public class NetRelayStoreObject implements IStoreObject<Map<String, String>> {
    * @param mapper
    *          the mapper to be used
    */
-  public NetRelayStoreObject(Map<String, String> requestMap, IMapper mapper) {
+  public NetRelayStoreObject(Map<String, String> requestMap, IMapper mapper, NetRelay netRelay) {
     Objects.requireNonNull(mapper, "Mapper must not be null");
     Objects.requireNonNull(requestMap, "requestMap must not be null");
     this.mapper = mapper;
     this.requestMap = requestMap;
+    this.netRelay = netRelay;
   }
 
   /*
@@ -134,22 +140,58 @@ public class NetRelayStoreObject implements IStoreObject<Map<String, String>> {
    * @param handler
    */
   public final void initToEntity(Handler<AsyncResult<Void>> handler) {
-    Object tmpObject = getMapper().getObjectFactory().createInstance(getMapper().getMapperClass());
-    LOGGER.debug("start initToEntity");
-    iterateFields(tmpObject, fieldResult -> {
-      if (fieldResult.failed()) {
-        handler.handle(fieldResult);
-        return;
+    createEntity(result -> {
+      if (result.failed()) {
+        handler.handle(Future.failedFuture(result.cause()));
+      } else {
+        Object tmpObject = result.result();
+        LOGGER.debug("start initToEntity");
+        iterateFields(tmpObject, fieldResult -> {
+          if (fieldResult.failed()) {
+            handler.handle(fieldResult);
+            return;
+          }
+          iterateObjectReferences(tmpObject, orResult -> {
+            if (orResult.failed()) {
+              handler.handle(orResult);
+              return;
+            }
+            finishToEntity(tmpObject, handler);
+            LOGGER.debug("finished initToEntity");
+          });
+        });
       }
-      iterateObjectReferences(tmpObject, orResult -> {
-        if (orResult.failed()) {
-          handler.handle(orResult);
-          return;
-        }
-        finishToEntity(tmpObject, handler);
-        LOGGER.debug("finished initToEntity");
-      });
     });
+  }
+
+  @SuppressWarnings({ "rawtypes" })
+  private void createEntity(Handler<AsyncResult<Object>> handler) {
+    if (hasProperty(getMapper().getIdField())) {
+      Object id = get(getMapper().getIdField());
+      IQuery<?> query = netRelay.getDatastore().createQuery(getMapper().getMapperClass());
+      query.field(query.getMapper().getIdField().getName()).is(id);
+      query.execute(qrr -> {
+        if (qrr.failed()) {
+          handler.handle(Future.failedFuture(qrr.cause()));
+        } else {
+          IQueryResult<?> qr = qrr.result();
+          if (!qr.iterator().hasNext()) {
+            handler.handle(Future.failedFuture(new NoSuchRecordException("Could not find record with ID " + id)));
+          } else {
+            qr.iterator().next(ir -> {
+              if (ir.failed()) {
+                handler.handle(Future.failedFuture(ir.cause()));
+              } else {
+                handler.handle(Future.succeededFuture(ir.result()));
+              }
+            });
+          }
+        }
+      });
+    } else {
+      Object returnObject = getMapper().getObjectFactory().createInstance(getMapper().getMapperClass());
+      handler.handle(Future.succeededFuture(returnObject));
+    }
   }
 
   protected void finishToEntity(Object tmpObject, Handler<AsyncResult<Void>> handler) {

@@ -21,7 +21,10 @@ import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 
+import de.braintags.io.vertx.pojomapper.testdatastore.DatastoreBaseTest;
 import de.braintags.io.vertx.pojomapper.testdatastore.TestHelper;
+import de.braintags.io.vertx.util.ErrorObject;
+import de.braintags.io.vertx.util.ResultObject;
 import de.braintags.netrelay.controller.impl.ThymeleafTemplateController;
 import de.braintags.netrelay.impl.NetRelayExt_InternalSettings;
 import de.braintags.netrelay.init.Settings;
@@ -64,6 +67,7 @@ public class NetRelayBaseTest {
   public final void initBeforeTest(TestContext context) {
     LOGGER.info("Starting test: " + this.getClass().getSimpleName() + "#" + name.getMethodName());
     initNetRelay(context);
+    DatastoreBaseTest.EXTERNAL_DATASTORE = netRelay.getDatastore();
     initTest();
   }
 
@@ -187,35 +191,44 @@ public class NetRelayBaseTest {
   }
 
   protected final void testRequest(TestContext context, HttpMethod method, String path,
-      Consumer<HttpClientRequest> requestAction, Consumer<HttpClientResponse> responseAction, int statusCode,
+      Consumer<HttpClientRequest> requestAction, Consumer<ResponseCopy> responseAction, int statusCode,
       String statusMessage, String responseBody) throws Exception {
     testRequestBuffer(context, method, path, requestAction, responseAction, statusCode, statusMessage,
         responseBody != null ? Buffer.buffer(responseBody) : null);
   }
 
   protected final void testRequestBuffer(TestContext context, HttpMethod method, String path,
-      Consumer<HttpClientRequest> requestAction, Consumer<HttpClientResponse> responseAction, int statusCode,
+      Consumer<HttpClientRequest> requestAction, Consumer<ResponseCopy> responseAction, int statusCode,
       String statusMessage, Buffer responseBodyBuffer) throws Exception {
     testRequestBuffer(context, client, method, 8080, path, requestAction, responseAction, statusCode, statusMessage,
         responseBodyBuffer);
   }
 
-  protected final void testRequestBuffer(TestContext context, HttpClient client, HttpMethod method, int port,
+  protected final void testRequestBufferXX(TestContext context, HttpClient client, HttpMethod method, int port,
       String path, Consumer<HttpClientRequest> requestAction, Consumer<HttpClientResponse> responseAction,
       int statusCode, String statusMessage, Buffer responseBodyBuffer) throws Exception {
-    Async async = context.async();
+    Async async = context.async(2);
+    ErrorObject<Exception> err = new ErrorObject<>(null);
     HttpClientRequest req = client.request(method, port, "localhost", path, resp -> {
       context.assertEquals(statusCode, resp.statusCode());
       context.assertEquals(statusMessage, resp.statusMessage());
       if (responseAction != null) {
-        responseAction.accept(resp);
+        try {
+          responseAction.accept(resp);
+        } catch (Exception e) {
+          err.setThrowable(e);
+        } finally {
+          async.countDown();
+        }
+      } else {
+        async.countDown();
       }
       if (responseBodyBuffer == null) {
-        async.complete();
+        async.countDown();
       } else {
         resp.bodyHandler(buff -> {
           context.assertEquals(responseBodyBuffer, buff);
-          async.complete();
+          async.countDown();
         });
       }
     });
@@ -224,6 +237,50 @@ public class NetRelayBaseTest {
     }
     req.end();
     async.await();
+    if (err.isError()) {
+      context.fail(err.getThrowable());
+    }
+  }
+
+  protected final void testRequestBuffer(TestContext context, HttpClient client, HttpMethod method, int port,
+      String path, Consumer<HttpClientRequest> requestAction, Consumer<ResponseCopy> responseAction, int statusCode,
+      String statusMessage, Buffer responseBodyBuffer) throws Exception {
+    Async async = context.async();
+    ResultObject<ResponseCopy> resultObject = new ResultObject<>(null);
+    HttpClientRequest req = client.request(method, port, "localhost", path, resp -> {
+      ResponseCopy rc = new ResponseCopy();
+      resp.bodyHandler(buff -> {
+        rc.content = buff.toString();
+        rc.code = resp.statusCode();
+        rc.statusMessage = resp.statusMessage();
+
+        resultObject.setResult(rc);
+        async.complete();
+      });
+    });
+    if (requestAction != null) {
+      requestAction.accept(req);
+    }
+    req.end();
+    async.await();
+
+    ResponseCopy rc = resultObject.getResult();
+    context.assertEquals(statusCode, rc.code);
+    context.assertEquals(statusMessage, rc.statusMessage);
+    if (responseAction != null) {
+      responseAction.accept(rc);
+    }
+    if (responseBodyBuffer == null) {
+      // async.complete();
+    } else {
+      context.assertEquals(responseBodyBuffer.toString(), rc.content);
+    }
+  }
+
+  public class ResponseCopy {
+    String content;
+    int code;
+    String statusMessage;
   }
 
 }

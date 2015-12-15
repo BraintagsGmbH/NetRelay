@@ -50,10 +50,8 @@ public class TPersistenceController_Insert extends AbstractPersistenceController
         req.headers().set("content-type", "application/x-www-form-urlencoded");
         req.write(buffer);
       } , resp -> {
-        resp.bodyHandler(buff -> {
-          LOGGER.info("RESPONSE: " + buff);
-          context.assertTrue(buff.toString().contains("myFirstName"), "Expected name not found");
-        });
+        LOGGER.info("RESPONSE: " + resp.content);
+        context.assertTrue(resp.content.toString().contains("myFirstName"), "Expected name not found");
       } , 200, "OK", null);
     } catch (Exception e) {
       context.fail(e);

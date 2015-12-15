@@ -14,8 +14,8 @@ package de.braintags.netrelay;
 
 import org.junit.Test;
 
-import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
-import de.braintags.io.vertx.util.ResultObject;
+import de.braintags.io.vertx.pojomapper.testdatastore.DatastoreBaseTest;
+import de.braintags.io.vertx.pojomapper.testdatastore.ResultContainer;
 import de.braintags.netrelay.controller.impl.BodyController;
 import de.braintags.netrelay.controller.impl.persistence.PersistenceController;
 import de.braintags.netrelay.impl.NetRelayExt_FileBasedSettings;
@@ -24,7 +24,6 @@ import de.braintags.netrelay.mapper.SimpleNetRelayMapper;
 import de.braintags.netrelay.routing.RouterDefinition;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpMethod;
-import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 
 /**
@@ -39,28 +38,18 @@ public class TPersistenceController_Update extends AbstractPersistenceController
 
   @Test
   public void testUpdate(TestContext context) {
-    Async async = context.async();
-    IWrite<SimpleNetRelayMapper> write = netRelay.getDatastore().createWrite(SimpleNetRelayMapper.class);
     SimpleNetRelayMapper mapper = new SimpleNetRelayMapper();
     mapper.age = 13;
     mapper.child = true;
     mapper.name = "testmapper for update";
-    write.add(mapper);
-    ResultObject<SimpleNetRelayMapper> ro = new ResultObject<>(null);
-    write.save(result -> {
-      if (result.failed()) {
-        context.fail(result.cause());
-        async.complete();
-      } else {
-        // all fine, ID should be set in mapper
-        LOGGER.info("ID: " + mapper.id);
-        async.complete();
-      }
-    });
-    async.await();
+    ResultContainer rc = DatastoreBaseTest.saveRecord(context, mapper);
+    if (rc.assertionError != null)
+      throw rc.assertionError;
+
+    Object id = rc.writeResult.iterator().next().getId();
+    LOGGER.info("ID: " + id);
 
     try {
-      String id = mapper.id;
       String url = String.format("/products/%s/UPDATE/%s/update.html", NetRelayExt_FileBasedSettings.SIMPLEMAPPER_NAME,
           id);
 
@@ -74,10 +63,13 @@ public class TPersistenceController_Update extends AbstractPersistenceController
         req.headers().set("content-type", "application/x-www-form-urlencoded");
         req.write(buffer);
       } , resp -> {
-        resp.bodyHandler(buff -> {
-          LOGGER.info("RESPONSE: " + buff);
-          context.assertTrue(buff.toString().contains("updatePerformed"), "Expected name not found");
-        });
+        context.assertNotNull(resp);
+        String content = resp.content;
+        LOGGER.info("RESPONSE: " + content);
+        context.assertTrue(content.contains("updatePerformed"), "Update was not performed");
+        context.assertTrue(content.contains("20"), "updated age was not saved");
+        // child was not modified in request and should stay true
+        context.assertTrue(content.contains("true"), "property child was modified, but should not");
       } , 200, "OK", null);
 
     } catch (Exception e) {

@@ -66,10 +66,8 @@ public class TPersistenceController_Delete extends AbstractPersistenceController
       String url = String.format("/products/%s/DELETE/%s/delete.html", NetRelayExt_FileBasedSettings.SIMPLEMAPPER_NAME,
           id);
       testRequest(context, HttpMethod.POST, url, null, resp -> {
-        resp.bodyHandler(buff -> {
-          LOGGER.info("RESPONSE: " + buff);
-          context.assertTrue(buff.toString().contains("deleteSuccess"), "Expected name not found");
-        });
+        LOGGER.info("RESPONSE: " + resp.content);
+        context.assertTrue(resp.content.toString().contains("deleteSuccess"), "Expected name not found");
       } , 200, "OK", null);
     } catch (Exception e) {
       context.fail(e);

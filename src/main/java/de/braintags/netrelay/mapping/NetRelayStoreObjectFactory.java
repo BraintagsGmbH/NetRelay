@@ -17,6 +17,7 @@ import java.util.Map;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.pojomapper.mapping.impl.AbstractStoreObjectFactory;
+import de.braintags.netrelay.NetRelay;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -28,6 +29,11 @@ import io.vertx.core.Handler;
  * 
  */
 public class NetRelayStoreObjectFactory extends AbstractStoreObjectFactory {
+  private NetRelay netRelay;
+
+  public NetRelayStoreObjectFactory(NetRelay netRelay) {
+    this.netRelay = netRelay;
+  }
 
   @Override
   public void createStoreObject(IMapper mapper, Object entity, Handler<AsyncResult<IStoreObject<?>>> handler) {
@@ -43,7 +49,7 @@ public class NetRelayStoreObjectFactory extends AbstractStoreObjectFactory {
 
   @Override
   public void createStoreObject(Object storedObject, IMapper mapper, Handler<AsyncResult<IStoreObject<?>>> handler) {
-    NetRelayStoreObject storeObject = new NetRelayStoreObject((Map<String, String>) storedObject, mapper);
+    NetRelayStoreObject storeObject = new NetRelayStoreObject((Map<String, String>) storedObject, mapper, netRelay);
     storeObject.initToEntity(result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
