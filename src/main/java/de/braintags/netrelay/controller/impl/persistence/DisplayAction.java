@@ -31,7 +31,6 @@ import io.vertx.ext.web.RoutingContext;
  * 
  */
 public class DisplayAction extends AbstractAction {
-  private static final String ERRORMESSAGE = "could not find record with ID %s";
 
   /**
    * 
@@ -87,7 +86,7 @@ public class DisplayAction extends AbstractAction {
       } else {
         IQueryResult<?> qr = result.result();
         if (qr.isEmpty()) {
-          handler.handle(Future.failedFuture(new NoSuchRecordException(String.format(ERRORMESSAGE, id))));
+          handler.handle(Future.failedFuture(new NoSuchRecordException(String.format(ERRORMESSAGE_RECNOTFOUND, id))));
         } else {
           qr.iterator().next(ir -> {
             if (ir.failed()) {

@@ -14,10 +14,7 @@ package de.braintags.netrelay.mapping;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 
@@ -27,12 +24,9 @@ import de.braintags.io.vertx.pojomapper.mapping.IObjectReference;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.ErrorObject;
-import de.braintags.netrelay.controller.impl.persistence.PersistenceController;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.core.MultiMap;
-import io.vertx.ext.web.RoutingContext;
 
 /**
  * 
@@ -67,45 +61,16 @@ public class NetRelayStoreObject implements IStoreObject<Map<String, String>> {
   /**
    * Constructor to create an instance from a request
    * 
-   * @param context
-   *          the {@link RoutingContext} to read the data from
+   * @param requestMap
+   *          a {@link Map} with key value pairs, which are describing the object properties
    * @param mapper
    *          the mapper to be used
    */
-  public NetRelayStoreObject(RoutingContext context, IMapper mapper) {
+  public NetRelayStoreObject(Map<String, String> requestMap, IMapper mapper) {
     Objects.requireNonNull(mapper, "Mapper must not be null");
-    Objects.requireNonNull(context, "context must not be null");
+    Objects.requireNonNull(requestMap, "requestMap must not be null");
     this.mapper = mapper;
-    requestMap = extractProperties(mapper.getMapperClass().getSimpleName(), context);
-  }
-
-  /**
-   * Extract the properties from the request, where the name starts with the entity name, which shall be handled by the
-   * current request
-   * 
-   * @param entityName
-   *          the name, like it was specified by the parameter {@link PersistenceController#MAPPER_KEY}
-   * @param context
-   *          the {@link RoutingContext} of the request
-   * @return the key / values of the request, where the key starts with "entityName.". The key is reduced to the pure
-   *         name
-   */
-  protected Map<String, String> extractProperties(String entityName, RoutingContext context) {
-    String startKey = entityName.toLowerCase() + ".";
-    Map<String, String> map = new HashMap<>();
-
-    MultiMap attrs = context.request().formAttributes();
-    Iterator<Entry<String, String>> it = attrs.iterator();
-    while (it.hasNext()) {
-      Entry<String, String> entry = it.next();
-      String key = entry.getKey().toLowerCase();
-      if (key.startsWith(startKey)) {
-        String pureKey = key.substring(startKey.length());
-        String value = entry.getValue();
-        map.put(pureKey, value);
-      }
-    }
-    return map;
+    this.requestMap = requestMap;
   }
 
   /*

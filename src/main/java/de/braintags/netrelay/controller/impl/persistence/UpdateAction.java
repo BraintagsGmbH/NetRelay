@@ -12,9 +12,11 @@
  */
 package de.braintags.netrelay.controller.impl.persistence;
 
+import java.util.Map;
+
+import de.braintags.io.vertx.pojomapper.exception.ParameterRequiredException;
+import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.netrelay.controller.impl.AbstractCaptureController.CaptureMap;
-import io.vertx.core.AsyncResult;
-import io.vertx.core.Handler;
 import io.vertx.ext.web.RoutingContext;
 
 /**
@@ -23,7 +25,7 @@ import io.vertx.ext.web.RoutingContext;
  * @author Michael Remme
  * 
  */
-public class UpdateAction extends AbstractAction {
+public class UpdateAction extends InsertAction {
 
   /**
    * 
@@ -32,9 +34,22 @@ public class UpdateAction extends AbstractAction {
     super(persitenceController);
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.netrelay.controller.impl.persistence.InsertAction#extractProperties(java.lang.String,
+   * io.vertx.ext.web.RoutingContext)
+   */
   @Override
-  void handle(String entity, RoutingContext context, CaptureMap map, Handler<AsyncResult<Void>> handler) {
-    throw new UnsupportedOperationException();
+  protected Map<String, String> extractProperties(String entityName, CaptureMap captureMap, RoutingContext context,
+      IMapper mapper) {
+    Map<String, String> map = super.extractProperties(entityName, captureMap, context, mapper);
+    String id = captureMap.get(PersistenceController.ID_KEY);
+    if (id == null || id.hashCode() == 0) {
+      throw new ParameterRequiredException("ID");
+    }
+    map.put(mapper.getIdField().getName().toLowerCase(), id);
+    return map;
   }
 
 }

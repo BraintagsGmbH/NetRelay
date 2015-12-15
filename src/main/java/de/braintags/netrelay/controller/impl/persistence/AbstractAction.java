@@ -32,6 +32,7 @@ import io.vertx.ext.web.RoutingContext;
  * 
  */
 public abstract class AbstractAction {
+  protected static final String ERRORMESSAGE_RECNOTFOUND = "could not find record with ID %s";
   private PersistenceController persitenceController;
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(AbstractAction.class);

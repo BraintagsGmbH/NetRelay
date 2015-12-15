@@ -12,11 +12,17 @@
  */
 package de.braintags.netrelay.controller.impl.persistence;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Map.Entry;
+
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.netrelay.controller.impl.AbstractCaptureController.CaptureMap;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.MultiMap;
 import io.vertx.ext.web.RoutingContext;
 
 /**
@@ -37,9 +43,11 @@ public class InsertAction extends AbstractAction {
   }
 
   @Override
-  void handle(String entityName, RoutingContext context, CaptureMap map, Handler<AsyncResult<Void>> handler) {
+  final void handle(String entityName, RoutingContext context, CaptureMap captureMap,
+      Handler<AsyncResult<Void>> handler) {
     IMapper mapper = getMapper(entityName);
-    getPersistenceController().getMapperFactory().getStoreObjectFactory().createStoreObject(context, mapper, result -> {
+    Map<String, String> params = extractProperties(entityName, captureMap, context, mapper);
+    getPersistenceController().getMapperFactory().getStoreObjectFactory().createStoreObject(params, mapper, result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
       } else {
@@ -47,6 +55,40 @@ public class InsertAction extends AbstractAction {
         saveObjectInDatastore(ob, entityName, context, mapper, handler);
       }
     });
+  }
+
+  /**
+   * Extract the properties from the request, where the name starts with the entity name, which shall be handled by the
+   * current request
+   * 
+   * @param entityName
+   *          the name, like it was specified by the parameter {@link PersistenceController#MAPPER_KEY}
+   * @param captureMap
+   *          the resolved capture parameters for the current request
+   * @param context
+   *          the {@link RoutingContext} of the request
+   * @param mapper
+   *          the IMapper for the current request
+   * @return the key / values of the request, where the key starts with "entityName.". The key is reduced to the pure
+   *         name
+   */
+  protected Map<String, String> extractProperties(String entityName, CaptureMap captureMap, RoutingContext context,
+      IMapper mapper) {
+    String startKey = entityName.toLowerCase() + ".";
+    Map<String, String> map = new HashMap<>();
+
+    MultiMap attrs = context.request().formAttributes();
+    Iterator<Entry<String, String>> it = attrs.iterator();
+    while (it.hasNext()) {
+      Entry<String, String> entry = it.next();
+      String key = entry.getKey().toLowerCase();
+      if (key.startsWith(startKey)) {
+        String pureKey = key.substring(startKey.length());
+        String value = entry.getValue();
+        map.put(pureKey, value);
+      }
+    }
+    return map;
   }
 
 }

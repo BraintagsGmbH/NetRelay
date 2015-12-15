@@ -12,13 +12,14 @@
  */
 package de.braintags.netrelay.mapping;
 
+import java.util.Map;
+
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
 import de.braintags.io.vertx.pojomapper.mapping.impl.AbstractStoreObjectFactory;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
-import io.vertx.ext.web.RoutingContext;
 
 /**
  * The {@link NetRelayStoreObjectFactory} is used, when instances shall be created from the information of a request.
@@ -42,7 +43,7 @@ public class NetRelayStoreObjectFactory extends AbstractStoreObjectFactory {
 
   @Override
   public void createStoreObject(Object storedObject, IMapper mapper, Handler<AsyncResult<IStoreObject<?>>> handler) {
-    NetRelayStoreObject storeObject = new NetRelayStoreObject((RoutingContext) storedObject, mapper);
+    NetRelayStoreObject storeObject = new NetRelayStoreObject((Map<String, String>) storedObject, mapper);
     storeObject.initToEntity(result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));

@@ -33,7 +33,7 @@ import io.vertx.ext.unit.TestContext;
  * @author Michael Remme
  * 
  */
-public class TPersistenceController_Display extends AbstractCaptureParameterTest {
+public class TPersistenceController_Display extends AbstractPersistenceControllerTest {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(TPersistenceController_Display.class);
 
