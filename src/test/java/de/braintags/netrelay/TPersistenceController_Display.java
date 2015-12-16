@@ -22,7 +22,6 @@ import de.braintags.netrelay.impl.NetRelayExt_FileBasedSettings;
 import de.braintags.netrelay.init.Settings;
 import de.braintags.netrelay.mapper.SimpleNetRelayMapper;
 import de.braintags.netrelay.routing.RouterDefinition;
-import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
@@ -36,31 +35,6 @@ import io.vertx.ext.unit.TestContext;
 public class TPersistenceController_Display extends AbstractPersistenceControllerTest {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(TPersistenceController_Display.class);
-
-  // @Test
-  public void testInsert(TestContext context) throws Exception {
-    try {
-      String url = String.format("/products/%s/INSERT/insert.html", NetRelayExt_FileBasedSettings.SIMPLEMAPPER_NAME);
-      Buffer responseBuffer = Buffer.buffer();
-      testRequest(context, HttpMethod.POST, url, req -> {
-        Buffer buffer = Buffer.buffer();
-        buffer.appendString("origin=junit-testUserAlias&login=admin%40foo.bar&pass+word=admin");
-        buffer.appendString("&").appendString(NetRelayExt_FileBasedSettings.SIMPLEMAPPER_NAME)
-            .appendString(".name=myFirstName");
-        buffer.appendString("&").appendString(NetRelayExt_FileBasedSettings.SIMPLEMAPPER_NAME).appendString(".age=18");
-        buffer.appendString("&").appendString(NetRelayExt_FileBasedSettings.SIMPLEMAPPER_NAME)
-            .appendString(".child=true");
-        req.headers().set("content-length", String.valueOf(buffer.length()));
-        req.headers().set("content-type", "application/x-www-form-urlencoded");
-        req.write(buffer);
-      } , resp -> {
-        LOGGER.info("RESPONSE: " + resp.content);
-        context.assertTrue(resp.content.toString().contains("myFirstName"), "Expected name not found");
-      } , 200, "OK", null);
-    } catch (Exception e) {
-      context.fail(e);
-    }
-  }
 
   @Test
   public void testDisplaySingleRecord(TestContext context) {

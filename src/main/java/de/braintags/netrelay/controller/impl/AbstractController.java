@@ -14,6 +14,7 @@ package de.braintags.netrelay.controller.impl;
 
 import java.util.Properties;
 
+import de.braintags.io.vertx.pojomapper.exception.ParameterRequiredException;
 import de.braintags.netrelay.NetRelay;
 import de.braintags.netrelay.controller.IController;
 import de.braintags.netrelay.routing.CaptureCollection;
@@ -30,6 +31,7 @@ public abstract class AbstractController implements IController {
   private Vertx vertx;
   private CaptureCollection[] captureCollection;
   private NetRelay netRelay;
+  private Properties properties;
 
   /**
    * 
@@ -55,6 +57,7 @@ public abstract class AbstractController implements IController {
   public final void init(Vertx vertx, NetRelay netRelay, Properties properties, CaptureCollection[] captureCollection) {
     this.vertx = vertx;
     this.netRelay = netRelay;
+    this.properties = properties;
     initProperties(properties);
     initCaptureCollection(captureCollection);
   }
@@ -93,6 +96,24 @@ public abstract class AbstractController implements IController {
    */
   public final NetRelay getNetRelay() {
     return netRelay;
+  }
+
+  /**
+   * Read the property with the given name
+   * 
+   * @param propertyName
+   *          the name of the property to be read
+   * @param defaultValue
+   *          the default value to be returned
+   * @param required
+   *          is it required
+   * @return the value of the property or null
+   */
+  public String readProperty(String propertyName, String defaultValue, boolean required) {
+    String value = (String) properties.get(propertyName);
+    if (value == null && required)
+      throw new ParameterRequiredException(propertyName);
+    return value == null ? defaultValue : value;
   }
 
 }
