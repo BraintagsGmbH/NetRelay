@@ -44,6 +44,8 @@ public class TAuthentication extends NetRelayBaseTest {
 
   }
 
+  // test double logout, or logout when no user is logged in
+
   /*
    * (non-Javadoc)
    * 

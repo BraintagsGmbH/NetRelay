@@ -80,6 +80,7 @@ public class AuthenticationController extends AbstractAuthController {
   @Override
   public void handle(RoutingContext event) {
     authHandler.handle(event);
+
   }
 
   @Override
@@ -108,9 +109,9 @@ public class AuthenticationController extends AbstractAuthController {
     getNetRelay().getRouter().route(logoutUrl).handler(context -> {
       if (context.user() != null) {
         context.clearUser();
-        String path = logoutDestinationURL + "?" + LOGOUT_MESSAGE_PROP + "=success";
-        RequestUtil.sendRedirect(context.response(), path);
       }
+      String path = logoutDestinationURL + "?" + LOGOUT_MESSAGE_PROP + "=success";
+      RequestUtil.sendRedirect(context.response(), path);
     });
 
   }

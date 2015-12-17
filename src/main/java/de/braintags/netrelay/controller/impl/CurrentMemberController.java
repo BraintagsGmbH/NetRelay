@@ -38,7 +38,20 @@ public class CurrentMemberController extends AbstractController {
    * @see io.vertx.core.Handler#handle(java.lang.Object)
    */
   @Override
-  public void handle(RoutingContext event) {
+  public void handle(RoutingContext context) {
+    // if (context.user() != null) {
+    // RequestUtil.getCurrentUser(context, getMongoClient(), FairyTaleVerticle.USER_COLLECTION_NAME, res -> {
+    // if (res.failed()) {
+    // context.fail(res.cause());
+    // return;
+    // } else {
+    // Member user = res.result();
+    // ApexUtil.setCurrentUser(user, context);
+    // context.next();
+    // }
+    // });
+    // } else
+    // context.next();
   }
 
   /*

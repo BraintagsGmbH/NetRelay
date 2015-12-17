@@ -32,12 +32,7 @@ public abstract class AbstractController implements IController {
   private CaptureCollection[] captureCollection;
   private NetRelay netRelay;
   private Properties properties;
-
-  /**
-   * 
-   */
-  public AbstractController() {
-  }
+  private String name;
 
   /**
    * The instance of {@link Vertx} which is used to initialize NetRelay
@@ -54,10 +49,12 @@ public abstract class AbstractController implements IController {
    * @see de.braintags.netrelay.controller.IController#init(io.vertx.core.Vertx, java.util.Properties)
    */
   @Override
-  public final void init(Vertx vertx, NetRelay netRelay, Properties properties, CaptureCollection[] captureCollection) {
+  public final void init(Vertx vertx, NetRelay netRelay, Properties properties, CaptureCollection[] captureCollection,
+      String name) {
     this.vertx = vertx;
     this.netRelay = netRelay;
     this.properties = properties;
+    this.name = name;
     initProperties(properties);
     initCaptureCollection(captureCollection);
   }
@@ -114,6 +111,15 @@ public abstract class AbstractController implements IController {
     if (value == null && required)
       throw new ParameterRequiredException(propertyName);
     return value == null ? defaultValue : value;
+  }
+
+  /**
+   * Get the name of the definition
+   * 
+   * @return
+   */
+  public final String getName() {
+    return name;
   }
 
 }

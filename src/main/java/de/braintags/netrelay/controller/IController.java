@@ -42,7 +42,9 @@ public interface IController extends Handler<RoutingContext> {
    * @param captureCollection
    *          the {@link CaptureCollection}s for of the current definition. The controller itself decides, wether it
    *          should use it and how to interprete entries of type {@link CaptureDefinition}
+   * @param name
+   *          the name of the instance to be displayed
    */
-  void init(Vertx vertx, NetRelay netRelay, Properties properties, CaptureCollection[] captureCollection);
+  void init(Vertx vertx, NetRelay netRelay, Properties properties, CaptureCollection[] captureCollection, String name);
 
 }
