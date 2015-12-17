@@ -35,8 +35,10 @@ import io.vertx.ext.web.RoutingContext;
  * After the action the page defined by the properties registerSuccess or registerFailure is called
  * 
  * @author Michael Remme
- * 
+ *
  */
+// TODO configurable regarding mapper. For instance one controller working with Member, another with Customer. define
+// Interface which must be implemented by instances handled here
 public class RegisterController extends AbstractController {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(RegisterController.class);

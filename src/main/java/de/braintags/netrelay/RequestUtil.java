@@ -12,11 +12,18 @@
  */
 package de.braintags.netrelay;
 
+import de.braintags.netrelay.model.Member;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import io.vertx.ext.auth.User;
+import io.vertx.ext.auth.mongo.impl.MongoUser;
+import io.vertx.ext.mongo.MongoClient;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.templ.ThymeleafTemplateEngine;
 
@@ -28,12 +35,6 @@ import io.vertx.ext.web.templ.ThymeleafTemplateEngine;
  */
 public class RequestUtil {
   private static final Logger logger = LoggerFactory.getLogger(RequestUtil.class);
-
-  /**
-   * 
-   */
-  private RequestUtil() {
-  }
 
   /**
    * Render a specific template
@@ -111,6 +112,67 @@ public class RequestUtil {
     }
     String rpath = path.substring(0, index) + path.substring(index + value.length() + 1);
     return rpath;
+  }
+
+  /**
+   * This method searches for a logged in User and returns it
+   * 
+   * @param context
+   * @param mongoClient
+   * @param collectionName
+   * @param resultHandler
+   */
+  public static final void getCurrentUser(RoutingContext context, MongoClient mongoClient, String collectionName,
+      Handler<AsyncResult<Member>> resultHandler) {
+    User user = context.user();
+
+    if (user == null) {
+      UnsupportedOperationException ex = new UnsupportedOperationException(
+          "To call this method a user must be logged in");
+      Future<Member> future = Future.failedFuture(ex);
+      resultHandler.handle(future);
+      return;
+    }
+
+    if (user instanceof Member) {
+      Future<Member> future = Future.succeededFuture((Member) user);
+      resultHandler.handle(future);
+      return;
+    } else if (user instanceof MongoUser) {
+      Future<Member> future = Future.failedFuture(new UnsupportedOperationException());
+      resultHandler.handle(future);
+
+      // JsonObject principal = ((MongoUser) user).principal();
+      // final Member member = new Member(FairyTaleVerticle.USER_COLLECTION_NAME);
+      // member.fromJson(principal, mongoClient, res -> {
+      // if (res.failed()) {
+      // resultHandler.handle(Future.failedFuture(res.cause()));
+      // return;
+      // } else {
+      // Future<Member> future = Future.succeededFuture(member);
+      // resultHandler.handle(future);
+      // return;
+      // }
+      // });
+    } else {
+      Future<Member> future = Future.failedFuture(new IllegalArgumentException("not an instance of Member"));
+      resultHandler.handle(future);
+      return;
+    }
+
+    // JsonObject principal = context.user().principal();
+    // Member.findUserByPrincipal(mongoClient, collectionName, principal,
+    // res -> {
+    // if (res.failed()) {
+    // resultHandler.handle(res);
+    // } else {
+    // Member tmpUser = res.result();
+    // ApexUtil.setCurrentUser(tmpUser, context);
+    // Future<Member> future = Future.succeededFuture(tmpUser);
+    // resultHandler.handle(future);
+    // }
+    // });
+
   }
 
 }

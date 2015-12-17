@@ -67,10 +67,22 @@ public class ThymeleafTemplateController extends AbstractController {
 
   private TemplateHandler templateHandler;
 
-  /**
+  /*
+   * (non-Javadoc)
    * 
+   * @see io.vertx.core.Handler#handle(java.lang.Object)
    */
-  public ThymeleafTemplateController() {
+  @Override
+  public void handle(RoutingContext event) {
+    String path = event.request().path();
+    LOGGER.info("handling template for url " + event.normalisedPath() + " | " + path);
+    if (path.endsWith("/")) {
+      LOGGER.info("REROUTING TO: " + path);
+      path += "index.html";
+      event.reroute(path);
+    } else {
+      templateHandler.handle(event);
+    }
   }
 
   @Override
@@ -127,17 +139,6 @@ public class ThymeleafTemplateController extends AbstractController {
     json.put(CONTENT_TYPE_PROPERTY, DEFAULT_CONTENT_TYPE);
     json.put(TEMPLATE_DIRECTORY_PROPERTY, DEFAULT_TEMPLATE_DIRECTORY);
     return json;
-  }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see io.vertx.core.Handler#handle(java.lang.Object)
-   */
-  @Override
-  public void handle(RoutingContext event) {
-    LOGGER.info("handling template for url " + event.normalisedPath() + " | " + event.request().path());
-    templateHandler.handle(event);
   }
 
 }

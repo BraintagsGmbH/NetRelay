@@ -14,6 +14,7 @@ package de.braintags.netrelay.controller.impl.authentication;
 
 import java.util.Properties;
 
+import de.braintags.netrelay.RequestUtil;
 import de.braintags.netrelay.routing.RouterDefinition;
 import io.vertx.ext.auth.mongo.MongoAuth;
 import io.vertx.ext.web.RoutingContext;
@@ -21,7 +22,12 @@ import io.vertx.ext.web.handler.FormLoginHandler;
 import io.vertx.ext.web.handler.UserSessionHandler;
 
 /**
- * Controller performs the authentication of members
+ * Controller performs the authentication, login and logout of members.
+ * 
+ * Logout: performs logout and stores message in context with key LOGOUT_MESSAGE_PROP
+ * 
+ * 
+ * 
  * 
  * @author mremme
  * 
@@ -37,9 +43,9 @@ public class AuthenticationController extends AbstractAuthController {
   public static final String LOGIN_ACTION_URL_PROP = "loginAction";
 
   /**
-   * The url where a logout is performed, if a member is logged in
+   * The url where a logout action is performed, if a member is logged in
    */
-  public static final String LOGOUT_URL_PROP = "logoutUrl";
+  public static final String LOGOUT_ACTION_URL_PROP = "logoutAction";
 
   /**
    * By this property you can define the destination page, which is called after a logout
@@ -60,6 +66,11 @@ public class AuthenticationController extends AbstractAuthController {
    * The default url which is called after a logout
    */
   public static final String DEFAULT_LOGOUT_DESTINATION = "/index.html";
+
+  /**
+   * This property name is used as key, to store a logout message into the context
+   */
+  public static final String LOGOUT_MESSAGE_PROP = "logoutMessage";
 
   /*
    * (non-Javadoc)
@@ -92,12 +103,13 @@ public class AuthenticationController extends AbstractAuthController {
   }
 
   private void initLogoutAction() {
-    String logoutUrl = readProperty(LOGOUT_URL_PROP, DEFAULT_LOGOUT_ACTION_URL, false);
+    String logoutUrl = readProperty(LOGOUT_ACTION_URL_PROP, DEFAULT_LOGOUT_ACTION_URL, false);
     String logoutDestinationURL = readProperty(LOGOUT_DESTINATION_PAGE_PROP, DEFAULT_LOGOUT_DESTINATION, false);
     getNetRelay().getRouter().route(logoutUrl).handler(context -> {
       if (context.user() != null) {
         context.clearUser();
-        context.reroute(logoutDestinationURL);
+        String path = logoutDestinationURL + "?" + LOGOUT_MESSAGE_PROP + "=success";
+        RequestUtil.sendRedirect(context.response(), path);
       }
     });
 
@@ -138,7 +150,8 @@ public class AuthenticationController extends AbstractAuthController {
     json.put(MongoAuth.PROPERTY_COLLECTION_NAME, "usertable");
     json.put(MongoAuth.PROPERTY_ROLE_FIELD, "roles");
     json.put(LOGIN_ACTION_URL_PROP, DEFAULT_LOGIN_ACTION_URL);
-    json.put(LOGOUT_URL_PROP, DEFAULT_LOGOUT_ACTION_URL);
+    json.put(LOGOUT_ACTION_URL_PROP, DEFAULT_LOGOUT_ACTION_URL);
+    json.put(LOGOUT_DESTINATION_PAGE_PROP, DEFAULT_LOGOUT_DESTINATION);
     return json;
   }
 

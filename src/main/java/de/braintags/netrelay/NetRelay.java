@@ -21,7 +21,6 @@ import de.braintags.io.vertx.pojomapper.mongo.init.MongoDataStoreInit;
 import de.braintags.netrelay.controller.impl.BodyController;
 import de.braintags.netrelay.controller.impl.CookieController;
 import de.braintags.netrelay.controller.impl.FailureController;
-import de.braintags.netrelay.controller.impl.RedirectController;
 import de.braintags.netrelay.controller.impl.SessionController;
 import de.braintags.netrelay.controller.impl.StaticController;
 import de.braintags.netrelay.controller.impl.ThymeleafTemplateController;
@@ -208,7 +207,7 @@ public abstract class NetRelay extends AbstractVerticle {
     settings.getRouterDefinitions().add(TimeoutController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(BodyController.createDefaultRouterDefinition());
 
-    settings.getRouterDefinitions().add(RedirectController.createDefaultRouterDefinition());
+    // settings.getRouterDefinitions().add(RedirectController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(StaticController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(AuthenticationController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(RegisterController.createDefaultRouterDefinition());
