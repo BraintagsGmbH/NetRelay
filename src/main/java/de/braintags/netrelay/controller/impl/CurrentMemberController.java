@@ -14,7 +14,10 @@ package de.braintags.netrelay.controller.impl;
 
 import java.util.Properties;
 
+import de.braintags.netrelay.RequestUtil;
+import de.braintags.netrelay.controller.impl.authentication.AuthenticationController;
 import de.braintags.netrelay.model.Member;
+import de.braintags.netrelay.routing.RouterDefinition;
 import io.vertx.ext.web.RoutingContext;
 
 /**
@@ -25,12 +28,8 @@ import io.vertx.ext.web.RoutingContext;
  * 
  */
 public class CurrentMemberController extends AbstractController {
-
-  /**
-   * 
-   */
-  public CurrentMemberController() {
-  }
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(CurrentMemberController.class);
 
   /*
    * (non-Javadoc)
@@ -39,19 +38,43 @@ public class CurrentMemberController extends AbstractController {
    */
   @Override
   public void handle(RoutingContext context) {
-    // if (context.user() != null) {
-    // RequestUtil.getCurrentUser(context, getMongoClient(), FairyTaleVerticle.USER_COLLECTION_NAME, res -> {
-    // if (res.failed()) {
-    // context.fail(res.cause());
-    // return;
-    // } else {
-    // Member user = res.result();
-    // ApexUtil.setCurrentUser(user, context);
-    // context.next();
-    // }
-    // });
-    // } else
-    // context.next();
+    Member member = RequestUtil.getCurrentUser(context);
+    if (member != null) {
+      context.put(Member.CURRENT_USER_PROPERTY, member);
+      LOGGER.info(member.getClass().getName());
+      context.next();
+    } else if (context.user() != null) {
+      try {
+        Class mapperClass = getMapperClass(context);
+        RequestUtil.getCurrentUser(context, getNetRelay().getDatastore(), mapperClass, res -> {
+          if (res.failed()) {
+            context.fail(res.cause());
+          } else {
+            Member user = res.result();
+            context.put(Member.CURRENT_USER_PROPERTY, user);
+            RequestUtil.setCurrentUser(user, context);
+            context.next();
+          }
+        });
+      } catch (Exception e) {
+        context.fail(e);
+      }
+    } else {
+      context.next();
+    }
+  }
+
+  private Class getMapperClass(RoutingContext context) {
+    String mapperName = context.user().principal().getString(AuthenticationController.MAPPERNAME_IN_PRINCIPAL);
+    if (mapperName == null) {
+      throw new IllegalArgumentException("No mapper definition found in principal");
+    }
+
+    Class mapperClass = getNetRelay().getSettings().getMappingDefinitions().getMapperClass(mapperName);
+    if (mapperClass == null) {
+      throw new IllegalArgumentException("No MapperClass definition for: " + mapperName);
+    }
+    return mapperClass;
   }
 
   /*
@@ -63,4 +86,28 @@ public class CurrentMemberController extends AbstractController {
   public void initProperties(Properties properties) {
   }
 
+  /**
+   * Creates a default definition for the current instance
+   * 
+   * @return
+   */
+  public static RouterDefinition createDefaultRouterDefinition() {
+    RouterDefinition def = new RouterDefinition();
+    def.setName(CurrentMemberController.class.getSimpleName());
+    def.setBlocking(false);
+    def.setController(CurrentMemberController.class);
+    def.setHandlerProperties(getDefaultProperties());
+    def.setRoutes(new String[] {});
+    return def;
+  }
+
+  /**
+   * Get the default properties for an implementation of StaticController
+   * 
+   * @return
+   */
+  public static Properties getDefaultProperties() {
+    Properties json = new Properties();
+    return json;
+  }
 }

@@ -20,6 +20,7 @@ import de.braintags.io.vertx.pojomapper.init.IDataStoreInit;
 import de.braintags.io.vertx.pojomapper.mongo.init.MongoDataStoreInit;
 import de.braintags.netrelay.controller.impl.BodyController;
 import de.braintags.netrelay.controller.impl.CookieController;
+import de.braintags.netrelay.controller.impl.CurrentMemberController;
 import de.braintags.netrelay.controller.impl.FailureController;
 import de.braintags.netrelay.controller.impl.SessionController;
 import de.braintags.netrelay.controller.impl.StaticController;
@@ -203,7 +204,6 @@ public abstract class NetRelay extends AbstractVerticle {
   protected void addDefaultRouterDefinitions(Settings settings) {
     settings.getRouterDefinitions().add(CookieController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(SessionController.createDefaultRouterDefinition());
-    // settings.getRouterDefinitions().add(UserSessionController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(TimeoutController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(BodyController.createDefaultRouterDefinition());
 
@@ -211,6 +211,7 @@ public abstract class NetRelay extends AbstractVerticle {
     settings.getRouterDefinitions().add(StaticController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(AuthenticationController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(RegisterController.createDefaultRouterDefinition());
+    settings.getRouterDefinitions().add(CurrentMemberController.createDefaultRouterDefinition());
 
     settings.getRouterDefinitions().addAfter(BodyController.class.getSimpleName(),
         PersistenceController.createDefaultRouterDefinition());

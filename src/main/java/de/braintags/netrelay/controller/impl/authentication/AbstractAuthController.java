@@ -17,8 +17,12 @@ import java.util.Properties;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.mongo.MongoDataStore;
 import de.braintags.netrelay.controller.impl.AbstractController;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.AuthProvider;
+import io.vertx.ext.auth.User;
 import io.vertx.ext.auth.mongo.HashSaltStyle;
 import io.vertx.ext.auth.mongo.MongoAuth;
 import io.vertx.ext.web.handler.AuthHandler;
@@ -33,6 +37,10 @@ import io.vertx.ext.web.handler.RedirectAuthHandler;
 public abstract class AbstractAuthController extends AbstractController {
   public static final String AUTH_PROVIDER_MONGO = "MongoAuth";
 
+  /**
+   * The name of the key, which is used to store the mapper in the {@link User#principal()}
+   */
+  public static final String MAPPERNAME_IN_PRINCIPAL = "mapper";
   /**
    * Defines the name of the {@link AuthProvider} to be used
    */
@@ -62,10 +70,11 @@ public abstract class AbstractAuthController extends AbstractController {
     authHandler = RedirectAuthHandler.create(authProvider, loginPage);
   }
 
-  private AuthProvider createAuthProvider(Properties properties) {
+  private AuthProviderProxy createAuthProvider(Properties properties) {
     String authProvider = (String) properties.get(AUTH_PROVIDER_PROP);
+    String mapper = readProperty(MongoAuth.PROPERTY_COLLECTION_NAME, null, true);
     if (authProvider.equals(AUTH_PROVIDER_MONGO)) {
-      return initMongoAuthProvider();
+      return new AuthProviderProxy(initMongoAuthProvider(mapper), mapper);
     } else {
       throw new UnsupportedOperationException("unsupported authprovider: " + authProvider);
     }
@@ -74,7 +83,7 @@ public abstract class AbstractAuthController extends AbstractController {
   /**
    * Init the Authentication Service
    */
-  private AuthProvider initMongoAuthProvider() {
+  private AuthProvider initMongoAuthProvider(String mapper) {
     IDataStore store = getNetRelay().getDatastore();
     if (!(store instanceof MongoDataStore)) {
       throw new IllegalArgumentException("MongoAuthProvider expects a MongoDataStore");
@@ -86,7 +95,7 @@ public abstract class AbstractAuthController extends AbstractController {
 
     auth.setPasswordField(readProperty(MongoAuth.PROPERTY_PASSWORD_FIELD, null, true));
     auth.setUsernameField(readProperty(MongoAuth.PROPERTY_USERNAME_FIELD, null, true));
-    auth.setCollectionName(readProperty(MongoAuth.PROPERTY_COLLECTION_NAME, null, true));
+    auth.setCollectionName(mapper);
 
     String roleField = readProperty(MongoAuth.PROPERTY_ROLE_FIELD, null, false);
     if (roleField != null) {
@@ -100,4 +109,32 @@ public abstract class AbstractAuthController extends AbstractController {
     return auth;
   }
 
+  class AuthProviderProxy implements AuthProvider {
+    AuthProvider prov;
+    String mapper;
+
+    AuthProviderProxy(AuthProvider prov, String mapper) {
+      this.prov = prov;
+      this.mapper = mapper;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see io.vertx.ext.auth.AuthProvider#authenticate(io.vertx.core.json.JsonObject, io.vertx.core.Handler)
+     */
+    @Override
+    public void authenticate(JsonObject arg0, Handler<AsyncResult<User>> handler) {
+      prov.authenticate(arg0, result -> {
+        if (result.failed()) {
+          handler.handle(result);
+        } else {
+          User user = result.result();
+          user.principal().put(MAPPERNAME_IN_PRINCIPAL, mapper);
+          handler.handle(Future.succeededFuture(user));
+        }
+      });
+    }
+
+  }
 }

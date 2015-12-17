@@ -14,6 +14,7 @@ package de.braintags.netrelay;
 
 import org.junit.Test;
 
+import de.braintags.netrelay.mapper.Customer;
 import io.vertx.ext.unit.TestContext;
 
 /**
@@ -54,6 +55,11 @@ public class TRequestUtil extends NetRelayBaseTest {
     result = RequestUtil.cleanPathElement("first", path);
     context.assertEquals("second/third/firstfourth/", result);
 
+  }
+
+  @Test
+  public void testCustomer(TestContext context) {
+    netRelay.getDatastore().createQuery(Customer.class);
   }
 
 }

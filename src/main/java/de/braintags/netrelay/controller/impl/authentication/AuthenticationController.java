@@ -109,6 +109,7 @@ public class AuthenticationController extends AbstractAuthController {
     getNetRelay().getRouter().route(logoutUrl).handler(context -> {
       if (context.user() != null) {
         context.clearUser();
+        RequestUtil.removeCurrentUser(context);
       }
       String path = logoutDestinationURL + "?" + LOGOUT_MESSAGE_PROP + "=success";
       RequestUtil.sendRedirect(context.response(), path);
