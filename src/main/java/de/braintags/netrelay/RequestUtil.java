@@ -28,7 +28,6 @@ import io.vertx.ext.web.templ.ThymeleafTemplateEngine;
  */
 public class RequestUtil {
   private static final Logger logger = LoggerFactory.getLogger(RequestUtil.class);
-  public static final String CURRENT_USER_PROPERTY = "currentUser";
 
   /**
    * 

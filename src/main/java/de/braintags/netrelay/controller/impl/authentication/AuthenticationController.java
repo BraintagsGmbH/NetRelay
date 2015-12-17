@@ -18,6 +18,7 @@ import de.braintags.netrelay.routing.RouterDefinition;
 import io.vertx.ext.auth.mongo.MongoAuth;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.FormLoginHandler;
+import io.vertx.ext.web.handler.UserSessionHandler;
 
 /**
  * Controller performs the authentication of members
@@ -26,6 +27,9 @@ import io.vertx.ext.web.handler.FormLoginHandler;
  * 
  */
 public class AuthenticationController extends AbstractAuthController {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(AuthenticationController.class);
+
   /**
    * With this property the url for the login can be defined. It is the url, which is called by a login form and is a
    * virtual url, where the {@link FormLoginHandler} is processed. Default is "/member/login"
@@ -70,8 +74,21 @@ public class AuthenticationController extends AbstractAuthController {
   @Override
   public void initProperties(Properties properties) {
     super.initProperties(properties);
+    initUserSessionHandler();
     initLoginAction();
     initLogoutAction();
+    initLogger();
+  }
+
+  private void initLogger() {
+    getNetRelay().getRouter().route().handler(context -> {
+      LOGGER.info("USER: " + context.user());
+      context.next();
+    });
+  }
+
+  private void initUserSessionHandler() {
+    getNetRelay().getRouter().route().handler(UserSessionHandler.create(authProvider));
   }
 
   private void initLogoutAction() {
@@ -88,7 +105,8 @@ public class AuthenticationController extends AbstractAuthController {
 
   private void initLoginAction() {
     String loginUrl = readProperty(LOGIN_ACTION_URL_PROP, DEFAULT_LOGIN_ACTION_URL, false);
-    getNetRelay().getRouter().route(loginUrl).handler(FormLoginHandler.create(authProvider));
+    FormLoginHandler fl = FormLoginHandler.create(authProvider);
+    getNetRelay().getRouter().route(loginUrl).handler(fl);
   }
 
   /**
