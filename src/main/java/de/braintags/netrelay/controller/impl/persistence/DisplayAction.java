@@ -92,7 +92,8 @@ public class DisplayAction extends AbstractAction {
             if (ir.failed()) {
               handler.handle(Future.failedFuture(ir.cause()));
             } else {
-              saveObjectInDatastore(ir.result(), entityName, context, mapper, handler);
+              addToContext(context, entityName, ir.result());
+              handler.handle(Future.succeededFuture());
             }
           });
         }
