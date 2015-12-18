@@ -34,11 +34,9 @@ public abstract class AbstractCaptureParameterTest extends NetRelayBaseTest {
     context.assertEquals(action, cm.get(CaptureTestController.ACTION_KEY));
   }
 
+  @Override
   protected RouterDefinition defineRouterDefinition(Class controllerClass, String route) {
-    RouterDefinition rd = new RouterDefinition();
-    rd.setName(controllerClass.getSimpleName());
-    rd.setController(controllerClass);
-    rd.setRoutes(new String[] { route });
+    RouterDefinition rd = super.defineRouterDefinition(controllerClass, route);
     rd.setCaptureCollection(createDefaultCaptureCollection());
     return rd;
   }

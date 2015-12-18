@@ -277,6 +277,14 @@ public class NetRelayBaseTest {
     }
   }
 
+  protected RouterDefinition defineRouterDefinition(Class controllerClass, String route) {
+    RouterDefinition rd = new RouterDefinition();
+    rd.setName(controllerClass.getSimpleName());
+    rd.setController(controllerClass);
+    rd.setRoutes(new String[] { route });
+    return rd;
+  }
+
   public class ResponseCopy {
     String content;
     int code;
