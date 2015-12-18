@@ -31,6 +31,7 @@ import io.vertx.ext.web.Router;
  */
 public class RouterDefinition {
   private String name;
+  private boolean active = true;
   private String[] routes;
   private boolean blocking = false;
   private boolean failureDefinition = false;
@@ -223,6 +224,21 @@ public class RouterDefinition {
    */
   public final void setCaptureCollection(CaptureCollection[] captureCollection) {
     this.captureCollection = captureCollection;
+  }
+
+  /**
+   * @return the active
+   */
+  public final boolean isActive() {
+    return active;
+  }
+
+  /**
+   * @param active
+   *          the active to set
+   */
+  public final void setActive(boolean active) {
+    this.active = active;
   }
 
 }

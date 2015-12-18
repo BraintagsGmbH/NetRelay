@@ -38,12 +38,13 @@ public class RoutingInit {
 
   public static void initRoutingDefinition(Vertx vertx, NetRelay netRelay, Router router, RouterDefinition def)
       throws Exception {
-    if (def.isFailureDefinition()) {
-      initFailureDefinition(vertx, netRelay, router, def);
-    } else {
-      initRegularDefinition(vertx, netRelay, router, def);
+    if (def.isActive()) {
+      if (def.isFailureDefinition()) {
+        initFailureDefinition(vertx, netRelay, router, def);
+      } else {
+        initRegularDefinition(vertx, netRelay, router, def);
+      }
     }
-
   }
 
   private static void initRegularDefinition(Vertx vertx, NetRelay netRelay, Router router, RouterDefinition def)
