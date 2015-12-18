@@ -122,4 +122,8 @@ public abstract class AbstractController implements IController {
     return name;
   }
 
+  @Override
+  public String toString() {
+    return name;
+  }
 }
