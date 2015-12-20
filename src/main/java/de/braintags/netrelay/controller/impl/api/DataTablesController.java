@@ -12,7 +12,9 @@
  */
 package de.braintags.netrelay.controller.impl.api;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
@@ -40,6 +42,9 @@ import io.vertx.ext.web.RoutingContext;
  * 
  */
 public class DataTablesController extends AbstractController {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(DataTablesController.class);
+
   /**
    * The name of a the property in the request, which specifies the mapper
    */
@@ -59,6 +64,8 @@ public class DataTablesController extends AbstractController {
       context.fail(new ParameterRequiredException(MAPPER_KEY));
     } else {
       Class mapperClass = getNetRelay().getSettings().getMappingDefinitions().getMapperClass(mapperName);
+      Objects.requireNonNull(mapperClass,
+          "Could not determine mapper class for " + mapperName + ". Check the configuration");
       DataTableLinkDescriptor descr = new DataTableLinkDescriptor(mapperClass, context);
       IQuery<?> query = descr.toQuery(getNetRelay().getDatastore());
       execute(query, descr, result -> {
@@ -77,28 +84,37 @@ public class DataTablesController extends AbstractController {
       if (qr.failed()) {
         handler.handle(Future.failedFuture(qr.cause()));
       } else {
+        LOGGER.info(qr.result().getOriginalQuery());
+        long totalResult = qr.result().getCompleteResult();
         qr.result().toArray(result -> {
           if (result.failed()) {
             handler.handle(Future.failedFuture(result.cause()));
           } else {
             Object[] selection = result.result();
-            mapperFactory.getStoreObjectFactory().createStoreObjects(query.getMapper(), Arrays.asList(selection),
-                str -> {
-              if (str.failed()) {
-                handler.handle(Future.failedFuture(result.cause()));
-              } else {
-                handler.handle(Future.succeededFuture(createJsonObject(query.getMapper(), str.result(), descr)));
-              }
-            });
+            if (selection.length == 0) {
+              handler.handle(Future.succeededFuture(
+                  createJsonObject(query.getMapper(), new ArrayList<IStoreObject<?>>(), descr, totalResult)));
+            } else {
+              mapperFactory.getStoreObjectFactory().createStoreObjects(query.getMapper(), Arrays.asList(selection),
+                  str -> {
+                if (str.failed()) {
+                  handler.handle(Future.failedFuture(result.cause()));
+                } else {
+                  handler.handle(
+                      Future.succeededFuture(createJsonObject(query.getMapper(), str.result(), descr, totalResult)));
+                }
+              });
+            }
           }
         });
       }
     });
   }
 
-  private JsonObject createJsonObject(IMapper mapper, List<IStoreObject<?>> selection, DataTableLinkDescriptor descr) {
+  private JsonObject createJsonObject(IMapper mapper, List<IStoreObject<?>> selection, DataTableLinkDescriptor descr,
+      long completeCount) {
     JsonObject json = new JsonObject();
-    json.put("iTotalRecords", selection.size());
+    json.put("iTotalRecords", completeCount);
     json.put("iTotalDisplayRecords", selection.size());
     JsonArray resArray = new JsonArray();
     json.put("aaData", resArray);
@@ -111,8 +127,12 @@ public class DataTablesController extends AbstractController {
   private JsonArray handleObject(IMapper mapper, IStoreObject<?> sto, DataTableLinkDescriptor descr) {
     JsonArray json = new JsonArray();
     for (ColDef colDef : descr.getColumns()) {
-      IField field = mapper.getField(colDef.name);
-      json.add(sto.get(field));
+      if (colDef.name != null && colDef.name.hashCode() != 0) {
+        IField field = mapper.getField(colDef.name);
+        json.add(sto.get(field));
+      } else {
+        json.add("");
+      }
     }
     return json;
   }

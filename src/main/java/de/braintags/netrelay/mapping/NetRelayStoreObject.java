@@ -14,6 +14,7 @@ package de.braintags.netrelay.mapping;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -45,7 +46,7 @@ public class NetRelayStoreObject implements IStoreObject<Map<String, String>> {
   private IMapper mapper;
   private Object entity = null;
   private Collection<IObjectReference> objectReferences = new ArrayList<IObjectReference>();
-  private Map<String, String> requestMap;
+  private Map<String, String> requestMap = new HashMap<>();
   private NetRelay netRelay;
 
   /**

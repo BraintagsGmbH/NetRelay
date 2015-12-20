@@ -68,10 +68,10 @@ public class NetRelayBaseTest {
     LOGGER.info("Starting test: " + this.getClass().getSimpleName() + "#" + name.getMethodName());
     initNetRelay(context);
     DatastoreBaseTest.EXTERNAL_DATASTORE = netRelay.getDatastore();
-    initTest();
+    initTest(context);
   }
 
-  public void initTest() {
+  public void initTest(TestContext context) {
 
   }
 

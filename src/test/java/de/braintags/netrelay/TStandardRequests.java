@@ -110,8 +110,8 @@ public class TStandardRequests extends NetRelayBaseTest {
    * @see de.braintags.netrelay.NetRelayBaseTest#initTest()
    */
   @Override
-  public void initTest() {
-    super.initTest();
+  public void initTest(TestContext context) {
+    super.initTest(context);
   }
 
   /*

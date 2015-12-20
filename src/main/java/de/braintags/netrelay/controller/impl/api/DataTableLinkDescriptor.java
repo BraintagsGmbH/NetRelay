@@ -12,6 +12,8 @@
  */
 package de.braintags.netrelay.controller.impl.api;
 
+import java.util.Objects;
+
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import io.vertx.ext.web.RoutingContext;
@@ -38,6 +40,7 @@ public class DataTableLinkDescriptor {
    * 
    */
   public DataTableLinkDescriptor(Class<?> mapperClass, RoutingContext context) {
+    Objects.requireNonNull(mapperClass, "Mapper cass must not be null");
     this.mapperClass = mapperClass;
     extractColumns(context);
     extractStartLength(context);
@@ -59,6 +62,7 @@ public class DataTableLinkDescriptor {
     }
     query.setLimit(displayLength);
     query.setStart(displayStart);
+    query.setReturnCompleteCount(true);
     return query;
   }
 
