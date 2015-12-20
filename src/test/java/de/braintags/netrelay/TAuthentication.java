@@ -36,7 +36,7 @@ public class TAuthentication extends NetRelayBaseTest {
       String url = "/private/privatePage.html";
       testRequest(context, HttpMethod.POST, url, null, resp -> {
         LOGGER.info("RESPONSE: " + resp.content);
-        context.assertTrue(resp.content.toString().contains("testmapper for display"), "Expected name not found");
+        context.assertTrue(resp.content.toString().contains("PRIVAT"), "Expected name not found");
       } , 200, "OK", null);
     } catch (Exception e) {
       context.fail(e);

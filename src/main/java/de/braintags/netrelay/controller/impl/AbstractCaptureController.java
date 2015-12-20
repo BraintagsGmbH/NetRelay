@@ -105,9 +105,14 @@ public abstract class AbstractCaptureController extends AbstractController {
    */
   protected void handleReroute(RoutingContext context, List<CaptureMap> resolvedCaptureCollections) {
     if (doReroute) {
+      String path = context.normalisedPath();
       String cleanedPath = cleanPath(context, resolvedCaptureCollections);
-      LOGGER.info("rerouting to " + cleanedPath);
-      context.reroute(cleanedPath);
+      if (!path.equals(cleanedPath)) {
+        LOGGER.info("rerouting to " + cleanedPath);
+        context.reroute(cleanedPath);
+      } else {
+        context.next();
+      }
     } else {
       context.next();
     }

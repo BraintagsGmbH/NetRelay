@@ -102,18 +102,20 @@ public class RequestUtil {
    *           if element with one "/" before or after the value wasn't found
    */
   public static String cleanPathElement(String value, String path) {
-    int index = path.indexOf("/" + value + "/");
-    if (index < 0) {
-      index = path.indexOf("/" + value);
+    if (path.indexOf(value) >= 0) {
+      int index = path.indexOf("/" + value + "/");
+      if (index < 0) {
+        index = path.indexOf("/" + value);
+      }
+      if (index < 0) {
+        index = path.indexOf(value + "/");
+      }
+      if (index < 0) {
+        throw new IllegalArgumentException("Could not clean url from value '" + value + "'");
+      }
+      path = path.substring(0, index) + path.substring(index + value.length() + 1);
     }
-    if (index < 0) {
-      index = path.indexOf(value + "/");
-    }
-    if (index < 0) {
-      throw new IllegalArgumentException("Could not clean url from value '" + value + "'");
-    }
-    String rpath = path.substring(0, index) + path.substring(index + value.length() + 1);
-    return rpath;
+    return path;
   }
 
   /**

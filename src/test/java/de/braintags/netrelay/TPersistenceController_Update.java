@@ -78,6 +78,48 @@ public class TPersistenceController_Update extends AbstractPersistenceController
 
   }
 
+  @Test
+  public void testUpdateAsParameter(TestContext context) {
+    SimpleNetRelayMapper mapper = new SimpleNetRelayMapper();
+    mapper.age = 13;
+    mapper.child = true;
+    mapper.name = "testmapper for update";
+    ResultContainer rc = DatastoreBaseTest.saveRecord(context, mapper);
+    if (rc.assertionError != null)
+      throw rc.assertionError;
+
+    Object id = rc.writeResult.iterator().next().getId();
+    LOGGER.info("ID: " + id);
+
+    try {
+
+      String url = "/products/update2.html?action=UPDATE&entity=" + NetRelayExt_FileBasedSettings.SIMPLEMAPPER_NAME
+          + "&ID=" + id;
+      testRequest(context, HttpMethod.POST, url, req -> {
+        Buffer buffer = Buffer.buffer();
+        buffer.appendString("origin=junit-testUserAlias&login=admin%40foo.bar&pass+word=admin");
+        buffer.appendString("&").appendString(NetRelayExt_FileBasedSettings.SIMPLEMAPPER_NAME)
+            .appendString(".name=updatePerformed");
+        buffer.appendString("&").appendString(NetRelayExt_FileBasedSettings.SIMPLEMAPPER_NAME).appendString(".age=20");
+        req.headers().set("content-length", String.valueOf(buffer.length()));
+        req.headers().set("content-type", "application/x-www-form-urlencoded");
+        req.write(buffer);
+      } , resp -> {
+        context.assertNotNull(resp);
+        String content = resp.content;
+        LOGGER.info("RESPONSE: " + content);
+        context.assertTrue(content.contains("updatePerformed"), "Update was not performed");
+        context.assertTrue(content.contains("20"), "updated age was not saved");
+        // child was not modified in request and should stay true
+        context.assertTrue(content.contains("true"), "property child was modified, but should not");
+      } , 200, "OK", null);
+
+    } catch (Exception e) {
+      context.fail(e);
+    }
+
+  }
+
   /*
    * (non-Javadoc)
    * 
@@ -87,7 +129,7 @@ public class TPersistenceController_Update extends AbstractPersistenceController
   protected void modifySettings(TestContext context, Settings settings) {
     super.modifySettings(context, settings);
     RouterDefinition def = settings.getRouterDefinitions().remove(PersistenceController.class.getSimpleName());
-    def.setRoutes(new String[] { "/products/:entity/:action/:ID/update.html" });
+    def.setRoutes(new String[] { "/products/:entity/:action/:ID/update.html", "/products/update2.html" });
 
     settings.getRouterDefinitions().addAfter(BodyController.class.getSimpleName(), def);
   }

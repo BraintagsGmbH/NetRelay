@@ -80,6 +80,48 @@ public class TPersistenceController_Delete extends AbstractPersistenceController
     DatastoreBaseTest.find(context, query, 0);
   }
 
+  @Test
+  public void testDeleteRecordAsParameter(TestContext context) {
+    Async async1 = context.async();
+    IWrite<SimpleNetRelayMapper> write = netRelay.getDatastore().createWrite(SimpleNetRelayMapper.class);
+    SimpleNetRelayMapper mapper = new SimpleNetRelayMapper();
+    mapper.age = 13;
+    mapper.child = false;
+    mapper.name = "testmapper for display";
+    write.add(mapper);
+    ResultObject<SimpleNetRelayMapper> ro = new ResultObject<>(null);
+    write.save(result -> {
+      if (result.failed()) {
+        context.fail(result.cause());
+        async1.complete();
+      } else {
+        // all fine, ID should be set in mapper
+        LOGGER.info("ID: " + mapper.id);
+        async1.complete();
+      }
+    });
+    async1.await();
+
+    Async async2 = context.async();
+    String id = mapper.id;
+    try {
+      String url = "/products/delete2.html?action=DELETE&entity=" + NetRelayExt_FileBasedSettings.SIMPLEMAPPER_NAME
+          + "&ID=" + id;
+      testRequest(context, HttpMethod.POST, url, null, resp -> {
+        LOGGER.info("RESPONSE: " + resp.content);
+        context.assertTrue(resp.content.toString().contains("deleteSuccess"), "Expected name not found");
+      } , 200, "OK", null);
+    } catch (Exception e) {
+      context.fail(e);
+    } finally {
+      async2.complete();
+    }
+    async2.await();
+    IQuery<SimpleNetRelayMapper> query = netRelay.getDatastore().createQuery(SimpleNetRelayMapper.class);
+    query.field(query.getMapper().getIdField().getName()).is(id);
+    DatastoreBaseTest.find(context, query, 0);
+  }
+
   /*
    * (non-Javadoc)
    * 
@@ -89,7 +131,7 @@ public class TPersistenceController_Delete extends AbstractPersistenceController
   protected void modifySettings(TestContext context, Settings settings) {
     super.modifySettings(context, settings);
     RouterDefinition def = settings.getRouterDefinitions().remove(PersistenceController.class.getSimpleName());
-    def.setRoutes(new String[] { "/products/:entity/:action/:ID/delete.html" });
+    def.setRoutes(new String[] { "/products/:entity/:action/:ID/delete.html", "/products/delete2.html" });
 
     settings.getRouterDefinitions().addAfter(BodyController.class.getSimpleName(), def);
   }

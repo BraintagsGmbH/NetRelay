@@ -34,7 +34,7 @@ public class TPersistenceController_Insert extends AbstractPersistenceController
       .getLogger(TPersistenceController_Insert.class);
 
   @Test
-  public void testInsert(TestContext context) throws Exception {
+  public void testInsertAsCapture(TestContext context) throws Exception {
     try {
       String url = String.format("/products/%s/INSERT/insert.html", NetRelayExt_FileBasedSettings.SIMPLEMAPPER_NAME);
       Buffer responseBuffer = Buffer.buffer();
@@ -58,6 +58,32 @@ public class TPersistenceController_Insert extends AbstractPersistenceController
     }
   }
 
+  @Test
+  public void testInsertAsParameter(TestContext context) throws Exception {
+    try {
+      String url = String.format("/products/insert2.html?action=INSERT&entity=%s",
+          NetRelayExt_FileBasedSettings.SIMPLEMAPPER_NAME);
+      Buffer responseBuffer = Buffer.buffer();
+      testRequest(context, HttpMethod.POST, url, req -> {
+        Buffer buffer = Buffer.buffer();
+        buffer.appendString("origin=junit-testUserAlias&login=admin%40foo.bar&pass+word=admin");
+        buffer.appendString("&").appendString(NetRelayExt_FileBasedSettings.SIMPLEMAPPER_NAME)
+            .appendString(".name=myFirstName");
+        buffer.appendString("&").appendString(NetRelayExt_FileBasedSettings.SIMPLEMAPPER_NAME).appendString(".age=18");
+        buffer.appendString("&").appendString(NetRelayExt_FileBasedSettings.SIMPLEMAPPER_NAME)
+            .appendString(".child=true");
+        req.headers().set("content-length", String.valueOf(buffer.length()));
+        req.headers().set("content-type", "application/x-www-form-urlencoded");
+        req.write(buffer);
+      } , resp -> {
+        LOGGER.info("RESPONSE: " + resp.content);
+        context.assertTrue(resp.content.toString().contains("myFirstName"), "Expected name not found in response");
+      } , 200, "OK", null);
+    } catch (Exception e) {
+      context.fail(e);
+    }
+  }
+
   /*
    * (non-Javadoc)
    * 
@@ -67,7 +93,7 @@ public class TPersistenceController_Insert extends AbstractPersistenceController
   protected void modifySettings(TestContext context, Settings settings) {
     super.modifySettings(context, settings);
     RouterDefinition def = settings.getRouterDefinitions().remove(PersistenceController.class.getSimpleName());
-    def.setRoutes(new String[] { "/products/:entity/:action/insert.html" });
+    def.setRoutes(new String[] { "/products/:entity/:action/insert.html", "/products/insert2.html" });
     settings.getRouterDefinitions().addAfter(BodyController.class.getSimpleName(), def);
   }
 

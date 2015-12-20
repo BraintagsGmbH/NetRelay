@@ -33,7 +33,7 @@ public class TTemplateController extends NetRelayBaseTest {
 
   @Test
   public void testRedirect(TestContext context) throws Exception {
-    testRequest(context, HttpMethod.GET, "/", 302, "Found");
+    testRequest(context, HttpMethod.GET, "/", 200, "OK");
   }
 
   /*
