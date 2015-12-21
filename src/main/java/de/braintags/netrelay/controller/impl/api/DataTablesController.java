@@ -127,7 +127,7 @@ public class DataTablesController extends AbstractController {
   private JsonArray handleObject(IMapper mapper, IStoreObject<?> sto, DataTableLinkDescriptor descr) {
     JsonArray json = new JsonArray();
     for (ColDef colDef : descr.getColumns()) {
-      if (colDef.name != null && colDef.name.hashCode() != 0) {
+      if (colDef != null && colDef.name != null && colDef.name.hashCode() != 0) {
         IField field = mapper.getField(colDef.name);
         json.add(sto.get(field));
       } else {
