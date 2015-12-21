@@ -14,6 +14,7 @@ package de.braintags.netrelay.controller.impl.persistence;
 
 import de.braintags.netrelay.controller.impl.AbstractCaptureController.CaptureMap;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.ext.web.RoutingContext;
 
@@ -41,7 +42,7 @@ public class NoneAction extends AbstractAction {
    */
   @Override
   void handle(String entityName, RoutingContext context, CaptureMap map, Handler<AsyncResult<Void>> handler) {
-    // do really nothing?
+    handler.handle(Future.succeededFuture());
   }
 
 }

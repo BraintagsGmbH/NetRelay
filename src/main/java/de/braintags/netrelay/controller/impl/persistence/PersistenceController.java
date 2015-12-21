@@ -131,6 +131,7 @@ public class PersistenceController extends AbstractCaptureController {
     insertAction = new InsertAction(this);
     updateAction = new UpdateAction(this);
     deleteAction = new DeleteAction(this);
+    noneAction = new NoneAction(this);
     mapperFactory = new NetRelayMapperFactory(getNetRelay());
   }
 
