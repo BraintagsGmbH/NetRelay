@@ -58,6 +58,7 @@ public class PersistenceController extends AbstractCaptureController {
   private InsertAction insertAction;
   private UpdateAction updateAction;
   private DeleteAction deleteAction;
+  private NoneAction noneAction;
 
   /*
    * (non-Javadoc)
@@ -110,6 +111,9 @@ public class PersistenceController extends AbstractCaptureController {
 
     case DELETE:
       return deleteAction;
+
+    case NONE:
+      return noneAction;
 
     default:
       throw new UnsupportedOperationException("unknown action: " + action);

@@ -23,6 +23,7 @@ public enum Action {
   INSERT(),
   UPDATE(),
   DISPLAY(),
-  DELETE();
+  DELETE(),
+  NONE();
 
 }
