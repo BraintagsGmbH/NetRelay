@@ -15,6 +15,7 @@ package de.braintags.netrelay;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.exception.NoSuchRecordException;
+import de.braintags.io.vertx.pojomapper.exception.ParameterRequiredException;
 import de.braintags.netrelay.model.Member;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -37,6 +38,27 @@ import io.vertx.ext.web.templ.ThymeleafTemplateEngine;
  */
 public class RequestUtil {
   private static final Logger logger = LoggerFactory.getLogger(RequestUtil.class);
+
+  /**
+   * Read the value of the defined key.
+   * 
+   * @param context
+   *          the context to be handled
+   * @param key
+   *          the key to retirve from the form parameters
+   * @param defaultValue
+   *          will be returned, if value is null
+   * @param required
+   *          if required and value is null, an exception is thrown
+   * @return the value or null, if none and not required
+   */
+  public static String readFormAttribute(RoutingContext context, String key, String defaultValue, boolean required) {
+    String value = context.request().formAttributes().get(key);
+    if (value == null && required) {
+      throw new ParameterRequiredException(key);
+    }
+    return value == null ? defaultValue : value;
+  }
 
   /**
    * Render a specific template

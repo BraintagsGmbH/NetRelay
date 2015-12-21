@@ -22,6 +22,7 @@ import de.braintags.netrelay.controller.impl.BodyController;
 import de.braintags.netrelay.controller.impl.CookieController;
 import de.braintags.netrelay.controller.impl.CurrentMemberController;
 import de.braintags.netrelay.controller.impl.FailureController;
+import de.braintags.netrelay.controller.impl.MailController;
 import de.braintags.netrelay.controller.impl.SessionController;
 import de.braintags.netrelay.controller.impl.StaticController;
 import de.braintags.netrelay.controller.impl.ThymeleafTemplateController;
@@ -29,6 +30,7 @@ import de.braintags.netrelay.controller.impl.TimeoutController;
 import de.braintags.netrelay.controller.impl.authentication.AuthenticationController;
 import de.braintags.netrelay.controller.impl.authentication.RegisterController;
 import de.braintags.netrelay.controller.impl.persistence.PersistenceController;
+import de.braintags.netrelay.init.MailClientSettings;
 import de.braintags.netrelay.init.Settings;
 import de.braintags.netrelay.routing.RouterDefinition;
 import de.braintags.netrelay.routing.RoutingInit;
@@ -39,6 +41,8 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
+import io.vertx.ext.mail.MailClient;
+import io.vertx.ext.mail.MailConfig;
 import io.vertx.ext.web.Router;
 
 /**
@@ -55,6 +59,7 @@ public abstract class NetRelay extends AbstractVerticle {
   private IDataStore datastore;
   private Settings settings;
   private Router router;
+  private MailClient mailClient;
 
   /**
    * 
@@ -86,6 +91,7 @@ public abstract class NetRelay extends AbstractVerticle {
   private void init(Future<Void> startFuture) {
     try {
       router = Router.router(vertx);
+      initMailClient();
       initControlller(router);
       initHttpServer(router, result -> {
         if (result.failed()) {
@@ -96,6 +102,14 @@ public abstract class NetRelay extends AbstractVerticle {
       });
     } catch (Exception e) {
       startFuture.fail(e);
+    }
+  }
+
+  private void initMailClient() {
+    MailClientSettings ms = settings.getMailClientSettings();
+    if (ms.isActive()) {
+      MailConfig config = new MailConfig();
+      MailClient mailClient = MailClient.createShared(vertx, ms, ms.getName());
     }
   }
 
@@ -207,7 +221,7 @@ public abstract class NetRelay extends AbstractVerticle {
     settings.getRouterDefinitions().add(TimeoutController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(BodyController.createDefaultRouterDefinition());
 
-    // settings.getRouterDefinitions().add(RedirectController.createDefaultRouterDefinition());
+    settings.getRouterDefinitions().add(MailController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(StaticController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(AuthenticationController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(RegisterController.createDefaultRouterDefinition());
@@ -215,8 +229,8 @@ public abstract class NetRelay extends AbstractVerticle {
 
     settings.getRouterDefinitions().addAfter(BodyController.class.getSimpleName(),
         PersistenceController.createDefaultRouterDefinition());
-    settings.getRouterDefinitions().add(ThymeleafTemplateController.createDefaultRouterDefinition());
 
+    settings.getRouterDefinitions().add(ThymeleafTemplateController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(FailureController.createDefaultRouterDefinition());
   }
 
@@ -246,5 +260,15 @@ public abstract class NetRelay extends AbstractVerticle {
   public void resetRoutes() throws Exception {
     getRouter().clear();
     initControlller(router);
+  }
+
+  /**
+   * If {@link MailClientSettings#isActive()} from the {@link Settings}, then this will return
+   * the initialized instance of {@link MailClient}
+   * 
+   * @return the mailClient
+   */
+  public final MailClient getMailClient() {
+    return mailClient;
   }
 }

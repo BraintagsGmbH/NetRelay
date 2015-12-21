@@ -21,6 +21,7 @@ import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.file.FileSystem;
 import io.vertx.core.json.Json;
+import io.vertx.ext.mail.MailClient;
 
 /**
  * The settings contain the preferences to launch NetRelay and are stored locally as file. They are loaded / created on
@@ -57,6 +58,7 @@ public class Settings {
   private DataStoreSettings datastoreSettings;
   private boolean edited = false;
   private MappingDefinitions mappingDefinitions = new MappingDefinitions();
+  private MailClientSettings mailClientSettings = new MailClientSettings();
 
   /**
    * The port, where the server shall run on
@@ -201,6 +203,25 @@ public class Settings {
    */
   public void setMappingDefinitions(MappingDefinitions mappingDefinitions) {
     this.mappingDefinitions = mappingDefinitions;
+  }
+
+  /**
+   * The settings, by which the internally used {@link MailClient} is initialized
+   * 
+   * @return the mailClientSettings
+   */
+  public final MailClientSettings getMailClientSettings() {
+    return mailClientSettings;
+  }
+
+  /**
+   * The settings, by which the internally used {@link MailClient} is initialized
+   * 
+   * @param mailClientSettings
+   *          the mailClientSettings to set
+   */
+  public final void setMailClientSettings(MailClientSettings mailClientSettings) {
+    this.mailClientSettings = mailClientSettings;
   }
 
 }
