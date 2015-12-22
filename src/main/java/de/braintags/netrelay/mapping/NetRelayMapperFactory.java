@@ -15,8 +15,8 @@ package de.braintags.netrelay.mapping;
 import de.braintags.io.vertx.pojomapper.json.mapping.JsonPropertyMapperFactory;
 import de.braintags.io.vertx.pojomapper.mapping.impl.MapperFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
-import de.braintags.io.vertx.pojomapper.typehandler.stringbased.StringTypeHandlerFactory;
 import de.braintags.netrelay.NetRelay;
+import de.braintags.netrelay.typehandler.HttpTypehandlerFactory;
 
 /**
  * NetRelayMapperFactory is used as factory for mapper definitions for the communication with the underlaying
@@ -29,7 +29,7 @@ import de.braintags.netrelay.NetRelay;
 public class NetRelayMapperFactory extends MapperFactory {
 
   public NetRelayMapperFactory(NetRelay netrelay) {
-    super(null, new StringTypeHandlerFactory(), new JsonPropertyMapperFactory(),
+    super(null, new HttpTypehandlerFactory(), new JsonPropertyMapperFactory(),
         new NetRelayStoreObjectFactory(netrelay));
   }
 
