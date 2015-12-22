@@ -63,7 +63,7 @@ public class TMailController extends NetRelayBaseTest {
       Buffer responseBuffer = Buffer.buffer();
       testRequest(context, HttpMethod.POST, url, req -> {
         Buffer buffer = Buffer.buffer();
-        buffer.appendString("to=mremme%40braintags.de");
+        buffer.appendString("to=testaccount%40braintags.de");
         buffer.appendString("&subject=").appendString(RequestUtil.encodeText("TEstnachrich per mail"));
         buffer.appendString("&mailText=").appendString(RequestUtil.encodeText("super cleverer text als nachricht"));
         buffer.appendString("&htmlText=")
