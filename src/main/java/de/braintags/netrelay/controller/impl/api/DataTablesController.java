@@ -130,7 +130,8 @@ public class DataTablesController extends AbstractController {
       if (colDef != null && colDef.name != null && colDef.name.hashCode() != 0) {
         IField field = mapper.getField(colDef.name);
         Objects.requireNonNull(field, "Could not find defined field for '" + colDef.name + "'");
-        json.add(sto.get(field));
+        Object value = sto.get(field);
+        json.add(value == null ? "" : value);
       } else {
         json.add("");
       }

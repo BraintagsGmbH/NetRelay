@@ -69,7 +69,7 @@ public class TDataTablesController extends NetRelayBaseTest {
       .appendString("mDataProp_6=6&sSearch_6=&bRegex_6=false&bSearchable_6=false&bSortable_6=false&").appendString(
           "sSearch=&bRegex=false&iSortCol_0=0&sSortDir_0=asc&iSortingCols=1&sRangeSeparator=~&more_data=my_value");
 
-  public static final Buffer LINK4 = Buffer.buffer("http://localhost:8080/api/datatables?")
+  public static final Buffer TMP_LINK = Buffer.buffer("http://localhost:8080/api/datatable?")
       .appendString("sEcho=1&iColumns=6&sColumns=id%2CuserName%2CfirstName%2ClastName%2Cemail%2Cid")
       .appendString(
           "&iDisplayStart=0&iDisplayLength=10&mDataProp_0=0&sSearch_0=&bRegex_0=false&bSearchable_0=true&bSortable_0=true")
@@ -82,6 +82,12 @@ public class TDataTablesController extends NetRelayBaseTest {
       .appendString("&mapper=Member");
 
   //
+
+  @Test
+  public void testObjectWithNullField(TestContext context) throws Exception {
+    // Mapper mit Field erzeugen, das NULL als value hat; einmal Feld als String, einmal als Object
+    throw new UnsupportedOperationException();
+  }
 
   @Test
   public void testAllRecords(TestContext context) throws Exception {
@@ -98,12 +104,6 @@ public class TDataTablesController extends NetRelayBaseTest {
   @Test
   public void testLimitRecords(TestContext context) throws Exception {
     String url = LINK3.toString();
-    testParameters1(context, url, 3, 2);
-  }
-
-  @Test
-  public void testLink4(TestContext context) throws Exception {
-    String url = LINK4.toString();
     testParameters1(context, url, 3, 2);
   }
 

@@ -12,6 +12,9 @@
  */
 package de.braintags.netrelay;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.exception.NoSuchRecordException;
@@ -38,6 +41,34 @@ import io.vertx.ext.web.templ.ThymeleafTemplateEngine;
  */
 public class RequestUtil {
   private static final Logger logger = LoggerFactory.getLogger(RequestUtil.class);
+
+  /**
+   * Encodes the text into a suitable format for UTF-8 for http requests for instance
+   * 
+   * @param text
+   *          text to be encoded
+   * @return the encoded result
+   */
+  public static String encodeText(String text) {
+    return encodeText(text, "UTF-8");
+  }
+
+  /**
+   * Encodes the text into a suitable format for http requests for instance
+   * 
+   * @param text
+   *          text to be encoded
+   * @param encoding
+   *          the encoding used
+   * @return the encoded result
+   */
+  public static String encodeText(String text, String encoding) {
+    try {
+      return URLEncoder.encode(text, encoding);
+    } catch (UnsupportedEncodingException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
   /**
    * Read the value of the defined key.

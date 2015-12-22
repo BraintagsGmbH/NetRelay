@@ -36,20 +36,45 @@ public class TMailController extends NetRelayBaseTest {
   @Test
   public void sendSimpleMail(TestContext context) {
     try {
-      String url = "/api/sendMail";
+      String url = "/api/sendMail.html";
       Buffer responseBuffer = Buffer.buffer();
       testRequest(context, HttpMethod.POST, url, req -> {
         Buffer buffer = Buffer.buffer();
-        buffer.appendString("to=michael.remme%40braintags.de");
-        buffer.appendString("&subject=subjectToSend");
-        buffer.appendString("&mailText=textToBeSent");
+        buffer.appendString("to=testaccount%40braintags.de");
+        buffer.appendString("&subject=").appendString(RequestUtil.encodeText("TEstnachrich per mail"));
+        buffer.appendString("&mailText=").appendString(RequestUtil.encodeText("super cleverer text als nachricht"));
 
         req.headers().set("content-length", String.valueOf(buffer.length()));
         req.headers().set("content-type", "application/x-www-form-urlencoded");
         req.write(buffer);
       } , resp -> {
         LOGGER.info("RESPONSE: " + resp.content);
-        context.assertTrue(resp.content.toString().contains("myFirstName"), "Expected name not found");
+        context.assertTrue(resp.content.toString().contains("MESSAGE SENT"), "Expected message not found");
+      } , 200, "OK", null);
+    } catch (Exception e) {
+      context.fail(e);
+    }
+  }
+
+  @Test
+  public void sendHtmlMessage(TestContext context) {
+    try {
+      String url = "/api/sendMail.html";
+      Buffer responseBuffer = Buffer.buffer();
+      testRequest(context, HttpMethod.POST, url, req -> {
+        Buffer buffer = Buffer.buffer();
+        buffer.appendString("to=mremme%40braintags.de");
+        buffer.appendString("&subject=").appendString(RequestUtil.encodeText("TEstnachrich per mail"));
+        buffer.appendString("&mailText=").appendString(RequestUtil.encodeText("super cleverer text als nachricht"));
+        buffer.appendString("&htmlText=")
+            .appendString(RequestUtil.encodeText("this is html text <a href=\"braintags.de\">braintags.de</a>"));
+
+        req.headers().set("content-length", String.valueOf(buffer.length()));
+        req.headers().set("content-type", "application/x-www-form-urlencoded");
+        req.write(buffer);
+      } , resp -> {
+        LOGGER.info("RESPONSE: " + resp.content);
+        context.assertTrue(resp.content.toString().contains("MESSAGE SENT"), "Expected message not found");
       } , 200, "OK", null);
     } catch (Exception e) {
       context.fail(e);
@@ -62,7 +87,7 @@ public class TMailController extends NetRelayBaseTest {
     MailClientSettings ms = settings.getMailClientSettings();
     ms.setActive(true);
     // defineRouterDefinitions adds the default key-definitions
-    RouterDefinition def = defineRouterDefinition(MailController.class, "/api/sendMail");
+    RouterDefinition def = defineRouterDefinition(MailController.class, "/api/sendMail.html");
     def.getHandlerProperties().put(MailController.FROM_PARAM, "unknown@braintags.de");
 
     settings.getRouterDefinitions().addAfter(BodyController.class.getSimpleName(), def);

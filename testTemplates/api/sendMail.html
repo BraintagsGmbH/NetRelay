@@ -1,0 +1,21 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-4.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+</head>
+
+<body>
+			<p>message id</p>
+			<p th:text="${context.get( 'mailResult').getMessageID() }">
+			</p>
+			
+			<p>message json</p>
+			<p th:text="${context.get( 'mailResult').toJson() }">
+			</p>
+			
+			MESSAGE SENT
+			
+
+</body>
+</html>
