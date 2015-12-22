@@ -69,6 +69,20 @@ public class TDataTablesController extends NetRelayBaseTest {
       .appendString("mDataProp_6=6&sSearch_6=&bRegex_6=false&bSearchable_6=false&bSortable_6=false&").appendString(
           "sSearch=&bRegex=false&iSortCol_0=0&sSortDir_0=asc&iSortingCols=1&sRangeSeparator=~&more_data=my_value");
 
+  public static final Buffer LINK4 = Buffer.buffer("http://localhost:8080/api/datatables?")
+      .appendString("sEcho=1&iColumns=6&sColumns=id%2CuserName%2CfirstName%2ClastName%2Cemail%2Cid")
+      .appendString(
+          "&iDisplayStart=0&iDisplayLength=10&mDataProp_0=0&sSearch_0=&bRegex_0=false&bSearchable_0=true&bSortable_0=true")
+      .appendString("&mDataProp_1=1&sSearch_1=&bRegex_1=false&bSearchable_1=true&bSortable_1=true")
+      .appendString("&mDataProp_2=2&sSearch_2=&bRegex_2=false&bSearchable_2=true&bSortable_2=true")
+      .appendString("&mDataProp_3=3&sSearch_3=&bRegex_3=false&bSearchable_3=true&bSortable_3=true")
+      .appendString("&mDataProp_4=4&sSearch_4=&bRegex_4=false&bSearchable_4=true&bSortable_4=true")
+      .appendString("&mDataProp_5=5&sSearch_5=&bRegex_5=false&bSearchable_5=false&bSortable_5=false")
+      .appendString("&sSearch=&bRegex=false&iSortCol_0=0&sSortDir_0=asc&iSortingCols=1&sRangeSeparator=~")
+      .appendString("&mapper=Member");
+
+  //
+
   @Test
   public void testAllRecords(TestContext context) throws Exception {
     String url = LINK.toString();
@@ -84,6 +98,12 @@ public class TDataTablesController extends NetRelayBaseTest {
   @Test
   public void testLimitRecords(TestContext context) throws Exception {
     String url = LINK3.toString();
+    testParameters1(context, url, 3, 2);
+  }
+
+  @Test
+  public void testLink4(TestContext context) throws Exception {
+    String url = LINK4.toString();
     testParameters1(context, url, 3, 2);
   }
 
