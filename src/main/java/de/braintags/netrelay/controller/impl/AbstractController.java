@@ -16,10 +16,12 @@ import java.util.Properties;
 
 import de.braintags.io.vertx.pojomapper.exception.ParameterRequiredException;
 import de.braintags.netrelay.NetRelay;
+import de.braintags.netrelay.RequestUtil;
 import de.braintags.netrelay.controller.IController;
 import de.braintags.netrelay.routing.CaptureCollection;
 import de.braintags.netrelay.routing.RouterDefinition;
 import io.vertx.core.Vertx;
+import io.vertx.ext.web.RoutingContext;
 
 /**
  * An abstract implementation of {@link IController}
@@ -110,6 +112,29 @@ public abstract class AbstractController implements IController {
     String value = (String) properties.get(propertyName);
     if (value == null && required)
       throw new ParameterRequiredException(propertyName);
+    return value == null ? defaultValue : value;
+  }
+
+  /**
+   * Reads a value either from the request or - if not found there - from the configuration properties
+   * 
+   * @param context
+   *          the context from the current request
+   * @param key
+   *          the key to search for
+   * @param defaultValue
+   *          the default value
+   * @param required
+   *          is the value required?
+   * @return a found value, the default value or null
+   */
+  public String readParameterOrProperty(RoutingContext context, String key, String defaultValue, boolean required) {
+    String value = RequestUtil.readFormAttribute(context, key, null, false);
+    if (value == null) {
+      value = readProperty(key, null, false);
+    }
+    if (value == null && required)
+      throw new ParameterRequiredException(key);
     return value == null ? defaultValue : value;
   }
 

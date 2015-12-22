@@ -87,13 +87,24 @@ public class ThymeleafTemplateController extends AbstractController {
 
   @Override
   public void initProperties(Properties properties) {
-    ThymeleafTemplateEngine thEngine = ThymeleafTemplateEngine.create();
-    thEngine.setMode(properties.getProperty(TEMPLATE_MODE_PROPERTY, ThymeleafTemplateEngine.DEFAULT_TEMPLATE_MODE));
-    setCachable(thEngine, properties);
+    ThymeleafTemplateEngine thEngine = createTemplateEngine(properties);
     templateHandler = TemplateHandler.create(thEngine, getTemplateDirectory(properties), getContentType(properties));
   }
 
-  private String getTemplateDirectory(Properties props) {
+  /**
+   * Creates a ThymeleafEngine by using the defined properties
+   * 
+   * @param properties
+   * @return
+   */
+  public static ThymeleafTemplateEngine createTemplateEngine(Properties properties) {
+    ThymeleafTemplateEngine thEngine = ThymeleafTemplateEngine.create();
+    thEngine.setMode(properties.getProperty(TEMPLATE_MODE_PROPERTY, ThymeleafTemplateEngine.DEFAULT_TEMPLATE_MODE));
+    setCachable(thEngine, properties);
+    return thEngine;
+  }
+
+  public static String getTemplateDirectory(Properties props) {
     return (String) props.getOrDefault(TEMPLATE_DIRECTORY_PROPERTY, DEFAULT_TEMPLATE_DIRECTORY);
   }
 
@@ -101,7 +112,7 @@ public class ThymeleafTemplateController extends AbstractController {
     return (String) props.getOrDefault(CONTENT_TYPE_PROPERTY, DEFAULT_CONTENT_TYPE);
   }
 
-  private void setCachable(ThymeleafTemplateEngine thEngine, Properties properties) {
+  private static void setCachable(ThymeleafTemplateEngine thEngine, Properties properties) {
     if (properties.containsKey(CACHE_ENABLED_PROPERTY)) {
       boolean cachable = Boolean.valueOf(properties.getProperty(CACHE_ENABLED_PROPERTY));
       TemplateEngine te = thEngine.getThymeleafTemplateEngine();
