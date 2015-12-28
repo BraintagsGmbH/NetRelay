@@ -34,7 +34,7 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 
 /**
- * 
+ * NetRelayStoreObject is the bridge between http requests and mapper objects
  * 
  * @author Michael Remme
  * 

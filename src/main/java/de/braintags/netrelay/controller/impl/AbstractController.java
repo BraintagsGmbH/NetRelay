@@ -131,6 +131,9 @@ public abstract class AbstractController implements IController {
   public String readParameterOrProperty(RoutingContext context, String key, String defaultValue, boolean required) {
     String value = RequestUtil.readFormAttribute(context, key, null, false);
     if (value == null) {
+      value = RequestUtil.readParameterAttribute(context, key, null, false);
+    }
+    if (value == null) {
       value = readProperty(key, null, false);
     }
     if (value == null && required)

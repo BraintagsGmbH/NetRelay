@@ -76,8 +76,17 @@ public class InsertAction extends AbstractAction {
       IMapper mapper) {
     String startKey = entityName.toLowerCase() + ".";
     Map<String, String> map = new HashMap<>();
+    extractPropertiesFromMap(startKey, map, context.request().formAttributes());
+    extractPropertiesFromMap(startKey, map, context.request().params());
+    return map;
+  }
 
-    MultiMap attrs = context.request().formAttributes();
+  /**
+   * @param startKey
+   * @param map
+   * @param attrs
+   */
+  private void extractPropertiesFromMap(String startKey, Map<String, String> map, MultiMap attrs) {
     Iterator<Entry<String, String>> it = attrs.iterator();
     while (it.hasNext()) {
       Entry<String, String> entry = it.next();
@@ -88,7 +97,6 @@ public class InsertAction extends AbstractAction {
         map.put(pureKey, value);
       }
     }
-    return map;
   }
 
 }

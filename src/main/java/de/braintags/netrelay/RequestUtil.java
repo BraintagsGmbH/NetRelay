@@ -71,12 +71,34 @@ public class RequestUtil {
   }
 
   /**
-   * Read the value of the defined key.
+   * Read the value of the defined key from a request parameter
    * 
    * @param context
    *          the context to be handled
    * @param key
-   *          the key to retirve from the form parameters
+   *          the key to retrive from the request parameters
+   * @param defaultValue
+   *          will be returned, if value is null
+   * @param required
+   *          if required and value is null, an exception is thrown
+   * @return the value or null, if none and not required
+   */
+  public static String readParameterAttribute(RoutingContext context, String key, String defaultValue,
+      boolean required) {
+    String value = context.request().params().get(key);
+    if (value == null && required) {
+      throw new ParameterRequiredException(key);
+    }
+    return value == null ? defaultValue : value;
+  }
+
+  /**
+   * Read the value of the defined key from a transferred form request
+   * 
+   * @param context
+   *          the context to be handled
+   * @param key
+   *          the key to retrive from the form parameters
    * @param defaultValue
    *          will be returned, if value is null
    * @param required

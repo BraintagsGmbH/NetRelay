@@ -23,6 +23,7 @@ import de.braintags.netrelay.routing.RouterDefinition;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
+import io.vertx.ext.mail.StartTLSOptions;
 import io.vertx.ext.unit.TestContext;
 
 /**
@@ -114,6 +115,16 @@ public class TMailController extends NetRelayBaseTest {
   protected void modifySettings(TestContext context, Settings settings) {
     super.modifySettings(context, settings);
     MailClientSettings ms = settings.getMailClientSettings();
+    ms.setHostname("mail.braintags.net");
+    ms.setPort(8025);
+    ms.setName("mailclient");
+    ms.setUsername("dev-test@braintags.net");
+    ms.setPassword("thoo4ati");
+    ms.setSsl(false);
+    ms.setStarttls(StartTLSOptions.DISABLED);
+    // ms.setAuthMethods("LOGIN");
+    // ms.setLogin(LoginOption.REQUIRED);
+
     ms.setActive(true);
     // defineRouterDefinitions adds the default key-definitions
     RouterDefinition def = defineRouterDefinition(MailController.class, "/api/sendMail");
