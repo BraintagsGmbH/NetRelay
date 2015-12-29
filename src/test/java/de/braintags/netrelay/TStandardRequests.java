@@ -68,6 +68,11 @@ public class TStandardRequests extends NetRelayBaseTest {
     context.assertTrue(StandarRequestController.controllerProcessed, "handler wasn't executed");
     checkFileUpload(context, 1, fileName, fieldName, contentType, uploadsDir, fileData);
     checkFields(context);
+
+    // is the file also in the mapped attributes?
+    context.assertNull(StandarRequestController.attrs.get(fieldName),
+        "uploaded file infos should not be inside attributes");
+
     // The body should be set too
     Buffer rawBody = StandarRequestController.bodyBuffer;
     context.assertNotNull(rawBody);
@@ -111,6 +116,7 @@ public class TStandardRequests extends NetRelayBaseTest {
   private void checkFields(TestContext context) {
     context.assertNotNull(StandarRequestController.attrs);
     context.assertEquals(3, StandarRequestController.attrs.size());
+
     context.assertEquals("junit-testUserAlias", StandarRequestController.attrs.get("origin"));
     context.assertEquals("admin@foo.bar", StandarRequestController.attrs.get("login"));
     context.assertEquals("admin", StandarRequestController.attrs.get("pass word"));

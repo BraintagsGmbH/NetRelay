@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.netrelay.controller.impl.AbstractCaptureController.CaptureMap;
@@ -23,6 +24,8 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
+import io.vertx.core.file.FileSystem;
+import io.vertx.ext.web.FileUpload;
 import io.vertx.ext.web.RoutingContext;
 
 /**
@@ -34,6 +37,8 @@ import io.vertx.ext.web.RoutingContext;
 public class InsertAction extends AbstractAction {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(InsertAction.class);
+
+  public static final String MOVE_MESSAGE = "moved uploaded file from %s to %s";
 
   /**
    * 
@@ -47,6 +52,8 @@ public class InsertAction extends AbstractAction {
       Handler<AsyncResult<Void>> handler) {
     IMapper mapper = getMapper(entityName);
     Map<String, String> params = extractProperties(entityName, captureMap, context, mapper);
+    handleFileUploads(entityName, context, params);
+
     getPersistenceController().getMapperFactory().getStoreObjectFactory().createStoreObject(params, mapper, result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
@@ -55,6 +62,43 @@ public class InsertAction extends AbstractAction {
         saveObjectInDatastore(ob, entityName, context, mapper, handler);
       }
     });
+  }
+
+  private void handleFileUploads(String entityName, RoutingContext context, Map<String, String> params) {
+    String startKey = entityName.toLowerCase() + ".";
+    Set<FileUpload> fileUploads = context.fileUploads();
+    for (FileUpload upload : fileUploads) {
+      String fieldName = upload.name().toLowerCase();
+      if (fieldName.startsWith(startKey)) {
+        LOGGER.info("uploaded file detected for field name " + fieldName + ", fileName: " + upload.fileName());
+        String relativePath = handleOneFile(upload);
+        String pureKey = fieldName.substring(startKey.length());
+        params.put(pureKey, relativePath);
+      }
+    }
+  }
+
+  private String handleOneFile(FileUpload upload) {
+    String uploadedFile = upload.uploadedFileName();
+    String[] newDestination = examineNewDestination(upload);
+    FileSystem fs = getPersistenceController().getVertx().fileSystem();
+    if (fs.existsBlocking(newDestination[0])) {
+      fs.deleteBlocking(newDestination[0]);
+    }
+    fs.moveBlocking(uploadedFile, newDestination[0]);
+
+    LOGGER.info(String.format(MOVE_MESSAGE, uploadedFile, newDestination[0]));
+    return newDestination[1];
+  }
+
+  private String[] examineNewDestination(FileUpload upload) {
+    String[] destinations = new String[2];
+    String upDir = getPersistenceController().readProperty(PersistenceController.UPLOAD_DIRECTORY_PROP, null, true);
+    String relDir = getPersistenceController().readProperty(PersistenceController.UPLOAD_RELATIVE_PATH_PROP, null,
+        true);
+    destinations[0] = upDir + (upDir.endsWith("/") ? "" : "/") + upload.fileName();
+    destinations[1] = relDir + (relDir.endsWith("/") ? "" : "/") + upload.fileName();
+    return destinations;
   }
 
   /**

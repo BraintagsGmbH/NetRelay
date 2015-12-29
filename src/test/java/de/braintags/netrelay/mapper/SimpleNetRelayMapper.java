@@ -26,5 +26,6 @@ public class SimpleNetRelayMapper extends BaseRecord {
   public String name;
   public int age;
   public boolean child;
+  public String fileName;
 
 }

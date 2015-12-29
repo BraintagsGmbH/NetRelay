@@ -15,6 +15,7 @@ package de.braintags.netrelay.controller.impl.persistence;
 import java.util.List;
 import java.util.Properties;
 
+import de.braintags.io.vertx.pojomapper.exception.InitException;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.ErrorObject;
@@ -27,6 +28,7 @@ import de.braintags.netrelay.routing.RouterDefinition;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.file.FileSystem;
 import io.vertx.ext.web.RoutingContext;
 
 /**
@@ -52,9 +54,16 @@ public class PersistenceController extends AbstractCaptureController {
       .getLogger(PersistenceController.class);
 
   /**
-   * The name of the property, which defines the directory, where uploaded files are transferred into
+   * The name of the property, which defines the directory, where uploaded files are transferred into.
+   * This can be "webroot/images/" for instance
    */
   public static final String UPLOAD_DIRECTORY_PROP = "uploadDirectory";
+
+  /**
+   * The name of the property, which defines the relative path for uploaded files. If the {@link #UPLOAD_DIRECTORY_PROP}
+   * is defined as "webroot/images/" for instance, then the relative path here coud be "images/"
+   */
+  public static final String UPLOAD_RELATIVE_PATH_PROP = "uploadRelativePath";
 
   /**
    * The name of a the property in the request, which specifies the mapper
@@ -150,6 +159,16 @@ public class PersistenceController extends AbstractCaptureController {
     deleteAction = new DeleteAction(this);
     noneAction = new NoneAction(this);
     mapperFactory = new NetRelayMapperFactory(getNetRelay());
+    String upDir = readProperty(PersistenceController.UPLOAD_DIRECTORY_PROP, null, true);
+    FileSystem fs = getVertx().fileSystem();
+    if (!fs.existsBlocking(upDir)) {
+      fs.mkdirsBlocking(upDir);
+      if (!fs.existsBlocking(upDir)) {
+        throw new InitException("could not create directory " + upDir);
+      } else {
+        LOGGER.info("Upload directory created: " + upDir);
+      }
+    }
   }
 
   /**
@@ -188,6 +207,8 @@ public class PersistenceController extends AbstractCaptureController {
     Properties json = new Properties();
     json.put(REROUTE_PROPERTY, "true");
     json.put(AUTO_CLEAN_PATH_PROPERTY, "true");
+    json.put(UPLOAD_DIRECTORY_PROP, "webroot/images/");
+    json.put(UPLOAD_RELATIVE_PATH_PROP, "images/");
     return json;
   }
 
