@@ -133,7 +133,6 @@ public class TPersistenceController_Insert extends AbstractPersistenceController
     def.setRoutes(
         new String[] { "/products/:entity/:action/insert.html", "/products/insert2.html", "/products/insert3.html" });
     def.getHandlerProperties().put(PersistenceController.UPLOAD_DIRECTORY_PROP, "webroot/images/productImages");
-
     settings.getRouterDefinitions().addAfter(BodyController.class.getSimpleName(), def);
   }
 

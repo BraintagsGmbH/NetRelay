@@ -43,6 +43,7 @@ import io.vertx.ext.web.RoutingContext;
  * {@value #ID_KEY}<br/>
  * {@value #ACTION_KEY}<br/>
  * {@value #UPLOAD_DIRECTORY_PROP}<br/>
+ * {@value #UPLOAD_RELATIVE_PATH_PROP}<br/>
  * 
  * Further parameters {@link AbstractCaptureController}
  * 
@@ -61,7 +62,7 @@ public class PersistenceController extends AbstractCaptureController {
 
   /**
    * The name of the property, which defines the relative path for uploaded files. If the {@link #UPLOAD_DIRECTORY_PROP}
-   * is defined as "webroot/images/" for instance, then the relative path here coud be "images/"
+   * is defined as "webroot/images/" for instance, then the relative path here could be "images/"
    */
   public static final String UPLOAD_RELATIVE_PATH_PROP = "uploadRelativePath";
 
