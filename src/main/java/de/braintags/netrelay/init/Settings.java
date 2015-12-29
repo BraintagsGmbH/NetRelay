@@ -54,6 +54,7 @@ public class Settings {
   public static final String LOCAL_USER_DIRECTORY = System.getProperty("user.home") + "/" + ".netrelay";
 
   private int serverPort = 8080;
+  private String defaultLoginPage = "/backend/login.html";
   private RouterDefinitions routerDefinitions = new RouterDefinitions();
   private DataStoreSettings datastoreSettings;
   private boolean edited = false;
@@ -222,6 +223,25 @@ public class Settings {
    */
   public final void setMailClientSettings(MailClientSettings mailClientSettings) {
     this.mailClientSettings = mailClientSettings;
+  }
+
+  /**
+   * The definition of the default page, which is used for a login redirect
+   *
+   * @return the defaultLoginPage
+   */
+  public final String getDefaultLoginPage() {
+    return defaultLoginPage;
+  }
+
+  /**
+   * The definition of the default page, which is used for a login redirect
+   * 
+   * @param defaultLoginPage
+   *          the defaultLoginPage to set
+   */
+  public final void setDefaultLoginPage(String defaultLoginPage) {
+    this.defaultLoginPage = defaultLoginPage;
   }
 
 }

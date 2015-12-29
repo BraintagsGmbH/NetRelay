@@ -186,8 +186,8 @@ public class PersistenceController extends AbstractCaptureController {
    */
   public static Properties getDefaultProperties() {
     Properties json = new Properties();
-    json.put(REROUTE_PROPERTY, "false");
-    json.put(AUTO_CLEAN_PATH_PROPERTY, "false");
+    json.put(REROUTE_PROPERTY, "true");
+    json.put(AUTO_CLEAN_PATH_PROPERTY, "true");
     return json;
   }
 
