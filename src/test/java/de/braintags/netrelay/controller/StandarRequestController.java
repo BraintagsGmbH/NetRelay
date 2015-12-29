@@ -13,10 +13,13 @@
 package de.braintags.netrelay.controller;
 
 import java.util.Properties;
+import java.util.Set;
 
 import de.braintags.netrelay.controller.impl.AbstractController;
 import de.braintags.netrelay.routing.RouterDefinition;
 import io.vertx.core.MultiMap;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.ext.web.FileUpload;
 import io.vertx.ext.web.RoutingContext;
 
 /**
@@ -29,6 +32,8 @@ public class StandarRequestController extends AbstractController {
   public static MultiMap attrs;
   public static boolean controllerProcessed = false;
   public static MultiMap params;
+  public static Set<FileUpload> fileUploads;
+  public static Buffer bodyBuffer;
 
   /**
    * 
@@ -46,6 +51,9 @@ public class StandarRequestController extends AbstractController {
     StandarRequestController.controllerProcessed = true;
     StandarRequestController.attrs = event.request().formAttributes();
     StandarRequestController.params = event.request().params();
+    StandarRequestController.fileUploads = event.fileUploads();
+    StandarRequestController.bodyBuffer = event.getBody();
+
     event.response().end();
   }
 

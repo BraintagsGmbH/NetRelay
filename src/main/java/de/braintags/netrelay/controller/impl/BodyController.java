@@ -14,18 +14,41 @@ package de.braintags.netrelay.controller.impl;
 
 import java.util.Properties;
 
+import de.braintags.netrelay.controller.impl.persistence.PersistenceController;
 import de.braintags.netrelay.routing.RouterDefinition;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
 
 /**
+ * A Controller, which creates and uses a {@link BodyHandler}
  * 
+ * <br/>
+ * <br/>
+ * possible paramters are:
+ * <br/>
+ * {@value #BODY_LIMIT_PROP}<br/>
+ * {@value #UPLOAD_DIRECTORY_PROP}
  * 
  * @author Michael Remme
  * 
  */
 public class BodyController extends AbstractController {
-  private BodyHandler bodyHandler = BodyHandler.create();
+  private BodyHandler bodyHandler;
+
+  /**
+   * Defines the maximum size of a body of a request, including all field information and uploaded files.
+   * The default is -1
+   */
+  public static final String BODY_LIMIT_PROP = "bodyLimit";
+
+  /**
+   * Defines the directory, where uploaded files are stored into. The upload directory defaults to
+   * {@link BodyHandler#DEFAULT_UPLOADS_DIRECTORY}
+   * NOTE: the directory defined here should be the temporary directory for incoming files. Other controller, like
+   * the {@link PersistenceController} will define an own directory, where those files, which shall be referenced into
+   * a record, will be moved.
+   */
+  public static final String UPLOAD_DIRECTORY_PROP = "uploadDirectory";
 
   /*
    * (non-Javadoc)
@@ -44,6 +67,12 @@ public class BodyController extends AbstractController {
    */
   @Override
   public void initProperties(Properties properties) {
+    int upSize = Integer.parseInt(readProperty(BODY_LIMIT_PROP, "-1", false));
+    String upDir = readProperty(UPLOAD_DIRECTORY_PROP, null, false);
+    bodyHandler = BodyHandler.create().setBodyLimit(upSize);
+    if (upDir != null) {
+      bodyHandler.setUploadsDirectory(upDir);
+    }
   }
 
   /**

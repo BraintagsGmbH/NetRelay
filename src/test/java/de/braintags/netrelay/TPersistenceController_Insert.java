@@ -85,6 +85,16 @@ public class TPersistenceController_Insert extends AbstractPersistenceController
   }
 
   /*
+   * <td>Bild <br>
+   * <input class="inputField" name="logo" style="width: 100%" type="file">
+   * <input name="bt_PayType$$logo" style="width:100%" id="logo" type="hidden">
+   * <a target="_blank" href="/datafiles/"><img src="/datafiles/administration/iconLupe.gif" alt="Vorschau"
+   * title="Vorschau" border="0"></a>
+   * </td>
+   * 
+   */
+
+  /*
    * (non-Javadoc)
    * 
    * @see de.braintags.netrelay.NetRelayBaseTest#modifySettings(de.braintags.netrelay.init.Settings)

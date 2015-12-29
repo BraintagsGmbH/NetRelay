@@ -30,7 +30,19 @@ import io.vertx.core.Handler;
 import io.vertx.ext.web.RoutingContext;
 
 /**
+ * The PersistenceController is the frame, which defines the logics of a request, so that mapper objects can be fetched
+ * from a datastore, inserted or updated by request or form parameters and deleted from the datastore.
  * 
+ * <br/>
+ * <br/>
+ * possible paramters are:
+ * <br/>
+ * {@value #MAPPER_KEY}<br/>
+ * {@value #ID_KEY}<br/>
+ * {@value #ACTION_KEY}<br/>
+ * {@value #UPLOAD_DIRECTORY_PROP}<br/>
+ * 
+ * Further parameters {@link AbstractCaptureController}
  * 
  * @author Michael Remme
  * 
@@ -38,6 +50,11 @@ import io.vertx.ext.web.RoutingContext;
 public class PersistenceController extends AbstractCaptureController {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(PersistenceController.class);
+
+  /**
+   * The name of the property, which defines the directory, where uploaded files are transferred into
+   */
+  public static final String UPLOAD_DIRECTORY_PROP = "uploadDirectory";
 
   /**
    * The name of a the property in the request, which specifies the mapper
@@ -169,8 +186,8 @@ public class PersistenceController extends AbstractCaptureController {
    */
   public static Properties getDefaultProperties() {
     Properties json = new Properties();
-    json.put(REROUTE_PROPERTY, "true");
-    json.put(AUTO_CLEAN_PATH_PROPERTY, "true");
+    json.put(REROUTE_PROPERTY, "false");
+    json.put(AUTO_CLEAN_PATH_PROPERTY, "false");
     return json;
   }
 
