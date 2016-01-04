@@ -32,6 +32,38 @@ import io.vertx.ext.web.templ.ThymeleafTemplateEngine;
  * A controller which is sending mails by using the {@link NetRelay#getMailClient()}. As a reply a JsonObject with the
  * result will be sent.
  * 
+ * <pre>
+ * config:
+
+, {
+      "name" : "MailController",
+      "active" : true,
+      "routes" : [ "/api/sendmail" ],
+      "blocking" : false,
+      "failureDefinition" : false,
+      "controller" : "de.braintags.netrelay.controller.impl.api.MailController",
+      "httpMethod" : null,
+      "handlerProperties" : {
+        "templateDirectory" : "templates",
+        "mode" : "XHTML",
+        "cacheEnabled" : "true",
+        "from" : "address@sender.com"
+      },
+      "captureCollection" : null
+    }
+
+Parameter ( lassen sich entweder per config oder per request parameter setzen:
+
+to - an wen geht die Mail
+from: absender
+subject: titel der Mail
+mailText: text einer Mail für textbasierten Inhalt
+htmlText: HTML Inhalt einer Mail
+template: der Pfad eines Templates im Template-Verzeichnis. Wird geparsed mit Thymeleaf und dann als Inhalt geschickt. Überschreibt htmlText
+ * 
+ * 
+ * </pre>
+ * 
  * @author Michael Remme
  * 
  */

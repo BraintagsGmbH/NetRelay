@@ -18,6 +18,9 @@ import de.braintags.netrelay.RequestUtil;
 import de.braintags.netrelay.controller.impl.authentication.AuthenticationController;
 import de.braintags.netrelay.model.Member;
 import de.braintags.netrelay.routing.RouterDefinition;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.ext.web.RoutingContext;
 
 /**
@@ -38,29 +41,45 @@ public class CurrentMemberController extends AbstractController {
    */
   @Override
   public void handle(RoutingContext context) {
+    loadMember(context, result -> {
+      if (result.failed()) {
+        context.fail(result.cause());
+      } else {
+        context.next();
+      }
+    });
+  }
+
+  /**
+   * Loads the data of a logged in member and stores them in the context
+   * 
+   * @param context
+   * @param handler
+   */
+  protected void loadMember(RoutingContext context, Handler<AsyncResult<Void>> handler) {
     Member member = RequestUtil.getCurrentUser(context);
     if (member != null) {
       context.put(Member.CURRENT_USER_PROPERTY, member);
       LOGGER.info(member.getClass().getName());
-      context.next();
+      handler.handle(Future.succeededFuture());
     } else if (context.user() != null) {
       try {
         Class mapperClass = getMapperClass(context);
         RequestUtil.getCurrentUser(context, getNetRelay().getDatastore(), mapperClass, res -> {
           if (res.failed()) {
-            context.fail(res.cause());
+            handler.handle(Future.failedFuture(res.cause()));
           } else {
             Member user = res.result();
             context.put(Member.CURRENT_USER_PROPERTY, user);
             RequestUtil.setCurrentUser(user, context);
-            context.next();
+            handler.handle(Future.succeededFuture());
           }
         });
       } catch (Exception e) {
-        context.fail(e);
+        handler.handle(Future.failedFuture(e));
       }
     } else {
-      context.next();
+      handler.handle(Future.succeededFuture());
     }
   }
 
