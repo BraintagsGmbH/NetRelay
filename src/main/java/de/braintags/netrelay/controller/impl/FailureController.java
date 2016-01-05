@@ -45,15 +45,18 @@ public class FailureController extends AbstractController {
    */
   @Override
   public void handle(RoutingContext event) {
-    String reply = "Status-Code: " + event.statusCode();
+    String reply = String.format("Statuscode %d for request %s", event.statusCode(), event.request().path());
     LOGGER.info(reply);
     if (event.failure() != null) {
       reply += "\n" + event.failure().toString();
       reply += "\n" + ExceptionUtil.getStackTrace(event.failure());
       LOGGER.error("", event.failure());
     }
-    if (!event.response().ended())
-      event.response().end(reply);
+    if (!event.response().ended()) {
+      event.response().setStatusCode(event.statusCode());
+      event.response().end();
+      // event.response().end(reply);
+    }
 
   }
 

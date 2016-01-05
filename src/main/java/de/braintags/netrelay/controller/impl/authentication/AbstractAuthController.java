@@ -26,25 +26,54 @@ import io.vertx.ext.auth.User;
 import io.vertx.ext.auth.mongo.HashSaltStyle;
 import io.vertx.ext.auth.mongo.MongoAuth;
 import io.vertx.ext.web.handler.AuthHandler;
+import io.vertx.ext.web.handler.BasicAuthHandler;
 import io.vertx.ext.web.handler.RedirectAuthHandler;
 
 /**
- * A controller, which generates and keeps an {@link AuthHandler}
+ * An abstract controller, which generates and keeps an {@link AuthHandler}
+ * 
+ * <br>
+ * Config-Parameter:<br/>
+ * <UL>
+ * <LI>{@value #AUTH_PROVIDER_PROP} - defines the name of the {@link AuthProvider} to be used. Possible values are:
+ * {@value #AUTH_PROVIDER_MONGO}
+ * <LI>{@value #AUTH_HANDLER_PROP} - the name of the property, which defines the {@link AuthHandler} to be used.
+ * Possible values are:
+ * {@link AuthHandlerEnum#BASIC}, {@link AuthHandlerEnum#REDIRECT}
+ * <LI>{@value #LOGIN_PAGE_PROP} - the property name, which defines the path to the login page, which shall be used
+ * </UL>
+ * <br>
+ * Request-Parameter:<br/>
+ * <br/>
+ * Result-Parameter:<br/>
+ * <br/>
+ *
  * 
  * @author Michael Remme
  * 
  */
 public abstract class AbstractAuthController extends AbstractController {
+  /**
+   * Used as possible value for property {@link #AUTH_PROVIDER_PROP} and references to an authentivation provider
+   * connected to a mongo db
+   */
   public static final String AUTH_PROVIDER_MONGO = "MongoAuth";
 
   /**
-   * The name of the key, which is used to store the mapper in the {@link User#principal()}
+   * The name of the key, which is used, to store the name of the mapper in the {@link User#principal()}
    */
   public static final String MAPPERNAME_IN_PRINCIPAL = "mapper";
+
   /**
    * Defines the name of the {@link AuthProvider} to be used
    */
   public static final String AUTH_PROVIDER_PROP = "authProvider";
+
+  /**
+   * Defines the name of the {@link AuthHandler} to be used
+   */
+  public static final String AUTH_HANDLER_PROP = "authHandler";
+
   /**
    * The name of the property which defines the login page to be used
    */
@@ -63,11 +92,23 @@ public abstract class AbstractAuthController extends AbstractController {
   public void initProperties(Properties properties) {
     loginPage = (String) properties.get(LOGIN_PAGE_PROP);
     this.authProvider = createAuthProvider(properties);
-    setupAuthentication(authProvider);
+    setupAuthentication(properties, authProvider);
   }
 
-  private void setupAuthentication(AuthProvider authProvider) {
-    authHandler = RedirectAuthHandler.create(authProvider, loginPage);
+  private void setupAuthentication(Properties properties, AuthProvider authProvider) {
+    AuthHandlerEnum ae = AuthHandlerEnum.valueOf(readProperty(AUTH_HANDLER_PROP, "REDIRECT", false));
+    switch (ae) {
+    case BASIC:
+      authHandler = BasicAuthHandler.create(authProvider);
+      break;
+
+    case REDIRECT:
+      authHandler = RedirectAuthHandler.create(authProvider, loginPage);
+      break;
+
+    default:
+      throw new UnsupportedOperationException("unsupported definition for authentication handler: " + ae);
+    }
   }
 
   private AuthProviderProxy createAuthProvider(Properties properties) {
@@ -136,5 +177,18 @@ public abstract class AbstractAuthController extends AbstractController {
       });
     }
 
+  }
+
+  public enum AuthHandlerEnum {
+    /**
+     * Used as possible value for {@link AbstractAuthController#AUTH_HANDLER_PROP} and creates a
+     * {@link BasicAuthHandler}
+     */
+    BASIC(),
+    /**
+     * Used as possible value for {@link AbstractAuthController#AUTH_HANDLER_PROP} and creates a
+     * {@link RedirectAuthHandler}
+     */
+    REDIRECT();
   }
 }
