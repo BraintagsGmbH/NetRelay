@@ -78,14 +78,9 @@ public class CurrentMemberController extends AbstractController {
    * @param handler
    */
   private final void loadMember(RoutingContext context, Handler<AsyncResult<Void>> handler) {
-    Member member = RequestUtil.getCurrentUser(context);
-    if (member != null) {
-      context.put(Member.CURRENT_USER_PROPERTY, member);
-      LOGGER.info(member.getClass().getName());
-      handler.handle(Future.succeededFuture());
-    } else if (context.user() != null) {
+    if (context.user() != null) {
       try {
-        Class mapperClass = getMapperClass(context);
+        Class<? extends Member> mapperClass = getMapperClass(context);
         RequestUtil.getCurrentUser(context, getNetRelay().getDatastore(), mapperClass, res -> {
           if (res.failed()) {
             handler.handle(Future.failedFuture(res.cause()));
@@ -104,13 +99,14 @@ public class CurrentMemberController extends AbstractController {
     }
   }
 
-  private Class getMapperClass(RoutingContext context) {
+  private Class<? extends Member> getMapperClass(RoutingContext context) {
     String mapperName = context.user().principal().getString(AuthenticationController.MAPPERNAME_IN_PRINCIPAL);
     if (mapperName == null) {
       throw new IllegalArgumentException("No mapper definition found in principal");
     }
 
-    Class mapperClass = getNetRelay().getSettings().getMappingDefinitions().getMapperClass(mapperName);
+    Class<? extends Member> mapperClass = getNetRelay().getSettings().getMappingDefinitions()
+        .getMapperClass(mapperName);
     if (mapperClass == null) {
       throw new IllegalArgumentException("No MapperClass definition for: " + mapperName);
     }
