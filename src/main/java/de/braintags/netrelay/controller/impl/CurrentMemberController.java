@@ -40,14 +40,35 @@ public class CurrentMemberController extends AbstractController {
    * @see io.vertx.core.Handler#handle(java.lang.Object)
    */
   @Override
-  public void handle(RoutingContext context) {
+  public final void handle(RoutingContext context) {
     loadMember(context, result -> {
       if (result.failed()) {
         context.fail(result.cause());
       } else {
-        context.next();
+        Member member = context.get(Member.CURRENT_USER_PROPERTY);
+        loadMemberData(member, context, dataResult -> {
+          if (dataResult.failed()) {
+            context.fail(dataResult.cause());
+          } else {
+            context.next();
+          }
+        });
       }
     });
+  }
+
+  /**
+   * Extensions may load additional data for the current member
+   * 
+   * @param member
+   *          the member, if logged in or null
+   * @param context
+   *          the context of the current request
+   * @param handler
+   *          the handler to be informed
+   */
+  protected void loadMemberData(Member member, RoutingContext context, Handler<AsyncResult<Void>> handler) {
+    handler.handle(Future.succeededFuture());
   }
 
   /**
@@ -56,7 +77,7 @@ public class CurrentMemberController extends AbstractController {
    * @param context
    * @param handler
    */
-  protected void loadMember(RoutingContext context, Handler<AsyncResult<Void>> handler) {
+  private final void loadMember(RoutingContext context, Handler<AsyncResult<Void>> handler) {
     Member member = RequestUtil.getCurrentUser(context);
     if (member != null) {
       context.put(Member.CURRENT_USER_PROPERTY, member);
