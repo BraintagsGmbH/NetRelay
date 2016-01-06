@@ -59,7 +59,7 @@ public class NetRelayBaseTest {
   protected static NetRelay netRelay;
 
   @Rule
-  public Timeout rule = Timeout.seconds(Integer.parseInt(System.getProperty("testTimeout", "5")));
+  public Timeout rule = Timeout.seconds(Integer.parseInt(System.getProperty("testTimeout", "20")));
   @Rule
   public TestName name = new TestName();
 

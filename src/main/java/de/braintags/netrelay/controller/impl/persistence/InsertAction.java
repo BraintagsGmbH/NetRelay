@@ -20,6 +20,7 @@ import java.util.Set;
 
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.netrelay.controller.impl.AbstractCaptureController.CaptureMap;
+import de.braintags.netrelay.exception.FileNameException;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -71,34 +72,56 @@ public class InsertAction extends AbstractAction {
       String fieldName = upload.name().toLowerCase();
       if (fieldName.startsWith(startKey)) {
         LOGGER.info("uploaded file detected for field name " + fieldName + ", fileName: " + upload.fileName());
-        String relativePath = handleOneFile(upload);
-        String pureKey = fieldName.substring(startKey.length());
-        params.put(pureKey, relativePath);
+        try {
+          String relativePath = handleOneFile(upload);
+          String pureKey = fieldName.substring(startKey.length());
+          params.put(pureKey, relativePath);
+        } catch (Exception e) {
+          context.fail(e);
+        }
       }
     }
   }
 
   private String handleOneFile(FileUpload upload) {
     String uploadedFile = upload.uploadedFileName();
-    String[] newDestination = examineNewDestination(upload);
     FileSystem fs = getPersistenceController().getVertx().fileSystem();
-    if (fs.existsBlocking(newDestination[0])) {
-      fs.deleteBlocking(newDestination[0]);
-    }
+    String[] newDestination = examineNewDestination(fs, upload);
     fs.moveBlocking(uploadedFile, newDestination[0]);
 
     LOGGER.info(String.format(MOVE_MESSAGE, uploadedFile, newDestination[0]));
     return newDestination[1];
   }
 
-  private String[] examineNewDestination(FileUpload upload) {
+  private String[] examineNewDestination(FileSystem fs, FileUpload upload) {
+    if (upload.fileName() == null || upload.fileName().hashCode() == 0) {
+      throw new FileNameException("The upload contains no filename");
+    }
     String[] destinations = new String[2];
     String upDir = getPersistenceController().readProperty(PersistenceController.UPLOAD_DIRECTORY_PROP, null, true);
+    if (!fs.existsBlocking(upDir)) {
+      fs.mkdirsBlocking(upDir);
+    }
     String relDir = getPersistenceController().readProperty(PersistenceController.UPLOAD_RELATIVE_PATH_PROP, null,
         true);
-    destinations[0] = upDir + (upDir.endsWith("/") ? "" : "/") + upload.fileName();
-    destinations[1] = relDir + (relDir.endsWith("/") ? "" : "/") + upload.fileName();
+    String fileName = createUniquName(fs, upDir, upload.fileName());
+    destinations[0] = upDir + (upDir.endsWith("/") ? "" : "/") + fileName;
+    destinations[1] = relDir + (relDir.endsWith("/") ? "" : "/") + fileName;
     return destinations;
+  }
+
+  private String createUniquName(FileSystem fs, String upDir, String fileName) {
+    String newFileName = fileName;
+    int counter = 0;
+    while (fs.existsBlocking(upDir + (upDir.endsWith("/") ? "" : "/") + newFileName)) {
+      if (fileName.indexOf('.') > 0) {
+        newFileName.replaceFirst(".", counter + ".");
+      } else {
+        newFileName = fileName + counter;
+      }
+    }
+    newFileName = newFileName.replaceAll(" ", "_");
+    return newFileName;
   }
 
   /**
