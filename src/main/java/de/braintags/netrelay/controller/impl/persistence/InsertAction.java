@@ -68,12 +68,13 @@ public class InsertAction extends AbstractAction {
   private void handleFileUploads(String entityName, RoutingContext context, Map<String, String> params) {
     String startKey = entityName.toLowerCase() + ".";
     Set<FileUpload> fileUploads = context.fileUploads();
+    FileSystem fs = getPersistenceController().getVertx().fileSystem();
     for (FileUpload upload : fileUploads) {
-      String fieldName = upload.name().toLowerCase();
-      if (fieldName.startsWith(startKey)) {
-        LOGGER.info("uploaded file detected for field name " + fieldName + ", fileName: " + upload.fileName());
+      if (isHandleUpload(fs, upload, startKey)) {
         try {
-          String relativePath = handleOneFile(upload);
+          String fieldName = upload.name().toLowerCase();
+          LOGGER.info("uploaded file detected for field name " + fieldName + ", fileName: " + upload.fileName());
+          String relativePath = handleOneFile(fs, upload);
           String pureKey = fieldName.substring(startKey.length());
           params.put(pureKey, relativePath);
         } catch (Exception e) {
@@ -83,14 +84,18 @@ public class InsertAction extends AbstractAction {
     }
   }
 
-  private String handleOneFile(FileUpload upload) {
+  private String handleOneFile(FileSystem fs, FileUpload upload) {
     String uploadedFile = upload.uploadedFileName();
-    FileSystem fs = getPersistenceController().getVertx().fileSystem();
     String[] newDestination = examineNewDestination(fs, upload);
     fs.moveBlocking(uploadedFile, newDestination[0]);
 
     LOGGER.info(String.format(MOVE_MESSAGE, uploadedFile, newDestination[0]));
     return newDestination[1];
+  }
+
+  private boolean isHandleUpload(FileSystem fs, FileUpload upload, String startKey) {
+    String fieldName = upload.name().toLowerCase();
+    return upload.size() > 0 && fieldName.startsWith(startKey);
   }
 
   private String[] examineNewDestination(FileSystem fs, FileUpload upload) {
@@ -104,23 +109,26 @@ public class InsertAction extends AbstractAction {
     }
     String relDir = getPersistenceController().readProperty(PersistenceController.UPLOAD_RELATIVE_PATH_PROP, null,
         true);
-    String fileName = createUniquName(fs, upDir, upload.fileName());
+    String fileName = createUniqueName(fs, upDir, upload.fileName());
     destinations[0] = upDir + (upDir.endsWith("/") ? "" : "/") + fileName;
     destinations[1] = relDir + (relDir.endsWith("/") ? "" : "/") + fileName;
     return destinations;
   }
 
-  private String createUniquName(FileSystem fs, String upDir, String fileName) {
+  private String createUniqueName(FileSystem fs, String upDir, String fileName) {
+    fileName = fileName.replaceAll(" ", "_");
     String newFileName = fileName;
     int counter = 0;
-    while (fs.existsBlocking(upDir + (upDir.endsWith("/") ? "" : "/") + newFileName)) {
+    String path = upDir + (upDir.endsWith("/") ? "" : "/") + newFileName;
+    while (fs.existsBlocking(path)) {
+      LOGGER.info("file exists already: " + path);
       if (fileName.indexOf('.') > 0) {
-        newFileName.replaceFirst(".", counter + ".");
+        newFileName = fileName.replaceFirst("\\.", counter++ + ".");
       } else {
-        newFileName = fileName + counter;
+        newFileName = fileName + counter++;
       }
+      path = upDir + (upDir.endsWith("/") ? "" : "/") + newFileName;
     }
-    newFileName = newFileName.replaceAll(" ", "_");
     return newFileName;
   }
 
