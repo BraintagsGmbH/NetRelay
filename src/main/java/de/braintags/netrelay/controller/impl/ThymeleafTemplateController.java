@@ -25,17 +25,30 @@ import io.vertx.ext.web.handler.TemplateHandler;
 import io.vertx.ext.web.templ.ThymeleafTemplateEngine;
 
 /**
- * This controller is used to process templates based on Thymeleaf
+ * This controller is used to process templates based on the template engine Thymeleaf
+ * <br>
+ * <br>
+ * Config-Parameter:<br/>
+ * <UL>
+ * <LI>{@value #TEMPLATE_MODE_PROPERTY}<br/>
+ * <LI>{@value #TEMPLATE_DIRECTORY_PROPERTY}<br/>
+ * <LI>{@value #CONTENT_TYPE_PROPERTY}<br/>
+ * <LI>{@value #CACHE_ENABLED_PROPERTY}<br/>
+ * </UL>
+ * <br>
+ * Request-Parameter:<br/>
+ * <br/>
+ * Result-Parameter:<br/>
+ * <br/>
  * 
- * @author mremme
- * 
+ * @author Michael Remme
  */
 public class ThymeleafTemplateController extends AbstractController {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(ThymeleafTemplateController.class);
 
   /**
-   * The property, by which the mode of Thymeleaf is defined.
+   * The property, by which the mode of Thymeleaf is defined. By default this is set to "XHTML"
    */
   public static final String TEMPLATE_MODE_PROPERTY = "mode";
 
@@ -50,7 +63,7 @@ public class ThymeleafTemplateController extends AbstractController {
   public static final String DEFAULT_TEMPLATE_DIRECTORY = TemplateHandler.DEFAULT_TEMPLATE_DIRECTORY;
 
   /**
-   * The property, which defines the content type to be handled
+   * The property, which defines the content type to be handled. PEr default this is text/html
    */
   public static final String CONTENT_TYPE_PROPERTY = "contentType";
 

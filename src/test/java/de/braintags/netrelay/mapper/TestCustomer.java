@@ -6,7 +6,7 @@ import de.braintags.io.vertx.pojomapper.annotation.Entity;
 import de.braintags.netrelay.model.Member;
 
 @Entity
-public class Customer extends Member {
+public class TestCustomer extends Member {
 
   public Calendar birthday;
   public String company;

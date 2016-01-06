@@ -25,10 +25,19 @@ import io.vertx.ext.web.RoutingContext;
 
 /**
  * If a user is logged in, the propriate record is fetched from the datastore and stored as
- * {@link Member#CURRENT_USER_PROPERTY} in the context
+ * {@link Member#CURRENT_USER_PROPERTY} in the context. Extensions of this class may overwrite the method
+ * {@link #loadMemberData(Member, RoutingContext, Handler)} to load additional data.
+ * 
+ * <br>
+ * <br>
+ * Config-Parameter:<br/>
+ * <br>
+ * Request-Parameter:<br/>
+ * <br/>
+ * Result-Parameter:<br/>
+ * {@link Member#CURRENT_USER_PROPERTY} in the context<br/>
  * 
  * @author Michael Remme
- * 
  */
 public class CurrentMemberController extends AbstractController {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory

@@ -19,10 +19,18 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.CookieHandler;
 
 /**
+ * The Cookie-Controller uses internally the {@link CookieHandler}
  * 
+ * <br>
+ * <br>
+ * Config-Parameter:<br/>
+ * <br>
+ * Request-Parameter:<br/>
+ * <br/>
+ * Result-Parameter:<br/>
+ * <br/>
  * 
- * @author mremme
- * 
+ * @author Michael Remme
  */
 public class CookieController extends AbstractController {
   private CookieHandler cookieHandler;

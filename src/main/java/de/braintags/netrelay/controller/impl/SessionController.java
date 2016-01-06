@@ -23,15 +23,29 @@ import io.vertx.ext.web.sstore.ClusteredSessionStore;
 import io.vertx.ext.web.sstore.LocalSessionStore;
 
 /**
+ * SessionController uses a {@link SessionHandler} internally to implement session handling for all browser sessions
  * 
+ * <br>
+ * <br>
+ * Config-Parameter:<br/>
+ * <UL>
+ * <LI>{@value #SESSION_STORE_PROP}<br/>
+ * <LI>{@value #EXPIRATION_STORE_PROP}<br/>
+ * <LI>{@value #SESSION_MAP_NAME_PROP}<br/>
+ * </UL>
+ * <br>
+ * Request-Parameter:<br/>
+ * <br/>
+ * Result-Parameter:<br/>
+ * <br/>
  * 
- * @author mremme
- * 
+ * @author Michael Remme
  */
 public class SessionController extends AbstractController {
   /**
    * The name of the property which defines, which {@link io.vertx.ext.web.sstore.SessionStore} shall be used.
-   * References to {@link SessionStore}
+   * References to {@link SessionStore}. Possible values are {@link SessionStore#LOCAL_SESSION_STORE} and
+   * {@link SessionStore#CLUSTERED_SESSION_STORE}
    */
   public static final String SESSION_STORE_PROP = "sessionStore";
   /**

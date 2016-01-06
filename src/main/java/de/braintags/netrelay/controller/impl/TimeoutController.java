@@ -19,14 +19,28 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.TimeoutHandler;
 
 /**
- * 
+ * This controller defines for the specified routes, after which time the request processing is stopped. It uses
+ * internally a {@link TimeoutHandler}
+ * <br>
+ * <br>
+ * Config-Parameter:<br/>
+ * <UL>
+ * <LI>{@value #TIMEOUT_PROP}<br/>
+ * </UL>
+ * <br>
+ * Request-Parameter:<br/>
+ * <br/>
+ * Result-Parameter:<br/>
+ * <br/>
  * 
  * @author Michael Remme
- * 
  */
 public class TimeoutController extends AbstractController {
   private TimeoutHandler timeoutHandler;
 
+  /**
+   * The property, by which the timeout in milliseconds is defined
+   */
   public static final String TIMEOUT_PROP = "timeout";
   public static final long DEFAULT_TIMEOUT = 30000;
 

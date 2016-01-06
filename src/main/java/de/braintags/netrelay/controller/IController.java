@@ -15,6 +15,7 @@ package de.braintags.netrelay.controller;
 import java.util.Properties;
 
 import de.braintags.netrelay.NetRelay;
+import de.braintags.netrelay.init.Settings;
 import de.braintags.netrelay.routing.CaptureCollection;
 import de.braintags.netrelay.routing.CaptureDefinition;
 import io.vertx.core.Handler;
@@ -23,7 +24,8 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
 /**
- * An IController is the {@link Handler}, which shall be executed for a certain route definition
+ * An IController is the {@link Handler}, which shall be executed for a certain route definition.
+ * An IController is configured as part of the {@link Settings#getRouterDefinitions()}
  * 
  * @author Michael Remme
  * 

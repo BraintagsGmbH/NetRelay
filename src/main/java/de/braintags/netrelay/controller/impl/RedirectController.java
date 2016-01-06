@@ -24,8 +24,17 @@ import io.vertx.ext.web.RoutingContext;
  * The RedirectController redirects fitting rules to the page, specified by property
  * {@link RedirectController#DESTINATION_PROPERTY}
  * 
- * @author mremme
+ * <br>
+ * <br>
+ * Config-Parameter:<br/>
+ * {@value #DESTINATION_PROPERTY} - the name of the property, which defines the destination, where the redirect will aim
+ * to<br>
+ * Request-Parameter:<br/>
+ * <br/>
+ * Result-Parameter:<br/>
+ * <br/>
  * 
+ * @author Michael Remme
  */
 public class RedirectController extends AbstractController {
   /**

@@ -14,7 +14,7 @@ package de.braintags.netrelay;
 
 import org.junit.Test;
 
-import de.braintags.netrelay.mapper.Customer;
+import de.braintags.netrelay.mapper.TestCustomer;
 import io.vertx.ext.unit.TestContext;
 
 /**
@@ -59,7 +59,7 @@ public class TRequestUtil extends NetRelayBaseTest {
 
   @Test
   public void testCustomer(TestContext context) {
-    netRelay.getDatastore().createQuery(Customer.class);
+    netRelay.getDatastore().createQuery(TestCustomer.class);
   }
 
 }

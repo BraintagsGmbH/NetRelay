@@ -19,20 +19,23 @@ import de.braintags.netrelay.routing.RouterDefinition;
 import io.vertx.ext.web.RoutingContext;
 
 /**
- * A Controller for failing calls
+ * A Controller for failing calls, which is sending an error code. When this controller is added to a RouterDefinition,
+ * the {@link RouterDefinition#setFailureDefinition(boolean)} should be set to true
  * 
- * @author mremme
+ * <br>
+ * <br>
+ * Config-Parameter:<br/>
+ * <br>
+ * Request-Parameter:<br/>
+ * <br/>
+ * Result-Parameter:<br/>
+ * <br/>
  * 
+ * @author Michael Remme
  */
 public class FailureController extends AbstractController {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(FailureController.class);
-
-  /**
-   * 
-   */
-  public FailureController() {
-  }
 
   @Override
   public void initProperties(Properties properties) {

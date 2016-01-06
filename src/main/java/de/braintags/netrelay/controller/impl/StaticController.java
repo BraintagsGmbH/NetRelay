@@ -19,10 +19,23 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.StaticHandler;
 
 /**
- * Used to serve static contens
+ * Used to serve static contents. Internally a {@link StaticHandler} is used
  * 
- * @author mremme
  * 
+ * <br>
+ * <br>
+ * Config-Parameter:<br/>
+ * <UL>
+ * <LI>{@value #CACHE_ENABLED_PROPERTY}<br/>
+ * <LI>{@value #CACHE_TIMEOUT_PROPERTY}<br/>
+ * </UL>
+ * <br>
+ * Request-Parameter:<br/>
+ * <br/>
+ * Result-Parameter:<br/>
+ * <br/>
+ * 
+ * @author Michael Remme
  */
 public class StaticController extends AbstractController {
   /**
