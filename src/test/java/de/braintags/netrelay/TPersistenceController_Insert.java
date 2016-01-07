@@ -57,7 +57,8 @@ public class TPersistenceController_Insert extends AbstractPersistenceController
         LOGGER.info("RESPONSE: " + resp.content);
         String response = resp.content.toString();
         context.assertTrue(response.contains("myFirstName"), "Expected name not found in response");
-        context.assertTrue(response.contains("somefile.dat"), "Expected filename not fount in response");
+        // do not search for real filename, because of numeration for deduplication
+        context.assertTrue(response.contains("somefile"), "Expected filename not fount in response");
       } , 200, "OK", null);
     } catch (Exception e) {
       context.fail(e);

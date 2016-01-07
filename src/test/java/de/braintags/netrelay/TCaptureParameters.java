@@ -28,14 +28,27 @@ import io.vertx.ext.unit.TestContext;
  */
 public class TCaptureParameters extends AbstractCaptureParameterTest {
 
+  /**
+   * Testing that the correct page is called, from a path, where the parameters are removed.
+   * The correct record is NOT checked
+   * 
+   * @param context
+   * @throws Exception
+   */
   @Test
   public void testParameters1(TestContext context) throws Exception {
-    CaptureTestController.resolvedCaptureCollections = null;
-    testRequest(context, HttpMethod.GET, "/products/nase/12/tuEs/detail.html", 200, "OK");
-    context.assertNotNull(CaptureTestController.resolvedCaptureCollections);
-    context.assertEquals(1, CaptureTestController.resolvedCaptureCollections.size());
-    assertValues(context, 0, "nase", "tuEs", "12");
-    context.assertEquals("/products/detail.html", CaptureTestController.cleanedPath);
+    try {
+      CaptureTestController.resolvedCaptureCollections = null;
+
+      testRequest(context, HttpMethod.GET, "/products/nase/12/tuEs/captureTest.html", 200, "OK");
+
+      context.assertNotNull(CaptureTestController.resolvedCaptureCollections);
+      context.assertEquals(1, CaptureTestController.resolvedCaptureCollections.size());
+      assertValues(context, 0, "nase", "tuEs", "12");
+      context.assertEquals("/products/captureTest.html", CaptureTestController.cleanedPath);
+    } catch (Exception e) {
+      context.fail(e);
+    }
   }
 
   /*
@@ -48,7 +61,7 @@ public class TCaptureParameters extends AbstractCaptureParameterTest {
     super.modifySettings(context, settings);
     // defineRouterDefinitions adds the default key-definitions
     settings.getRouterDefinitions().add(0,
-        defineRouterDefinition(CaptureTestController.class, "/products/:entity/:ID/:action/detail.html"));
+        defineRouterDefinition(CaptureTestController.class, "/products/:entity/:ID/:action/captureTest.html"));
     boolean exceptionRaised = false;
     try {
       // capture parameters and asterisk are not possible

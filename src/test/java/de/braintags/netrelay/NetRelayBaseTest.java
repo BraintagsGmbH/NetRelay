@@ -21,14 +21,19 @@ import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 
+import de.braintags.io.vertx.pojomapper.IDataStore;
+import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.testdatastore.DatastoreBaseTest;
+import de.braintags.io.vertx.pojomapper.testdatastore.ResultContainer;
 import de.braintags.io.vertx.pojomapper.testdatastore.TestHelper;
 import de.braintags.io.vertx.util.ErrorObject;
 import de.braintags.io.vertx.util.ResultObject;
 import de.braintags.netrelay.controller.impl.ThymeleafTemplateController;
 import de.braintags.netrelay.impl.NetRelayExt_InternalSettings;
 import de.braintags.netrelay.init.Settings;
+import de.braintags.netrelay.model.Member;
 import de.braintags.netrelay.routing.RouterDefinition;
+import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.buffer.Buffer;
@@ -88,19 +93,6 @@ public class NetRelayBaseTest {
     netRelay.stop();
     netRelay = null;
 
-    // Async as = context.async();
-    // Future<Void> stopFuture = Future.future();
-    // stopFuture.setHandler(stRes -> {
-    // if (stRes.failed()) {
-    // LOGGER.error("Error occured on shutdown", stRes.cause());
-    // as.complete();
-    // } else {
-    // as.complete();
-    // }
-    // });
-    // netRelay.stop(stopFuture);
-    // as.await();
-
     if (vertx != null) {
       Async async = context.async();
       vertx.close(ar -> {
@@ -136,6 +128,30 @@ public class NetRelayBaseTest {
     NetRelayExt_InternalSettings netrelay = new NetRelayExt_InternalSettings();
     modifySettings(context, netrelay.getSettings());
     return netrelay;
+  }
+
+  /**
+   * Searches in the database, wether a member with the given username / password exists.
+   * If not, it is created. After the found or created member is returned
+   * 
+   * @param context
+   * @param datastore
+   * @param member
+   * @return
+   */
+  public static final Member createOrFindMember(TestContext context, IDataStore datastore, Member member) {
+    IQuery<Member> query = datastore.createQuery(Member.class);
+    query.field("userName").is(member.getUserName()).field("password").is(member.getPassword());
+    Member returnMember = (Member) DatastoreBaseTest.findFirst(context, query);
+    if (returnMember == null) {
+      ResultContainer cont = DatastoreBaseTest.saveRecord(context, member);
+      if (cont.assertionError != null) {
+        throw cont.assertionError;
+      } else {
+        returnMember = member;
+      }
+    }
+    return returnMember;
   }
 
   /**
@@ -253,6 +269,8 @@ public class NetRelayBaseTest {
         rc.content = buff.toString();
         rc.code = resp.statusCode();
         rc.statusMessage = resp.statusMessage();
+        rc.headers = MultiMap.caseInsensitiveMultiMap();
+        rc.headers.addAll(resp.headers());
 
         resultObject.setResult(rc);
         async.complete();
@@ -289,6 +307,7 @@ public class NetRelayBaseTest {
     String content;
     int code;
     String statusMessage;
+    MultiMap headers;
   }
 
 }

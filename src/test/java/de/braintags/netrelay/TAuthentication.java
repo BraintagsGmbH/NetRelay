@@ -15,7 +15,7 @@ package de.braintags.netrelay;
 import org.junit.Test;
 
 import de.braintags.netrelay.controller.impl.authentication.AuthenticationController;
-import de.braintags.netrelay.init.Settings;
+import de.braintags.netrelay.model.Member;
 import de.braintags.netrelay.routing.RouterDefinition;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.unit.TestContext;
@@ -30,34 +30,68 @@ public class TAuthentication extends NetRelayBaseTest {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(TAuthentication.class);
 
+  /**
+   * Send a direct, successful login and - cause no parameter
+   * {@link AuthenticationController#DIRECT_LOGGED_IN_OK_URL_PROP} is set -
+   * check the page called
+   * 
+   * @param context
+   */
   @Test
-  public void testDisplaySingleRecord(TestContext context) {
+  public void testDirectLoginWithoutDestination(TestContext context) {
+    Member member = new Member();
+    member.setUserName("testuser");
+    member.setPassword("testpassword");
+    member = createOrFindMember(context, netRelay.getDatastore(), member);
+    context.assertNotNull(member, "Member must not be null");
+go on here to call login 
     try {
+      resetRoutes();
       String url = "/private/privatePage.html";
       testRequest(context, HttpMethod.POST, url, null, resp -> {
         LOGGER.info("RESPONSE: " + resp.content);
-        context.assertTrue(resp.content.toString().contains("PRIVAT"), "Expected name not found");
-      } , 200, "OK", null);
+        LOGGER.info("HEADERS: " + resp.headers);
+        context.assertTrue(resp.headers.contains("location"), "parameter location does not exist");
+        context.assertTrue(resp.headers.get("location").equals("/member/login"), "Expected location /member/login");
+      } , 302, "Found", null);
     } catch (Exception e) {
       context.fail(e);
     }
-
   }
+
+  /**
+   * Improves that for a call to a protected page a redirect is sent
+   * 
+   * @param context
+   */
+  @Test
+  public void testSimpleLogin(TestContext context) {
+    try {
+      resetRoutes();
+      String url = "/private/privatePage.html";
+      testRequest(context, HttpMethod.POST, url, null, resp -> {
+        LOGGER.info("RESPONSE: " + resp.content);
+        LOGGER.info("HEADERS: " + resp.headers);
+        context.assertTrue(resp.headers.contains("location"), "parameter location does not exist");
+        context.assertTrue(resp.headers.get("location").equals("/member/login"), "Expected location /member/login");
+      } , 302, "Found", null);
+    } catch (Exception e) {
+      context.fail(e);
+    }
+  }
+
+  // test wrong login
 
   // test double logout, or logout when no user is logged in
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see de.braintags.netrelay.NetRelayBaseTest#modifySettings(de.braintags.netrelay.init.Settings)
+  /**
+   * @throws Exception
    */
-  @Override
-  protected void modifySettings(TestContext context, Settings settings) {
-    super.modifySettings(context, settings);
-    RouterDefinition def = settings.getRouterDefinitions()
+  private void resetRoutes() throws Exception {
+    RouterDefinition def = netRelay.getSettings().getRouterDefinitions()
         .getNamedDefinition(AuthenticationController.class.getSimpleName());
-    def.setRoutes(new String[] { "/privat/*" });
-
+    def.setRoutes(new String[] { "/private/*" });
+    netRelay.resetRoutes();
   }
 
 }

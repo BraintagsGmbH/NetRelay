@@ -7,7 +7,12 @@
 
 <body>
  success
-
+				<div class="col-md-6">
+					<h2>recordlist</h2>
+					<p th:each="mapper : ${ context.get( 'SimpleNetRelayMapper') }">
+						<h4 th:text="${mapper.name}"></h4>
+					</p>
+				</div>
 
 </body>
 </html>

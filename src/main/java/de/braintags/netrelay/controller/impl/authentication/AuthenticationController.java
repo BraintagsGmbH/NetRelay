@@ -23,6 +23,7 @@ import io.vertx.ext.web.handler.UserSessionHandler;
 
 /**
  * Controller performs the authentication, login and logout of members.
+ * If a call to a protected page is performed, a 302-redirect to the defined login page is processed
  * 
  * Logout: performs logout and stores message in context with key LOGOUT_MESSAGE_PROP
  * 
@@ -51,6 +52,12 @@ public class AuthenticationController extends AbstractAuthController {
    * By this property you can define the destination page, which is called after a logout
    */
   public static final String LOGOUT_DESTINATION_PAGE_PROP = "logoutDestinationPage";
+
+  /**
+   * This is the name of the parameter, which defines the url to redirect to, if the user logs in directly at the url of
+   * the form login handler without being redirected here first. ( parameter used by FormLoginHandler )
+   */
+  public static final String DIRECT_LOGGED_IN_OK_URL_PROP = "directLoggedInOKURL";
 
   /**
    * The default url, where the login action is performed
@@ -119,7 +126,12 @@ public class AuthenticationController extends AbstractAuthController {
 
   private void initLoginAction() {
     String loginUrl = readProperty(LOGIN_ACTION_URL_PROP, DEFAULT_LOGIN_ACTION_URL, false);
+    String directLoginUrl = readProperty(DIRECT_LOGGED_IN_OK_URL_PROP, null, false);
+
     FormLoginHandler fl = FormLoginHandler.create(authProvider);
+    if (directLoginUrl == null) {
+      fl.setDirectLoggedInOKURL(directLoginUrl);
+    }
     getNetRelay().getRouter().route(loginUrl).handler(fl);
   }
 

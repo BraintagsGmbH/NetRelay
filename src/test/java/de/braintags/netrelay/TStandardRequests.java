@@ -39,6 +39,24 @@ public class TStandardRequests extends NetRelayBaseTest {
       .getLogger(TStandardRequests.class);
 
   @Test
+  public void testMultipleRequests(TestContext context) throws Exception {
+    resetRoutes();
+    testRequest(context, HttpMethod.GET, "/", response -> {
+      LOGGER.info("first request ran");
+      try {
+        testRequest(context, HttpMethod.GET, "/test.html", iresp -> {
+          LOGGER.info("second request ran");
+
+        } , 200, "OK", null);
+      } catch (Exception e) {
+        context.fail(e);
+      }
+
+    } , 200, "OK", null);
+
+  }
+
+  @Test
   public void testFormURLEncoded(TestContext context) throws Exception {
     resetRoutes();
     MultipartUtil mu = new MultipartUtil();

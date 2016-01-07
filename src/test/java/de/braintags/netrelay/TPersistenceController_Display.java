@@ -14,8 +14,7 @@ package de.braintags.netrelay;
 
 import org.junit.Test;
 
-import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
-import de.braintags.io.vertx.util.ResultObject;
+import de.braintags.io.vertx.pojomapper.testdatastore.DatastoreBaseTest;
 import de.braintags.netrelay.controller.impl.BodyController;
 import de.braintags.netrelay.controller.impl.persistence.PersistenceController;
 import de.braintags.netrelay.impl.NetRelayExt_FileBasedSettings;
@@ -23,7 +22,6 @@ import de.braintags.netrelay.init.Settings;
 import de.braintags.netrelay.mapper.SimpleNetRelayMapper;
 import de.braintags.netrelay.routing.RouterDefinition;
 import io.vertx.core.http.HttpMethod;
-import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 
 /**
@@ -38,25 +36,11 @@ public class TPersistenceController_Display extends AbstractPersistenceControlle
 
   @Test
   public void testDisplaySingleRecord(TestContext context) {
-    Async async = context.async();
-    IWrite<SimpleNetRelayMapper> write = netRelay.getDatastore().createWrite(SimpleNetRelayMapper.class);
     SimpleNetRelayMapper mapper = new SimpleNetRelayMapper();
     mapper.age = 13;
     mapper.child = false;
     mapper.name = "testmapper for display";
-    write.add(mapper);
-    ResultObject<SimpleNetRelayMapper> ro = new ResultObject<>(null);
-    write.save(result -> {
-      if (result.failed()) {
-        context.fail(result.cause());
-        async.complete();
-      } else {
-        // all fine, ID should be set in mapper
-        LOGGER.info("ID: " + mapper.id);
-        async.complete();
-      }
-    });
-    async.await();
+    DatastoreBaseTest.saveRecord(context, mapper);
 
     try {
       String id = mapper.id;
@@ -74,25 +58,11 @@ public class TPersistenceController_Display extends AbstractPersistenceControlle
 
   @Test
   public void testDisplaySingleRecordAsParam(TestContext context) {
-    Async async = context.async();
-    IWrite<SimpleNetRelayMapper> write = netRelay.getDatastore().createWrite(SimpleNetRelayMapper.class);
     SimpleNetRelayMapper mapper = new SimpleNetRelayMapper();
     mapper.age = 13;
     mapper.child = false;
     mapper.name = "testmapper for display";
-    write.add(mapper);
-    ResultObject<SimpleNetRelayMapper> ro = new ResultObject<>(null);
-    write.save(result -> {
-      if (result.failed()) {
-        context.fail(result.cause());
-        async.complete();
-      } else {
-        // all fine, ID should be set in mapper
-        LOGGER.info("ID: " + mapper.id);
-        async.complete();
-      }
-    });
-    async.await();
+    DatastoreBaseTest.saveRecord(context, mapper);
 
     try {
       String id = mapper.id;
@@ -110,6 +80,12 @@ public class TPersistenceController_Display extends AbstractPersistenceControlle
   @Test
   public void testDisplayListAll(TestContext context) {
     try {
+      SimpleNetRelayMapper mapper = new SimpleNetRelayMapper();
+      mapper.age = 13;
+      mapper.child = false;
+      mapper.name = "testmapper for display";
+      DatastoreBaseTest.saveRecord(context, mapper);
+
       String url = String.format("/products/%s/DISPLAY/list.html", NetRelayExt_FileBasedSettings.SIMPLEMAPPER_NAME);
       testRequest(context, HttpMethod.POST, url, null, resp -> {
         LOGGER.info("RESPONSE: " + resp.content);
@@ -123,7 +99,13 @@ public class TPersistenceController_Display extends AbstractPersistenceControlle
   @Test
   public void testDisplayListAllAsParam(TestContext context) {
     try {
-      String url = "/products/detail2.html?action=DISPLAY&entity=" + NetRelayExt_FileBasedSettings.SIMPLEMAPPER_NAME;
+      SimpleNetRelayMapper mapper = new SimpleNetRelayMapper();
+      mapper.age = 13;
+      mapper.child = false;
+      mapper.name = "testmapper for display";
+      DatastoreBaseTest.saveRecord(context, mapper);
+
+      String url = "/products/list.html?action=DISPLAY&entity=" + NetRelayExt_FileBasedSettings.SIMPLEMAPPER_NAME;
       testRequest(context, HttpMethod.POST, url, null, resp -> {
         LOGGER.info("RESPONSE: " + resp.content);
         context.assertTrue(resp.content.toString().contains("success"), "Expected name not found");
