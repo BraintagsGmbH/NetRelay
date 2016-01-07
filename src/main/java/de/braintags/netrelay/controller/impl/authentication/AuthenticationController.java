@@ -129,7 +129,7 @@ public class AuthenticationController extends AbstractAuthController {
     String directLoginUrl = readProperty(DIRECT_LOGGED_IN_OK_URL_PROP, null, false);
 
     FormLoginHandler fl = FormLoginHandler.create(authProvider);
-    if (directLoginUrl == null) {
+    if (directLoginUrl != null) {
       fl.setDirectLoggedInOKURL(directLoginUrl);
     }
     getNetRelay().getRouter().route(loginUrl).handler(fl);
