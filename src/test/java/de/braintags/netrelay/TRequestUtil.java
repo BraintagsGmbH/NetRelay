@@ -24,6 +24,8 @@ import io.vertx.ext.unit.TestContext;
  * 
  */
 public class TRequestUtil extends NetRelayBaseTest {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(TRequestUtil.class);
 
   @Test
   public void testCleanPath(TestContext context) {
@@ -54,7 +56,6 @@ public class TRequestUtil extends NetRelayBaseTest {
     path = "first/second/third/firstfourth/";
     result = RequestUtil.cleanPathElement("first", path);
     context.assertEquals("second/third/firstfourth/", result);
-
   }
 
   @Test

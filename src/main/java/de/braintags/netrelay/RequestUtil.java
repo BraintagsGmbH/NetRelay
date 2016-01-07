@@ -23,6 +23,7 @@ import de.braintags.netrelay.model.Member;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.JsonObject;
@@ -168,8 +169,11 @@ public class RequestUtil {
    * Clean one value element of the path within one "/".
    * "/path/2/template.html" - "2" = "/path/template.html"
    * 
+   * Logic is:
+   * value, "/" or nothing before or behind
+   * 
    * @param value
-   *          the prure value to be removed
+   *          the pure value to be removed
    * @param path
    *          the path to be cleaned
    * @return the cleaned path
@@ -177,20 +181,31 @@ public class RequestUtil {
    *           if element with one "/" before or after the value wasn't found
    */
   public static String cleanPathElement(String value, String path) {
-    if (path.indexOf(value) >= 0) {
-      int index = path.indexOf("/" + value + "/");
-      if (index < 0) {
-        index = path.indexOf("/" + value);
+    String[] elements = path.split("/");
+    Buffer buffer = Buffer.buffer(path.startsWith("/") ? "/" : "");
+    boolean added = false;
+    for (String element : elements) {
+      if (element != null && element.hashCode() != 0 && !element.equals(value)) {
+        buffer.appendString(added ? "/" : "").appendString(element);
+        added = true;
       }
-      if (index < 0) {
-        index = path.indexOf(value + "/");
-      }
-      if (index < 0) {
-        throw new IllegalArgumentException("Could not clean url from value '" + value + "'");
-      }
-      path = path.substring(0, index) + path.substring(index + value.length() + 1);
     }
-    return path;
+    return buffer.appendString(path.endsWith("/") ? "/" : "").toString();
+
+    // if (path.indexOf(value) >= 0) {
+    // int index = path.indexOf("/" + value + "/");
+    // if (index < 0) {
+    // index = path.indexOf("/" + value);
+    // }
+    // if (index < 0) {
+    // index = path.indexOf(value + "/");
+    // }
+    // if (index < 0) {
+    // throw new IllegalArgumentException("Could not clean url from value '" + value + "'");
+    // }
+    // path = path.substring(0, index) + path.substring(index + value.length() + 1);
+    // }
+    // return path;
   }
 
   /**
