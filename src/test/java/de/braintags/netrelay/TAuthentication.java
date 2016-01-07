@@ -112,8 +112,7 @@ public class TAuthentication extends NetRelayBaseTest {
       } , resp -> {
         LOGGER.info("RESPONSE: " + resp.content);
         LOGGER.info("HEADERS: " + resp.headers);
-        context.assertTrue(resp.content.contains("Login successful"), "required text in reply not found");
-      } , 200, "OK", null);
+      } , 403, "Forbidden", null);
     } catch (Exception e) {
       context.fail(e);
     }
