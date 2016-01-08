@@ -18,7 +18,6 @@ import java.util.Properties;
 import de.braintags.io.vertx.pojomapper.exception.InitException;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 import de.braintags.io.vertx.util.CounterObject;
-import de.braintags.io.vertx.util.ErrorObject;
 import de.braintags.netrelay.controller.Action;
 import de.braintags.netrelay.controller.impl.AbstractCaptureController;
 import de.braintags.netrelay.mapping.NetRelayMapperFactory;
@@ -96,20 +95,19 @@ public class PersistenceController extends AbstractCaptureController {
   @Override
   protected void handle(RoutingContext context, List<CaptureMap> resolvedCaptureCollections,
       Handler<AsyncResult<Void>> handler) {
-    ErrorObject<Void> err = new ErrorObject<>(handler);
-    CounterObject co = new CounterObject(resolvedCaptureCollections.size());
+    CounterObject<Void> co = new CounterObject<>(resolvedCaptureCollections.size(), handler);
 
     for (CaptureMap map : resolvedCaptureCollections) {
       handle(context, map, result -> {
         if (result.failed()) {
-          err.setThrowable(result.cause());
+          co.setThrowable(result.cause());
         } else {
           if (co.reduce()) {
             handler.handle(Future.succeededFuture());
           }
         }
       });
-      if (err.isError()) {
+      if (co.isError()) {
         return;
       }
     }

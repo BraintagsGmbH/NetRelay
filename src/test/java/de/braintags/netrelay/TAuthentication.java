@@ -226,6 +226,8 @@ public class TAuthentication extends NetRelayBaseTest {
     def.getHandlerProperties().put("roleField", "roles");
     if (directLoginPage != null) {
       def.getHandlerProperties().put(AuthenticationController.DIRECT_LOGGED_IN_OK_URL_PROP, directLoginPage);
+    } else {
+      def.getHandlerProperties().remove(AuthenticationController.DIRECT_LOGGED_IN_OK_URL_PROP);
     }
     netRelay.resetRoutes();
   }

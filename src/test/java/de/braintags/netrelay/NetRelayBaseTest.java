@@ -284,11 +284,11 @@ public class NetRelayBaseTest {
     async.await();
 
     ResponseCopy rc = resultObject.getResult();
-    context.assertEquals(statusCode, rc.code);
-    context.assertEquals(statusMessage, rc.statusMessage);
     if (responseAction != null) {
       responseAction.accept(rc);
     }
+    context.assertEquals(statusCode, rc.code);
+    context.assertEquals(statusMessage, rc.statusMessage);
     if (responseBodyBuffer == null) {
       // async.complete();
     } else {
