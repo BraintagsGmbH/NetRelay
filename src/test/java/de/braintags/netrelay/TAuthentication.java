@@ -18,6 +18,7 @@ import de.braintags.netrelay.controller.impl.authentication.AuthenticationContro
 import de.braintags.netrelay.model.Member;
 import de.braintags.netrelay.routing.RouterDefinition;
 import de.braintags.netrelay.util.MultipartUtil;
+import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.unit.TestContext;
 
@@ -28,6 +29,10 @@ import io.vertx.ext.unit.TestContext;
  * 
  */
 public class TAuthentication extends NetRelayBaseTest {
+  /**
+   * Comment for <code>PROTECTED_URL</code>
+   */
+  private static final String PROTECTED_URL = "/private/privatePage.html";
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(TAuthentication.class);
 
@@ -47,7 +52,7 @@ public class TAuthentication extends NetRelayBaseTest {
       mu.addFormField("username", member.getUserName());
       mu.addFormField("password", member.getPassword());
 
-      String url = "/member/login";
+      String url = AuthenticationController.DEFAULT_LOGIN_ACTION_URL;
       testRequest(context, HttpMethod.POST, url, req -> {
         mu.finish(req);
       } , resp -> {
@@ -75,15 +80,13 @@ public class TAuthentication extends NetRelayBaseTest {
       mu.addFormField("username", member.getUserName());
       mu.addFormField("password", member.getPassword());
 
-      String url = "/member/login";
+      String url = AuthenticationController.DEFAULT_LOGIN_ACTION_URL;
       testRequest(context, HttpMethod.POST, url, req -> {
         mu.finish(req);
       } , resp -> {
         LOGGER.info("RESPONSE: " + resp.content);
         LOGGER.info("HEADERS: " + resp.headers);
-        context.assertTrue(resp.headers.contains("location"), "parameter location does not exist");
-        context.assertTrue(resp.headers.get("location").equals("/loginSuccess.html"),
-            "Expected redirect to /loginSuccess.html");
+        improveRedirect("/loginSuccess.html", context, resp);
       } , 302, "Found", null);
     } catch (Exception e) {
       context.fail(e);
@@ -106,9 +109,11 @@ public class TAuthentication extends NetRelayBaseTest {
       mu.addFormField("username", "wrongUsername");
       mu.addFormField("password", member.getPassword());
 
-      String url = "/member/login";
+      String url = AuthenticationController.DEFAULT_LOGIN_ACTION_URL;
       testRequest(context, HttpMethod.POST, url, req -> {
+
         mu.finish(req);
+
       } , resp -> {
         LOGGER.info("RESPONSE: " + resp.content);
         LOGGER.info("HEADERS: " + resp.headers);
@@ -119,16 +124,63 @@ public class TAuthentication extends NetRelayBaseTest {
   }
 
   /**
-   * @param context
-   * @return
+   * Perform login and logout by resusing sent cookie
    */
-  private Member createMember(TestContext context) {
-    Member member = new Member();
-    member.setUserName("testuser");
-    member.setPassword("testpassword");
-    member = createOrFindMember(context, netRelay.getDatastore(), member);
-    context.assertNotNull(member, "Member must not be null");
-    return member;
+  @Test
+  public void loginLogout(TestContext context) {
+    Member member = createMember(context);
+    Buffer cookie = Buffer.buffer();
+    try {
+      resetRoutes(null);
+      MultipartUtil mu = new MultipartUtil();
+      mu.addFormField("username", member.getUserName());
+      mu.addFormField("password", member.getPassword());
+
+      // first perform the login and remember cookie
+      String url = AuthenticationController.DEFAULT_LOGIN_ACTION_URL;
+      testRequest(context, HttpMethod.POST, url, req -> {
+        mu.finish(req);
+      } , resp -> {
+        LOGGER.info("RESPONSE: " + resp.content);
+        LOGGER.info("HEADERS: " + resp.headers);
+        context.assertTrue(resp.content.contains("Login successful"), "required text in reply not found");
+        String setCookie = resp.headers.get("Set-Cookie");
+        context.assertNotNull(setCookie, "Cookie not found");
+        cookie.appendString(setCookie);
+      } , 200, "OK", null);
+
+      // second call protected page and set cookie
+      url = PROTECTED_URL;
+      testRequest(context, HttpMethod.POST, url, httpConn -> {
+        httpConn.headers().set("Cookie", cookie.toString());
+      } , resp -> {
+        LOGGER.info("RESPONSE: " + resp.content);
+        LOGGER.info("HEADERS: " + resp.headers);
+        context.assertTrue(resp.content.contains("PRIVAT"), "protected page should be read, but was not");
+        String setCookie = resp.headers.get("Set-Cookie");
+        context.assertNull(setCookie, "Cookie should not be sent here");
+      } , 200, "OK", null);
+    } catch (Exception e) {
+      context.fail(e);
+    }
+  }
+
+  /**
+   * Perform login and logout
+   */
+  @Test
+  public void logoutWithoutLogin(TestContext context) {
+    try {
+      resetRoutes(null);
+      String url = AuthenticationController.DEFAULT_LOGOUT_ACTION_URL;
+      testRequest(context, HttpMethod.POST, url, null, resp -> {
+        LOGGER.info("RESPONSE: " + resp.content);
+        LOGGER.info("HEADERS: " + resp.headers);
+        improveRedirect(AuthenticationController.DEFAULT_LOGOUT_DESTINATION, context, resp);
+      } , 302, "Found", null);
+    } catch (Exception e) {
+      context.fail(e);
+    }
   }
 
   /**
@@ -140,21 +192,16 @@ public class TAuthentication extends NetRelayBaseTest {
   public void testSimpleLogin(TestContext context) {
     try {
       resetRoutes(null);
-      String url = "/private/privatePage.html";
+      String url = PROTECTED_URL;
       testRequest(context, HttpMethod.POST, url, null, resp -> {
         LOGGER.info("RESPONSE: " + resp.content);
         LOGGER.info("HEADERS: " + resp.headers);
-        context.assertTrue(resp.headers.contains("location"), "parameter location does not exist");
-        context.assertTrue(resp.headers.get("location").equals("/member/login"), "Expected redirect to /member/login");
+        improveRedirect(AuthenticationController.DEFAULT_LOGIN_ACTION_URL, context, resp);
       } , 302, "Found", null);
     } catch (Exception e) {
       context.fail(e);
     }
   }
-
-  // test wrong login
-
-  // test double logout, or logout when no user is logged in
 
   /**
    * "loginPage" : "/backend/login.html",
@@ -181,6 +228,24 @@ public class TAuthentication extends NetRelayBaseTest {
       def.getHandlerProperties().put(AuthenticationController.DIRECT_LOGGED_IN_OK_URL_PROP, directLoginPage);
     }
     netRelay.resetRoutes();
+  }
+
+  /**
+   * @param context
+   * @return
+   */
+  private Member createMember(TestContext context) {
+    Member member = new Member();
+    member.setUserName("testuser");
+    member.setPassword("testpassword");
+    member = createOrFindMember(context, netRelay.getDatastore(), member);
+    context.assertNotNull(member, "Member must not be null");
+    return member;
+  }
+
+  private void improveRedirect(String redirectPath, TestContext context, ResponseCopy resp) {
+    context.assertTrue(resp.headers.contains("location"), "parameter location does not exist");
+    context.assertTrue(resp.headers.get("location").startsWith(redirectPath), "Expected redirect to " + redirectPath);
   }
 
 }

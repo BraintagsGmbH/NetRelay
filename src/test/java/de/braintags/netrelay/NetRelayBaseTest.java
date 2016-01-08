@@ -12,6 +12,7 @@
  */
 package de.braintags.netrelay;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 import org.junit.AfterClass;
@@ -271,7 +272,7 @@ public class NetRelayBaseTest {
         rc.statusMessage = resp.statusMessage();
         rc.headers = MultiMap.caseInsensitiveMultiMap();
         rc.headers.addAll(resp.headers());
-
+        rc.cookies = resp.cookies();
         resultObject.setResult(rc);
         async.complete();
       });
@@ -308,6 +309,7 @@ public class NetRelayBaseTest {
     int code;
     String statusMessage;
     MultiMap headers;
+    List<String> cookies;
   }
 
 }

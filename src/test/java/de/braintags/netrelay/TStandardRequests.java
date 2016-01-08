@@ -39,6 +39,51 @@ public class TStandardRequests extends NetRelayBaseTest {
       .getLogger(TStandardRequests.class);
 
   @Test
+  public void testReuseCookie(TestContext context) throws Exception {
+    try {
+      resetRoutes();
+      Buffer cookie = Buffer.buffer();
+      String url = "/";
+      testRequest(context, HttpMethod.GET, url, req -> {
+      } , resp -> {
+        LOGGER.info("RESPONSE: " + resp.content);
+        LOGGER.info("HEADERS: " + resp.headers);
+        String setCookie = resp.headers.get("Set-Cookie");
+        context.assertNotNull(setCookie, "Cookie not found");
+        cookie.appendString(setCookie);
+      } , 200, "OK", null);
+
+      testRequest(context, HttpMethod.POST, url, httpConn -> {
+        httpConn.headers().set("Cookie", cookie.toString());
+      } , resp -> {
+        LOGGER.info("RESPONSE: " + resp.content);
+        LOGGER.info("HEADERS: " + resp.headers);
+        String setCookie = resp.headers.get("Set-Cookie");
+        context.assertNull(setCookie, "Cookie should not be sent here");
+      } , 200, "OK", null);
+
+    } catch (Exception e) {
+      context.fail(e);
+    }
+  }
+
+  @Test
+  public void testSimpleRequests(TestContext context) throws Exception {
+    try {
+      resetRoutes();
+      String url = "/";
+      testRequest(context, HttpMethod.GET, url, req -> {
+      } , resp -> {
+        LOGGER.info("RESPONSE: " + resp.content);
+        LOGGER.info("HEADERS: " + resp.headers);
+      } , 200, "OK", null);
+    } catch (Exception e) {
+      context.fail(e);
+    }
+
+  }
+
+  @Test
   public void testMultipleRequests(TestContext context) throws Exception {
     resetRoutes();
     testRequest(context, HttpMethod.GET, "/", response -> {
