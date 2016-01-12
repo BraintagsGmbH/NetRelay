@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.netrelay.controller.impl.AbstractCaptureController.CaptureMap;
 import de.braintags.netrelay.exception.FileNameException;
@@ -30,7 +31,9 @@ import io.vertx.ext.web.FileUpload;
 import io.vertx.ext.web.RoutingContext;
 
 /**
- * 
+ * InsertAction is called from {@link PersistenceController} to insert new records into the {@link IDataStore}. New
+ * instances, which are successfully saved, are added under their entity name in the context and contain already the
+ * generated ID
  * 
  * @author Michael Remme
  * 

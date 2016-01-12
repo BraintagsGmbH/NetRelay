@@ -21,16 +21,20 @@
 		<pojomapper.version>1.0.1-SNAPSHOT</pojomapper.version>
 		<vertx.web.version>3.2.0-SNAPSHOT</vertx.web.version>
 		<asciidoc.dir>${project.basedir}/src/docs/asciidoc</asciidoc.dir>
+		<maven.test.skip>true</maven.test.skip>
+		<doc.skip>false</doc.skip>
+		<source.skip>false</source.skip>
+		<testjar.skip>false</testjar.skip>
 	</properties>
 
 	<dependencies>
-<dependency>
-  <groupId>org.apache.httpcomponents</groupId>
-  <artifactId>httpmime</artifactId>
-  <version>4.4-alpha2-SNAPSHOT</version>
-  <classifier>sources</classifier>
-</dependency>	
-	
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpmime</artifactId>
+			<version>4.4-alpha2-SNAPSHOT</version>
+			<classifier>sources</classifier>
+		</dependency>
+
 		<dependency>
 			<groupId>de.braintags</groupId>
 			<artifactId>vertx-pojo-mapper-mysql</artifactId>
@@ -77,11 +81,11 @@
 			<version>${stack.version}</version>
 		</dependency>
 		<dependency>
-		  <groupId>io.vertx</groupId>
-		  <artifactId>vertx-mail-client</artifactId>
-		  <version>${stack.version}</version>
-		</dependency>	
-	
+			<groupId>io.vertx</groupId>
+			<artifactId>vertx-mail-client</artifactId>
+			<version>${stack.version}</version>
+		</dependency>
+
 
 	</dependencies>
 
