@@ -191,21 +191,6 @@ public class RequestUtil {
       }
     }
     return buffer.appendString(path.endsWith("/") ? "/" : "").toString();
-
-    // if (path.indexOf(value) >= 0) {
-    // int index = path.indexOf("/" + value + "/");
-    // if (index < 0) {
-    // index = path.indexOf("/" + value);
-    // }
-    // if (index < 0) {
-    // index = path.indexOf(value + "/");
-    // }
-    // if (index < 0) {
-    // throw new IllegalArgumentException("Could not clean url from value '" + value + "'");
-    // }
-    // path = path.substring(0, index) + path.substring(index + value.length() + 1);
-    // }
-    // return path;
   }
 
   /**
