@@ -37,6 +37,8 @@ import io.vertx.ext.web.handler.UserSessionHandler;
 /**
  * Controller performs the authentication, login and logout of members.
  * If a call to a protected page is performed, a 302-redirect to the defined login page is processed
+ * If the login failed, then the controller tries to reroute the call to the defined login page again. Before it is
+ * setting the parameter {@value #AUTHENTICATION_ERROR_PARAM}. If this page is not defined, then a 403 error is sent.
  * 
  * Logout: performs logout and stores message in context with key LOGOUT_MESSAGE_PROP
  * 
@@ -49,13 +51,14 @@ import io.vertx.ext.web.handler.UserSessionHandler;
  * Possible values are:
  * {@link AuthHandlerEnum#BASIC}, {@link AuthHandlerEnum#REDIRECT}
  * <LI>{@value #LOGIN_PAGE_PROP} - the property name, which defines the path to the login page, which shall be used
- * <LI>{@value #DEFAULT_AUTH_ERROR_PAGE_PROP} the default page which will be called, if authentication failed and no
- * previous called page can be found
  * </UL>
  * <br>
  * Request-Parameter:<br/>
  * <br/>
  * Result-Parameter:<br/>
+ * {@value #AUTHENTICATION_ERROR_PARAM} the parameter, where an error String of a failed authentication is stored in
+ * the
+ * context
  * <br/>
  * 
  * 
@@ -65,6 +68,8 @@ import io.vertx.ext.web.handler.UserSessionHandler;
 public class AuthenticationController extends AbstractController {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(AuthenticationController.class);
+
+  public static final String AUTHENTICATION_ERROR_PARAM = "authenticationError";
 
   /**
    * With this property the url for the login can be defined. It is the url, which is called by a login form and is a
@@ -87,12 +92,6 @@ public class AuthenticationController extends AbstractController {
    * the form login handler without being redirected here first. ( parameter used by FormLoginHandler )
    */
   public static final String DIRECT_LOGGED_IN_OK_URL_PROP = "directLoggedInOKURL";
-
-  /**
-   * By this property the page can be set, which will be called as default page, when authentication failed and the
-   * system cannot read the originally called page
-   */
-  public static final String DEFAULT_AUTH_ERROR_PAGE_PROP = "defaultAuthenticationError";
 
   /**
    * The default url, where the login action is performed
@@ -194,14 +193,17 @@ public class AuthenticationController extends AbstractController {
   private void initLoginAction() {
     String loginUrl = readProperty(LOGIN_ACTION_URL_PROP, DEFAULT_LOGIN_ACTION_URL, false);
     String directLoginUrl = readProperty(DIRECT_LOGGED_IN_OK_URL_PROP, null, false);
-    String defaultAuthError = readProperty(DEFAULT_AUTH_ERROR_PAGE_PROP, null, false);
+    String authErrorParam = readProperty(AUTHENTICATION_ERROR_PARAM, null, false);
 
     FormLoginHandlerBt fl = new FormLoginHandlerBt(authProvider);
     if (directLoginUrl != null) {
       fl.setDirectLoggedInOKURL(directLoginUrl);
     }
-    if (defaultAuthError != null) {
-      fl.setDefaultAuthenticationErrorPage(defaultAuthError);
+    if (loginPage != null) {
+      fl.setLoginPage(loginPage);
+    }
+    if (authErrorParam != null) {
+      fl.setAuthenticationErrorParameter(authErrorParam);
     }
     getNetRelay().getRouter().route(loginUrl).handler(fl);
   }

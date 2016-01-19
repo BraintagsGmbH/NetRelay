@@ -34,38 +34,51 @@ public class FormLoginHandlerBt implements FormLoginHandler {
 
   private static final Logger log = LoggerFactory.getLogger(FormLoginHandlerBt.class);
 
+  public static final String DEFAULT_AUTHENTICATION_ERROR_PARAM = "authenticationError";
+
   private final AuthProvider authProvider;
 
   private String usernameParam;
   private String passwordParam;
   private String returnURLParam;
   private String directLoggedInOKURL;
-  private String defaultAuthErrorPage = null;
+  private String loginPage = null;
+  private String authenticationErrorParameter = DEFAULT_AUTHENTICATION_ERROR_PARAM;
 
   public FormLoginHandlerBt(AuthProvider authProvider) {
     this(authProvider, DEFAULT_USERNAME_PARAM, DEFAULT_PASSWORD_PARAM, DEFAULT_RETURN_URL_PARAM, null, null);
   }
 
   public FormLoginHandlerBt(AuthProvider authProvider, String usernameParam, String passwordParam,
-      String returnURLParam, String directLoggedInOKURL, String defaultAuthErrorPage) {
+      String returnURLParam, String directLoggedInOKURL, String loginPage) {
     this.authProvider = authProvider;
     this.usernameParam = usernameParam;
     this.passwordParam = passwordParam;
     this.returnURLParam = returnURLParam;
     this.directLoggedInOKURL = directLoggedInOKURL;
-    this.defaultAuthErrorPage = defaultAuthErrorPage;
+    this.loginPage = loginPage;
   }
 
   /**
-   * If the originally called page can not be read, the default page will be called in case of
-   * Authentication failed
+   * Set the name of the parameter, which is used to store the message of a failed authentication
+   * 
+   * @param param
+   * @return
+   */
+  public FormLoginHandlerBt setAuthenticationErrorParameter(String param) {
+    this.authenticationErrorParameter = param;
+    return this;
+  }
+
+  /**
+   * The login page is called directly in case of authentication error
    * 
    * @param path
    *          the path of the page to be called
    * @return the handler itself for chained calls
    */
-  public FormLoginHandlerBt setDefaultAuthenticationErrorPage(String path) {
-    this.defaultAuthErrorPage = path;
+  public FormLoginHandlerBt setLoginPage(String path) {
+    this.loginPage = path;
     return this;
   }
 
@@ -124,19 +137,21 @@ public class FormLoginHandlerBt implements FormLoginHandler {
             }
           } else {
             log.info("authentication failed: " + res.cause());
-            handleAuthenticationError(context);
+            handleAuthenticationError(context, res.cause());
           }
         });
       }
     }
   }
 
-  private void handleAuthenticationError(RoutingContext context) {
+  private void handleAuthenticationError(RoutingContext context, Throwable e) {
     // context.fail(403); // Failed login
-    if (redirectBySession(context)) {
-      return;
-    } else if (defaultAuthErrorPage != null) {
-      doRedirect(context.response(), defaultAuthErrorPage);
+    if (e != null) {
+      context.put(authenticationErrorParameter, e.toString());
+    }
+    if (loginPage != null) {
+      context.reroute(loginPage);
+      // doRedirect(context.response(), loginPage);
     } else {
       context.fail(403);
     }
