@@ -74,14 +74,20 @@ public class DataTablesController extends AbstractController {
           context.fail(tqResult.cause());
         } else {
           long tableCount = tqResult.result().getCount();
-          IQuery<?> query = descr.toQuery(getNetRelay().getDatastore());
-          execute(query, descr, tableCount, result -> {
-            if (result.failed()) {
-              context.fail(result.cause());
+          descr.toQuery(getNetRelay().getDatastore(), getNetRelay().getNetRelayMapperFactory(), qr -> {
+            if (qr.failed()) {
+              context.fail(qr.cause());
             } else {
-              HttpServerResponse response = context.response();
-              response.putHeader("content-type", "application/json; charset=utf-8")
-                  .end(result.result().encodePrettily());
+              IQuery<?> query = qr.result();
+              execute(query, descr, tableCount, result -> {
+                if (result.failed()) {
+                  context.fail(result.cause());
+                } else {
+                  HttpServerResponse response = context.response();
+                  response.putHeader("content-type", "application/json; charset=utf-8")
+                      .end(result.result().encodePrettily());
+                }
+              });
             }
           });
         }

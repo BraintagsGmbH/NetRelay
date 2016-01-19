@@ -12,10 +12,19 @@
  */
 package de.braintags.netrelay.controller.impl.api;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
+import de.braintags.io.vertx.pojomapper.mapping.IField;
+import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
+import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler;
+import de.braintags.io.vertx.util.CounterObject;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.ext.web.RoutingContext;
 
 /**
@@ -62,19 +71,67 @@ public class DataTableLinkDescriptor {
    * Generate an instance of IQuery from the information in here
    * 
    * @param dataStore
+   *          the datastore to be used
+   * @param mf
+   *          the {@link IMapperFactory} which converts seach values
    * @return
    */
-  public IQuery<?> toQuery(IDataStore dataStore) {
+  public void toQuery(IDataStore dataStore, IMapperFactory mf, Handler<AsyncResult<IQuery<?>>> handler) {
     IQuery<?> query = dataStore.createQuery(mapperClass);
-    for (ColDef def : columns) {
-      if (def != null && def.searchValue.hashCode() != 0) {
-        query.field(def.name).contains(def.searchValue);
-      }
-    }
     query.setLimit(displayLength);
     query.setStart(displayStart);
     query.setReturnCompleteCount(true);
-    return query;
+    List<ColDef> defs = clearColDefs();
+    if (defs.size() <= 0) {
+      querySuccess(query, handler);
+    } else {
+      loopColumns(query, defs, dataStore, mf, handler);
+    }
+  }
+
+  private List<ColDef> clearColDefs() {
+    ArrayList<ColDef> ret = new ArrayList<>();
+    for (ColDef def : columns) {
+      if (def != null && def.searchValue.hashCode() != 0) {
+        ret.add(def);
+      }
+    }
+    return ret;
+  }
+
+  private void loopColumns(IQuery<?> query, List<ColDef> defs, IDataStore dataStore, IMapperFactory mf,
+      Handler<AsyncResult<IQuery<?>>> handler) {
+    CounterObject<IQuery<?>> co = new CounterObject<>(defs.size(), handler);
+    for (ColDef def : defs) {
+      if (co.isError()) {
+        break;
+      }
+      IField field = mf.getMapper(mapperClass).getField(def.name);
+      ITypeHandler th = field.getTypeHandler();
+      th.fromStore(def.searchValue, field, null, thResult -> {
+        if (thResult.failed()) {
+          co.setThrowable(thResult.cause());
+        } else {
+          Object value = thResult.result().getResult();
+          if (allowContains(value)) {
+            query.field(def.name).contains(value);
+          } else {
+            query.field(def.name).is(value);
+          }
+          if (co.reduce()) {
+            querySuccess(query, handler);
+          }
+        }
+      });
+    }
+  }
+
+  private boolean allowContains(Object value) {
+    return !value.getClass().isEnum();
+  }
+
+  private void querySuccess(IQuery<?> q, Handler<AsyncResult<IQuery<?>>> handler) {
+    handler.handle(Future.succeededFuture(q));
   }
 
   // "iDisplayStart=0&iDisplayLength=10&"

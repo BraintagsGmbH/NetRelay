@@ -17,6 +17,7 @@ import java.util.List;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.exception.InitException;
 import de.braintags.io.vertx.pojomapper.init.IDataStoreInit;
+import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 import de.braintags.io.vertx.pojomapper.mongo.init.MongoDataStoreInit;
 import de.braintags.netrelay.controller.impl.BodyController;
 import de.braintags.netrelay.controller.impl.CookieController;
@@ -32,6 +33,7 @@ import de.braintags.netrelay.controller.impl.authentication.RegisterController;
 import de.braintags.netrelay.controller.impl.persistence.PersistenceController;
 import de.braintags.netrelay.init.MailClientSettings;
 import de.braintags.netrelay.init.Settings;
+import de.braintags.netrelay.mapping.NetRelayMapperFactory;
 import de.braintags.netrelay.routing.RouterDefinition;
 import de.braintags.netrelay.routing.RoutingInit;
 import examples.mapper.SimpleNetRelayMapper;
@@ -60,6 +62,10 @@ public abstract class NetRelay extends AbstractVerticle {
   private Settings settings;
   private Router router;
   private MailClient mailClient;
+  /**
+   * Teh mapper factory which translates between the browser and the server
+   */
+  private IMapperFactory mapperFactory;
 
   /**
    * 
@@ -91,6 +97,7 @@ public abstract class NetRelay extends AbstractVerticle {
   private void init(Future<Void> startFuture) {
     try {
       router = Router.router(vertx);
+      mapperFactory = new NetRelayMapperFactory(this);
       initMailClient();
       initControlller(router);
       initHttpServer(router, result -> {
@@ -114,6 +121,15 @@ public abstract class NetRelay extends AbstractVerticle {
     } else {
       LOGGER.info("MailClient NOT started, cause not activated in configuration");
     }
+  }
+
+  /**
+   * Retrive the {@link IMapperFactory} which translates between the mappers and the browser
+   * 
+   * @return the {@link IMapperFactory} of NetRelay
+   */
+  public IMapperFactory getNetRelayMapperFactory() {
+    return mapperFactory;
   }
 
   /**
