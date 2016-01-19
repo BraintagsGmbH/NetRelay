@@ -67,19 +67,31 @@ public class DataTablesController extends AbstractController {
       Objects.requireNonNull(mapperClass,
           "Could not determine mapper class for " + mapperName + ". Check the configuration");
       DataTableLinkDescriptor descr = new DataTableLinkDescriptor(mapperClass, context);
-      IQuery<?> query = descr.toQuery(getNetRelay().getDatastore());
-      execute(query, descr, result -> {
-        if (result.failed()) {
-          context.fail(result.cause());
+
+      IQuery<?> tableQuery = descr.toRecordsInTableQuery(getNetRelay().getDatastore());
+      tableQuery.executeCount(tqResult -> {
+        if (tqResult.failed()) {
+          context.fail(tqResult.cause());
         } else {
-          HttpServerResponse response = context.response();
-          response.putHeader("content-type", "application/json; charset=utf-8").end(result.result().encodePrettily());
+          long tableCount = tqResult.result().getCount();
+          IQuery<?> query = descr.toQuery(getNetRelay().getDatastore());
+          execute(query, descr, tableCount, result -> {
+            if (result.failed()) {
+              context.fail(result.cause());
+            } else {
+              HttpServerResponse response = context.response();
+              response.putHeader("content-type", "application/json; charset=utf-8")
+                  .end(result.result().encodePrettily());
+            }
+          });
         }
       });
+
     }
   }
 
-  private void execute(IQuery<?> query, DataTableLinkDescriptor descr, Handler<AsyncResult<JsonObject>> handler) {
+  private void execute(IQuery<?> query, DataTableLinkDescriptor descr, long tableCount,
+      Handler<AsyncResult<JsonObject>> handler) {
     query.execute(qr -> {
       if (qr.failed()) {
         handler.handle(Future.failedFuture(qr.cause()));
@@ -92,16 +104,16 @@ public class DataTablesController extends AbstractController {
           } else {
             Object[] selection = result.result();
             if (selection.length == 0) {
-              handler.handle(Future.succeededFuture(
-                  createJsonObject(query.getMapper(), new ArrayList<IStoreObject<?>>(), descr, totalResult)));
+              handler.handle(Future.succeededFuture(createJsonObject(query.getMapper(),
+                  new ArrayList<IStoreObject<?>>(), descr, totalResult, tableCount)));
             } else {
               mapperFactory.getStoreObjectFactory().createStoreObjects(query.getMapper(), Arrays.asList(selection),
                   str -> {
                 if (str.failed()) {
                   handler.handle(Future.failedFuture(result.cause()));
                 } else {
-                  handler.handle(
-                      Future.succeededFuture(createJsonObject(query.getMapper(), str.result(), descr, totalResult)));
+                  handler.handle(Future.succeededFuture(
+                      createJsonObject(query.getMapper(), str.result(), descr, totalResult, tableCount)));
                 }
               });
             }
@@ -112,10 +124,10 @@ public class DataTablesController extends AbstractController {
   }
 
   private JsonObject createJsonObject(IMapper mapper, List<IStoreObject<?>> selection, DataTableLinkDescriptor descr,
-      long completeCount) {
+      long completeCount, long tableCount) {
     JsonObject json = new JsonObject();
-    json.put("recordsTotal", completeCount);
-    json.put("recordsFiltered", selection.size());
+    json.put("recordsTotal", tableCount);
+    json.put("recordsFiltered", completeCount);
     JsonArray resArray = new JsonArray();
     json.put("data", resArray);
     for (IStoreObject<?> ob : selection) {

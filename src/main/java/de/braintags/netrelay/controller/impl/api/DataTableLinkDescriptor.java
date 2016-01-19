@@ -53,6 +53,17 @@ public class DataTableLinkDescriptor {
    * @param dataStore
    * @return
    */
+  public IQuery<?> toRecordsInTableQuery(IDataStore dataStore) {
+    IQuery<?> query = dataStore.createQuery(mapperClass);
+    return query;
+  }
+
+  /**
+   * Generate an instance of IQuery from the information in here
+   * 
+   * @param dataStore
+   * @return
+   */
   public IQuery<?> toQuery(IDataStore dataStore) {
     IQuery<?> query = dataStore.createQuery(mapperClass);
     for (ColDef def : columns) {
