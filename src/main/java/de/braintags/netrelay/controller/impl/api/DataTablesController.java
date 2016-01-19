@@ -114,10 +114,10 @@ public class DataTablesController extends AbstractController {
   private JsonObject createJsonObject(IMapper mapper, List<IStoreObject<?>> selection, DataTableLinkDescriptor descr,
       long completeCount) {
     JsonObject json = new JsonObject();
-    json.put("iTotalRecords", completeCount);
-    json.put("iTotalDisplayRecords", selection.size());
+    json.put("recordsTotal", completeCount);
+    json.put("recordsFiltered", selection.size());
     JsonArray resArray = new JsonArray();
-    json.put("aaData", resArray);
+    json.put("data", resArray);
     for (IStoreObject<?> ob : selection) {
       resArray.add(handleObject(mapper, ob, descr));
     }
