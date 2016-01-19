@@ -47,20 +47,42 @@ public class FailureController extends AbstractController {
    * @see io.vertx.core.Handler#handle(java.lang.Object)
    */
   @Override
-  public void handle(RoutingContext event) {
-    String reply = String.format("Statuscode %d for request %s", event.statusCode(), event.request().path());
+  public void handle(RoutingContext context) {
+    String reply = String.format("Statuscode %d for request %s", context.statusCode(), context.request().path());
     LOGGER.info(reply);
-    if (event.failure() != null) {
-      reply += "\n" + event.failure().toString();
-      reply += "\n" + ExceptionUtil.getStackTrace(event.failure());
-      LOGGER.error("", event.failure());
-    }
-    if (!event.response().ended()) {
-      event.response().setStatusCode(event.statusCode());
-      event.response().end();
-      // event.response().end(reply);
+    if (context.failure() != null) {
+      reactByException(context);
+      ;
+    } else {
+      reactByStatusCode(context);
     }
 
+  }
+
+  private void reactByException(RoutingContext context) {
+    Throwable error = context.failure();
+    String reply = String.format("Statuscode %d for request %s", context.statusCode(), context.request().path());
+    reply += "\n" + error.toString();
+    reply += "\n" + ExceptionUtil.getStackTrace(error);
+    LOGGER.error("", error);
+    if (!context.response().ended()) {
+      context.response().end(reply);
+    }
+  }
+
+  private void reactByStatusCode(RoutingContext context) {
+    switch (context.statusCode()) {
+    default:
+      handleDefaultStatus(context);
+
+    }
+  }
+
+  private void handleDefaultStatus(RoutingContext context) {
+    if (!context.response().ended()) {
+      context.response().setStatusCode(context.statusCode());
+      context.response().end();
+    }
   }
 
   /**

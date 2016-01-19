@@ -49,6 +49,8 @@ import io.vertx.ext.web.handler.UserSessionHandler;
  * Possible values are:
  * {@link AuthHandlerEnum#BASIC}, {@link AuthHandlerEnum#REDIRECT}
  * <LI>{@value #LOGIN_PAGE_PROP} - the property name, which defines the path to the login page, which shall be used
+ * <LI>{@value #DEFAULT_AUTH_ERROR_PAGE_PROP} the default page which will be called, if authentication failed and no
+ * previous called page can be found
  * </UL>
  * <br>
  * Request-Parameter:<br/>
@@ -85,6 +87,12 @@ public class AuthenticationController extends AbstractController {
    * the form login handler without being redirected here first. ( parameter used by FormLoginHandler )
    */
   public static final String DIRECT_LOGGED_IN_OK_URL_PROP = "directLoggedInOKURL";
+
+  /**
+   * By this property the page can be set, which will be called as default page, when authentication failed and the
+   * system cannot read the originally called page
+   */
+  public static final String DEFAULT_AUTH_ERROR_PAGE_PROP = "defaultAuthenticationError";
 
   /**
    * The default url, where the login action is performed
@@ -186,10 +194,14 @@ public class AuthenticationController extends AbstractController {
   private void initLoginAction() {
     String loginUrl = readProperty(LOGIN_ACTION_URL_PROP, DEFAULT_LOGIN_ACTION_URL, false);
     String directLoginUrl = readProperty(DIRECT_LOGGED_IN_OK_URL_PROP, null, false);
+    String defaultAuthError = readProperty(DEFAULT_AUTH_ERROR_PAGE_PROP, null, false);
 
-    FormLoginHandler fl = FormLoginHandler.create(authProvider);
+    FormLoginHandlerBt fl = new FormLoginHandlerBt(authProvider);
     if (directLoginUrl != null) {
       fl.setDirectLoggedInOKURL(directLoginUrl);
+    }
+    if (defaultAuthError != null) {
+      fl.setDefaultAuthenticationErrorPage(defaultAuthError);
     }
     getNetRelay().getRouter().route(loginUrl).handler(fl);
   }
@@ -301,6 +313,7 @@ public class AuthenticationController extends AbstractController {
     public void authenticate(JsonObject arg0, Handler<AsyncResult<User>> handler) {
       prov.authenticate(arg0, result -> {
         if (result.failed()) {
+          LOGGER.info("Authentication failed: " + result.cause());
           handler.handle(result);
         } else {
           User user = result.result();
