@@ -66,7 +66,7 @@ public class RedirectController extends AbstractController {
   @Override
   public void handle(RoutingContext context) {
     HttpServerResponse response = context.response();
-    RequestUtil.sendRedirect(response, destination);
+    RequestUtil.sendRedirect(response, context.request(), destination);
   }
 
   /**

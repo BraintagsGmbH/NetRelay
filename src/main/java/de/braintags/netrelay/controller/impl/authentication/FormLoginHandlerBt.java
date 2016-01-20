@@ -12,10 +12,10 @@
  */
 package de.braintags.netrelay.controller.impl.authentication;
 
+import de.braintags.netrelay.RequestUtil;
 import io.vertx.core.MultiMap;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServerRequest;
-import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
@@ -162,7 +162,7 @@ public class FormLoginHandlerBt implements FormLoginHandler {
       String returnURL = context.session().remove(returnURLParam);
       if (returnURL != null) {
         // Now redirect back to the original url
-        doRedirect(context.response(), returnURL);
+        RequestUtil.sendRedirect(context.response(), context.request(), returnURL);
         return true;
       }
     }
@@ -174,14 +174,14 @@ public class FormLoginHandlerBt implements FormLoginHandler {
       // Redirect to the default logged in OK page - this would occur
       // if the user logged in directly at this URL without being redirected here first from another
       // url
-      doRedirect(context.response(), directLoggedInOKURL);
+      RequestUtil.sendRedirect(context.response(), context.request(), directLoggedInOKURL);
       return true;
     }
     return false;
   }
 
-  private void doRedirect(HttpServerResponse response, String url) {
-    response.putHeader("location", url).setStatusCode(302).end();
+  private void doRedirectdd(RoutingContext context, String url) {
+    RequestUtil.sendRedirect(context.response(), context.request(), url);
   }
 
   private static final String DEFAULT_DIRECT_LOGGED_IN_OK_PAGE = ""

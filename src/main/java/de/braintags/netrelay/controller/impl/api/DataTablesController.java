@@ -131,6 +131,7 @@ public class DataTablesController extends AbstractController {
 
   private JsonObject createJsonObject(IMapper mapper, List<IStoreObject<?>> selection, DataTableLinkDescriptor descr,
       long completeCount, long tableCount) {
+    LOGGER.info("tableCount: " + tableCount + ", completeCount: " + completeCount);
     JsonObject json = new JsonObject();
     json.put("recordsTotal", tableCount);
     json.put("recordsFiltered", completeCount);

@@ -25,6 +25,7 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpHeaders;
+import io.vertx.core.http.HttpServerRequest;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
@@ -143,9 +144,38 @@ public class RequestUtil {
    * @param path
    */
   public static void sendRedirect(HttpServerResponse response, String path) {
-    response.putHeader("location", path);
+    sendRedirect(response, null, path);
+  }
+
+  /**
+   * Sending a redirect to another page by adding query parameters of a current request
+   * 
+   * @param response
+   * @param request
+   * @param path
+   */
+  public static void sendRedirect(HttpServerResponse response, HttpServerRequest request, String path) {
+    response.putHeader("location", createRedirectUrl(request, path));
     response.setStatusCode(302);
     response.end();
+  }
+
+  /**
+   * Creates a url from the given information for a redirect. If request is not null, then current query parameters are
+   * added to the path
+   * 
+   * @param request
+   * @param path
+   * @return
+   */
+  public static String createRedirectUrl(HttpServerRequest request, String path) {
+    if (request != null) {
+      String qp = request.query();
+      if (qp != null && qp.hashCode() != 0) {
+        path += (path.indexOf('?') < 0 ? "?" : "&") + qp;
+      }
+    }
+    return path;
   }
 
   /**

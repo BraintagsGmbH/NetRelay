@@ -250,7 +250,7 @@ public class AuthenticationController extends AbstractController {
       break;
 
     case REDIRECT:
-      authHandler = RedirectAuthHandler.create(authProvider, loginPage);
+      authHandler = new RedirectAuthHandlerBt(authProvider, loginPage, RedirectAuthHandler.DEFAULT_RETURN_URL_PARAM);
       break;
 
     default:
