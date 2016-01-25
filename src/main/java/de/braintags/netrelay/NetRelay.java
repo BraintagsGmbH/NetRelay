@@ -15,10 +15,10 @@ package de.braintags.netrelay;
 import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
-import de.braintags.io.vertx.pojomapper.exception.InitException;
 import de.braintags.io.vertx.pojomapper.init.IDataStoreInit;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 import de.braintags.io.vertx.pojomapper.mongo.init.MongoDataStoreInit;
+import de.braintags.io.vertx.util.exception.InitException;
 import de.braintags.netrelay.controller.impl.BodyController;
 import de.braintags.netrelay.controller.impl.CookieController;
 import de.braintags.netrelay.controller.impl.CurrentMemberController;

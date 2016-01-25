@@ -15,9 +15,9 @@ package de.braintags.netrelay.controller.impl.persistence;
 import java.util.List;
 import java.util.Properties;
 
-import de.braintags.io.vertx.pojomapper.exception.InitException;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 import de.braintags.io.vertx.util.CounterObject;
+import de.braintags.io.vertx.util.exception.InitException;
 import de.braintags.netrelay.controller.Action;
 import de.braintags.netrelay.controller.impl.AbstractCaptureController;
 import de.braintags.netrelay.mapping.NetRelayMapperFactory;

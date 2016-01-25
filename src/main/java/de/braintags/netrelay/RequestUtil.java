@@ -18,7 +18,7 @@ import java.net.URLEncoder;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.exception.NoSuchRecordException;
-import de.braintags.io.vertx.pojomapper.exception.ParameterRequiredException;
+import de.braintags.io.vertx.util.exception.ParameterRequiredException;
 import de.braintags.netrelay.model.Member;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;

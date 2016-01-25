@@ -18,10 +18,10 @@ import java.util.Objects;
 import java.util.Properties;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
-import de.braintags.io.vertx.pojomapper.exception.ParameterRequiredException;
 import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
+import de.braintags.io.vertx.util.exception.ParameterRequiredException;
 import de.braintags.netrelay.controller.impl.AbstractController;
 import de.braintags.netrelay.controller.impl.api.DataTableLinkDescriptor.ColDef;
 import de.braintags.netrelay.mapping.NetRelayMapperFactory;

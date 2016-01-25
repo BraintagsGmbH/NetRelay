@@ -291,4 +291,14 @@ public class NetRelayStoreObject implements IStoreObject<Map<String, String>> {
     return mapper.getTableInfo().getName() + ": " + String.valueOf(requestMap);
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.io.vertx.pojomapper.mapping.IStoreObject#isNewInstance()
+   */
+  @Override
+  public boolean isNewInstance() {
+    return false;
+  }
+
 }

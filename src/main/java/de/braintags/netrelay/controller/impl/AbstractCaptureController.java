@@ -18,7 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
 
-import de.braintags.io.vertx.pojomapper.exception.ParameterRequiredException;
+import de.braintags.io.vertx.util.exception.ParameterRequiredException;
 import de.braintags.netrelay.RequestUtil;
 import de.braintags.netrelay.controller.IController;
 import de.braintags.netrelay.routing.CaptureCollection;
