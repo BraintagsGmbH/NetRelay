@@ -107,6 +107,8 @@ public abstract class AbstractController implements IController {
    * @param required
    *          is it required
    * @return the value of the property or null
+   * @throws ParameterRequiredException,
+   *           if required parameter wasn't found
    */
   public String readProperty(String propertyName, String defaultValue, boolean required) {
     String value = (String) properties.get(propertyName);
@@ -127,18 +129,56 @@ public abstract class AbstractController implements IController {
    * @param required
    *          is the value required?
    * @return a found value, the default value or null
+   * @throws ParameterRequiredException,
+   *           if required parameter wasn't found
    */
   public String readParameterOrProperty(RoutingContext context, String key, String defaultValue, boolean required) {
-    String value = RequestUtil.readFormAttribute(context, key, null, false);
-    if (value == null) {
-      value = RequestUtil.readParameterAttribute(context, key, null, false);
-    }
+    String value = readParameter(context, key, false);
     if (value == null) {
       value = readProperty(key, null, false);
     }
     if (value == null && required)
       throw new ParameterRequiredException(key);
     return value == null ? defaultValue : value;
+  }
+
+  /**
+   * Reads a value from the request
+   * 
+   * @param context
+   *          the context from the current request
+   * @param key
+   *          the key to search for
+   * @param defaultValue
+   *          the default value
+   * @param required
+   *          is the value required?
+   * @return a found value, the default value or null
+   * @throws ParameterRequiredException,
+   *           if required parameter wasn't found
+   */
+  public String readParameter(RoutingContext context, String key, boolean required) {
+    String value = RequestUtil.readFormAttribute(context, key, null, false);
+    if (value == null) {
+      value = RequestUtil.readParameterAttribute(context, key, null, false);
+    }
+    if (value == null && required)
+      throw new ParameterRequiredException(key);
+    return value;
+  }
+
+  /**
+   * Returns true, if a URL parameter or form parameter exists with the given key
+   * 
+   * @param context
+   *          the context
+   * @param key
+   *          the key to lookup
+   * @return true, if exists
+   */
+  public boolean hasParameter(RoutingContext context, String key) {
+    return context.request().params().contains(key)
+        || (context.request().formAttributes() != null && context.request().formAttributes().contains(key));
   }
 
   /**

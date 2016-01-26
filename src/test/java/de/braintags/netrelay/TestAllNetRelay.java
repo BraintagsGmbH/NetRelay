@@ -24,8 +24,8 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(Suite.class)
 @SuiteClasses({ TRequestUtil.class, TStandardRequests.class, TTemplateController.class, TCaptureParameters.class,
-    TPersistenceSuite.class, TAuthentication.class, TDataTablesController.class, TMailController.class,
-    TSettings.class })
+    TPersistenceSuite.class, TAuthentication.class, TRegistration.class, TDataTablesController.class,
+    TMailController.class, TSettings.class })
 public class TestAllNetRelay {
   // -DBlockedThreadCheckInterval=10000000 -DWarningExceptionTime=10000000 -DtestTimeout=5
   // -Djava.util.logging.config.file=src/main/resources/logging.properties

@@ -22,9 +22,8 @@ import de.braintags.io.vertx.pojomapper.annotation.field.Id;
  * 
  */
 @Entity
-public class Member {
+public class Member implements IAuthenticatable {
   public static final String CURRENT_USER_PROPERTY = "currentUser";
-
   @Id
   private String id;
   private String userName;
@@ -33,21 +32,6 @@ public class Member {
   private String email;
   private String password;
   private String gender;
-
-  /**
-   * @return the id
-   */
-  public final String getId() {
-    return id;
-  }
-
-  /**
-   * @param id
-   *          the id to set
-   */
-  public final void setId(String id) {
-    this.id = id;
-  }
 
   /**
    * @return the userName
@@ -97,6 +81,7 @@ public class Member {
   /**
    * @return the email
    */
+  @Override
   public final String getEmail() {
     return email;
   }
@@ -105,6 +90,7 @@ public class Member {
    * @param email
    *          the email to set
    */
+  @Override
   public final void setEmail(String email) {
     this.email = email;
   }
@@ -112,6 +98,7 @@ public class Member {
   /**
    * @return the password
    */
+  @Override
   public final String getPassword() {
     return password;
   }
@@ -120,6 +107,7 @@ public class Member {
    * @param password
    *          the password to set
    */
+  @Override
   public final void setPassword(String password) {
     this.password = password;
   }
@@ -137,6 +125,21 @@ public class Member {
    */
   public final void setGender(String gender) {
     this.gender = gender;
+  }
+
+  /**
+   * @return the id
+   */
+  public final String getId() {
+    return id;
+  }
+
+  /**
+   * @param id
+   *          the id to set
+   */
+  public final void setId(String id) {
+    this.id = id;
   }
 
 }
