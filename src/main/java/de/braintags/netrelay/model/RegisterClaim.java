@@ -12,6 +12,9 @@
  */
 package de.braintags.netrelay.model;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import io.vertx.core.MultiMap;
 import io.vertx.core.http.HttpServerRequest;
 
@@ -24,8 +27,10 @@ import io.vertx.core.http.HttpServerRequest;
  * 
  */
 public class RegisterClaim extends AbstractRecord {
-  public MultiMap formAttributes;
-  public MultiMap urlParameter;
+  public String email;
+  public String password;
+  public boolean active = true;
+  public Map<String, String> requestParameter = new HashMap<>();
 
   public RegisterClaim() {
   }
@@ -35,9 +40,15 @@ public class RegisterClaim extends AbstractRecord {
    * 
    * @param request
    */
-  public RegisterClaim(HttpServerRequest request) {
-    formAttributes = request.formAttributes();
-    urlParameter = request.params();
+  public RegisterClaim(String email, String password, HttpServerRequest request) {
+    this.email = email;
+    this.password = password;
+    transfer(request.formAttributes(), requestParameter);
+    transfer(request.params(), requestParameter);
+  }
+
+  private void transfer(MultiMap mm, Map<String, String> destination) {
+    mm.entries().forEach(entry -> destination.put(entry.getKey(), entry.getValue()));
   }
 
 }

@@ -12,12 +12,21 @@
  */
 package de.braintags.netrelay.controller.impl.authentication;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Properties;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.dataaccess.write.IWrite;
+import de.braintags.io.vertx.pojomapper.mapping.IMapper;
+import de.braintags.io.vertx.pojomapper.util.QueryHelper;
 import de.braintags.io.vertx.util.exception.InitException;
+import de.braintags.netrelay.RequestUtil;
 import de.braintags.netrelay.controller.impl.AbstractController;
+import de.braintags.netrelay.mapping.NetRelayMapperFactory;
 import de.braintags.netrelay.model.IAuthenticatable;
 import de.braintags.netrelay.model.Member;
 import de.braintags.netrelay.model.RegisterClaim;
@@ -28,6 +37,16 @@ import io.vertx.core.Handler;
 import io.vertx.ext.web.RoutingContext;
 
 /**
+ * This controller performs a registration by using double-opt-in.
+ * At first, for the registration, the system is performing some ( optional ) checks, for instance, wether the email for
+ * the registrar exists already in the datastore. If every check is fine, the controller creates a new instance of
+ * {@link RegisterClaim}, which contains all needed data to finish the registration. Previously created instances of
+ * RegisterClaim with the same email address are deactivated. Then it will call the success page, which will create the
+ * conformation mail, where inside the activation link should be contained.<br/>
+ * The confirmation process is activated on the defined url, when the parameter {@value #VALIDATION_ID_PARAM} exists.
+ * The system searches an existing instance of {@link RegisterClaim}. If found, it uses the information to create a new
+ * account. If not, an error page is called
+ * 
  * The controller reads several properties from the current request, performs a password check, creates and saves a new
  * member and performs a login for the new member.
  * The properties, which must be sent by a request are:
@@ -36,26 +55,32 @@ import io.vertx.ext.web.RoutingContext;
  * 
  * Config-Parameter:<br/>
  * <UL>
- * <LI>{@value #SUCCESS_URL_PROP} - defines the url which is used, when the registration claim was successful
- * <LI>{@value #FAIL_URL_PROP} - defines the url which is used, when the registration claim raised an error
+ * <LI>{@value #REG_START_SUCCESS_URL_PROP} - defines the url which is used, when the registration claim was successful
+ * <LI>{@value #REG_START_FAIL_URL_PROP} - defines the url which is used, when the registration claim raised an error
  * <LI>{@value #AUTHENTICATABLE_CLASS_PROP} - the property name, which defines the class, which will be used to generate
  * a new member, user, customer etc.
  * </UL>
  * <br>
  * Request-Parameter:<br/>
- * The new instance is created by two fields first:
+ * <UL>
+ * <LI>for the start of a registration, a new instance of {@link RegisterClaim} is created by two fields first:
  * <UL>
  * <LI>email
  * <LI>password
  * </UL>
  * additional fields can be set by fields with the structure mapper.fieldName
+ * <LI>confirmation of a registration: the parameter {@value #VALIDATION_ID_PARAM} must contain the id transported
+ * before
+ * 
+ * </UL>
  * <br/>
  * Result-Parameter:<br/>
  * <UL>
  * <LI>{@value #REGISTER_ERROR_PARAM} the parameter, where an error String of a failed registration is stored in
  * the context. The codes are defined by {@link RegistrationCode}
- * <LI>RegisterClaim - on a successfull create action, the RegisterClaim is stored here, where the id can be used to
- * generate the confirmation link
+ * <LI>{@value #VALIDATION_ID_PARAM} - on a successfull create action, the RegisterClaim is stored here and the request
+ * is redirected to the success page, where the confirmation mail is created and sent. This parameter is keeping the
+ * confirmatino id, which must be integrated into the link
  * </UL>
  * <br/>
  * 
@@ -67,14 +92,24 @@ public class RegisterController extends AbstractController {
       .getLogger(RegisterController.class);
 
   /**
-   * The url, which shall be called after a successful register
+   * The url, which shall be called after a successful registration start
    */
-  public static final String SUCCESS_URL_PROP = "successUrl";
+  public static final String REG_START_SUCCESS_URL_PROP = "regStartSuccessUrl";
 
   /**
    * The url, which shall be called after a failed register
    */
-  public static final String FAIL_URL_PROP = "failUrl";
+  public static final String REG_START_FAIL_URL_PROP = "regStartFailUrl";
+
+  /**
+   * The url, which shall be called after a successful registration confirmation
+   */
+  public static final String REG_CONFIRM_SUCCESS_URL_PROP = "regConfirmSuccessUrl";
+
+  /**
+   * The url, which shall be called after a failed confirmation
+   */
+  public static final String REG_CONFIRM_FAIL_URL_PROP = "regConfirmFailUrl";
 
   /**
    * The name of the class - as instance of {@link IAuthenticatable} - which will be used to save a successful and
@@ -93,6 +128,12 @@ public class RegisterController extends AbstractController {
   public static final String REGISTER_ERROR_PARAM = "registerError";
 
   /**
+   * The name of the parameter, which keeps the validation ID, which will be used on the success page to create the
+   * validation link
+   */
+  public static final String VALIDATION_ID_PARAM = "validationId";
+
+  /**
    * The name of the field used to send the password
    */
   public static final String PASSWORD_FIELD_NAME = "password";
@@ -104,6 +145,8 @@ public class RegisterController extends AbstractController {
 
   private String successUrl;
   private String failUrl;
+  private String successConfirmUrl;
+  private String failConfirmUrl;
   private Class<? extends IAuthenticatable> authenticatableCLass;
   private boolean allowDuplicateEmail;
 
@@ -116,8 +159,10 @@ public class RegisterController extends AbstractController {
   public void handle(RoutingContext context) {
     if (hasParameter(context, PASSWORD_FIELD_NAME)) {
       registerStart(context);
-    } else {
+    } else if (hasParameter(context, VALIDATION_ID_PARAM)) {
       registerConfirm(context);
+    } else {
+      context.fail(new IllegalArgumentException("invalid action for registration"));
     }
   }
 
@@ -135,12 +180,14 @@ public class RegisterController extends AbstractController {
               context.put(REGISTER_ERROR_PARAM, pwRes.cause().getMessage());
               context.reroute(failUrl);
             } else {
-              createRegisterClaim(context, rcRes -> {
+              createRegisterClaim(context, email, password, rcRes -> {
                 if (rcRes.failed()) {
-                  context.put(REGISTER_ERROR_PARAM, rcRes.cause().getMessage());
+                  String message = rcRes.cause().getMessage();
+                  context.put(REGISTER_ERROR_PARAM, message);
                   context.reroute(failUrl);
                 } else {
-                  context.reroute(successUrl);
+                  RegisterClaim rc = rcRes.result();
+                  RequestUtil.sendRedirect(context.response(), successUrl + "?" + VALIDATION_ID_PARAM + "=" + rc.id);
                 }
               });
             }
@@ -154,17 +201,50 @@ public class RegisterController extends AbstractController {
     }
   }
 
-  private void createRegisterClaim(RoutingContext context, Handler<AsyncResult<Void>> handler) {
-    RegisterClaim rc = new RegisterClaim(context.request());
-    IWrite<RegisterClaim> write = getNetRelay().getDatastore().createWrite(RegisterClaim.class);
-    write.add(rc);
-    write.save(sr -> {
-      if (sr.failed()) {
-        LOGGER.error("", sr.cause());
-        handler.handle(Future.failedFuture(sr.cause()));
+  private void createRegisterClaim(RoutingContext context, String email, String password,
+      Handler<AsyncResult<RegisterClaim>> handler) {
+    deactivatePreviousClaims(context, email, previous -> {
+      if (previous.failed()) {
+        handler.handle(Future.failedFuture(previous.cause()));
       } else {
-        context.put(RegisterClaim.class.getSimpleName(), rc);
-        handler.handle(Future.succeededFuture());
+        RegisterClaim rc = new RegisterClaim(email, password, context.request());
+        IWrite<RegisterClaim> write = getNetRelay().getDatastore().createWrite(RegisterClaim.class);
+        write.add(rc);
+        write.save(sr -> {
+          if (sr.failed()) {
+            LOGGER.error("", sr.cause());
+            handler.handle(Future.failedFuture(sr.cause()));
+          } else {
+            context.put(RegisterClaim.class.getSimpleName(), rc);
+            handler.handle(Future.succeededFuture(rc));
+          }
+        });
+      }
+    });
+  }
+
+  private void deactivatePreviousClaims(RoutingContext context, String email, Handler<AsyncResult<Void>> handler) {
+    IQuery<RegisterClaim> query = getNetRelay().getDatastore().createQuery(RegisterClaim.class);
+    query.field("email").is(email).field("active").is(true);
+    QueryHelper.executeToList(query, qr -> {
+      if (qr.failed()) {
+        handler.handle(Future.failedFuture(qr.cause()));
+      } else {
+        List<RegisterClaim> cl = (List<RegisterClaim>) qr.result();
+        if (!cl.isEmpty()) {
+          IWrite<RegisterClaim> write = getNetRelay().getDatastore().createWrite(RegisterClaim.class);
+          cl.forEach(rc -> rc.active = false);
+          write.addAll(cl);
+          write.save(wr -> {
+            if (wr.failed()) {
+              handler.handle(Future.failedFuture(wr.cause()));
+            } else {
+              handler.handle(Future.succeededFuture());
+            }
+          });
+        } else {
+          handler.handle(Future.succeededFuture());
+        }
       }
     });
   }
@@ -201,30 +281,92 @@ public class RegisterController extends AbstractController {
   }
 
   private void registerConfirm(RoutingContext context) {
-    context.fail(new UnsupportedOperationException());
+    try {
+      String claimId = context.request().getParam(VALIDATION_ID_PARAM);
+      QueryHelper.findRecordById(getNetRelay().getDatastore(), RegisterClaim.class, claimId, cr -> {
+        if (cr.failed()) {
+          context.fail(cr.cause());
+        } else {
+          if (cr.result() == null) {
+            context.put(REGISTER_ERROR_PARAM, RegistrationCode.CONFIRMATION_FAILURE);
+            context.reroute(failConfirmUrl);
+          } else {
+            RegisterClaim rc = (RegisterClaim) cr.result();
+            toAuthenticatable(context, rc, acRes -> {
+              if (acRes.failed()) {
+                LOGGER.error("", acRes.cause());
+                context.put(REGISTER_ERROR_PARAM, acRes.cause().getMessage());
+                context.reroute(failConfirmUrl);
+              } else {
+                RequestUtil.sendRedirect(context.response(), successConfirmUrl);
+              }
+            });
+          }
+        }
+      });
+
+    } catch (Exception e) {
+      LOGGER.error("", e);
+      context.put(REGISTER_ERROR_PARAM, e.getMessage());
+      context.reroute(failConfirmUrl);
+    }
   }
 
-  private void storeMember(RoutingContext context, Member member) {
-    IWrite<Member> write = getNetRelay().getDatastore().createWrite(Member.class);
-    write.add(member);
-    write.save(result -> {
+  @SuppressWarnings({ "unchecked" })
+  private void toAuthenticatable(RoutingContext context, RegisterClaim rc, Handler<AsyncResult<Void>> handler) {
+    NetRelayMapperFactory mapperFactory = (NetRelayMapperFactory) getNetRelay().getNetRelayMapperFactory();
+    IMapper mapper = mapperFactory.getMapper(authenticatableCLass);
+    Map<String, String> props = extractPropertiesFromMap(mapper.getMapperClass().getSimpleName(), rc.requestParameter);
+    mapperFactory.getStoreObjectFactory().createStoreObject(props, mapper, result -> {
       if (result.failed()) {
-        LOGGER.error("error saving member", result.cause());
-        String message = result.cause().getLocalizedMessage();
-        context.put("generalError", message);
-        context.reroute(failUrl);
+        handler.handle(Future.failedFuture(result.cause()));
       } else {
-        context.put(Member.CURRENT_USER_PROPERTY, member);
-        context.reroute(successUrl);
+        IAuthenticatable user = (IAuthenticatable) result.result().getEntity();
+        user.setEmail(rc.email);
+        user.setPassword(rc.password);
+        IWrite<Object> write = (IWrite<Object>) getNetRelay().getDatastore().createWrite(authenticatableCLass);
+        write.add(user);
+        write.save(wr -> {
+          if (wr.failed()) {
+            handler.handle(Future.failedFuture(wr.cause()));
+          } else {
+            deactivateRegisterClaim(rc, handler);
+          }
+        });
       }
     });
   }
 
-  // private IAuthenticatable createMember(RoutingContext context, JsonObject errorObject) {
-  // IAuthenticatable member = this.authenticatableCLass.newInstance();
-  //
-  // return member;
-  // }
+  private void deactivateRegisterClaim(RegisterClaim claim, Handler<AsyncResult<Void>> handler) {
+    claim.active = false;
+    IWrite<RegisterClaim> write = getNetRelay().getDatastore().createWrite(RegisterClaim.class);
+    write.add(claim);
+    write.save(wr -> {
+      if (wr.failed()) {
+        handler.handle(Future.failedFuture(wr.cause()));
+      } else {
+        handler.handle(Future.succeededFuture());
+      }
+    });
+  }
+
+  // TODO This method should be integrated into NetRelayStoreObjectFactory to be executed before generation of instance
+  // and then replaced in InsertAction either
+  private Map<String, String> extractPropertiesFromMap(String entityName, Map<String, String> attrs) {
+    Map<String, String> returnList = new HashMap<>();
+    String startKey = entityName.toLowerCase() + ".";
+    Iterator<Entry<String, String>> it = attrs.entrySet().iterator();
+    while (it.hasNext()) {
+      Entry<String, String> entry = it.next();
+      String key = entry.getKey().toLowerCase();
+      if (key.startsWith(startKey)) {
+        String pureKey = key.substring(startKey.length());
+        String value = entry.getValue();
+        returnList.put(pureKey, value);
+      }
+    }
+    return returnList;
+  }
 
   /*
    * (non-Javadoc)
@@ -234,8 +376,10 @@ public class RegisterController extends AbstractController {
   @SuppressWarnings("unchecked")
   @Override
   public void initProperties(Properties properties) {
-    successUrl = readProperty(SUCCESS_URL_PROP, null, true);
-    failUrl = readProperty(FAIL_URL_PROP, null, true);
+    successUrl = readProperty(REG_START_SUCCESS_URL_PROP, null, true);
+    failUrl = readProperty(REG_START_FAIL_URL_PROP, null, true);
+    successConfirmUrl = readProperty(REG_CONFIRM_SUCCESS_URL_PROP, null, true);
+    failConfirmUrl = readProperty(REG_CONFIRM_FAIL_URL_PROP, null, true);
     try {
       authenticatableCLass = (Class<? extends IAuthenticatable>) Class
           .forName(readProperty(AUTHENTICATABLE_CLASS_PROP, Member.class.getName(), false));
@@ -243,7 +387,6 @@ public class RegisterController extends AbstractController {
       throw new InitException(e);
     }
     allowDuplicateEmail = Boolean.valueOf(readProperty(ALLOW_DUPLICATION_EMAIL_PROP, "false", false));
-
   }
 
   /**
@@ -268,8 +411,11 @@ public class RegisterController extends AbstractController {
    */
   public static Properties getDefaultProperties() {
     Properties json = new Properties();
-    json.put(SUCCESS_URL_PROP, "/customer/registerSuccess.html");
-    json.put(FAIL_URL_PROP, "/customer/register.html");
+    json.put(REG_START_SUCCESS_URL_PROP, "/customer/registerSuccess.html");
+    json.put(REG_START_FAIL_URL_PROP, "/customer/registerFail.html");
+    json.put(REG_CONFIRM_SUCCESS_URL_PROP, "/customer/registerConfirmSuccess.html");
+    json.put(REG_CONFIRM_FAIL_URL_PROP, "/customer/registerConfirmFail.html");
+
     json.put(AUTHENTICATABLE_CLASS_PROP, Member.class.getName());
     json.put(ALLOW_DUPLICATION_EMAIL_PROP, "false");
     return json;

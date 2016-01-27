@@ -20,7 +20,6 @@ import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.exception.InitException;
 import de.braintags.netrelay.controller.Action;
 import de.braintags.netrelay.controller.impl.AbstractCaptureController;
-import de.braintags.netrelay.mapping.NetRelayMapperFactory;
 import de.braintags.netrelay.routing.CaptureCollection;
 import de.braintags.netrelay.routing.CaptureDefinition;
 import de.braintags.netrelay.routing.RouterDefinition;
@@ -157,7 +156,7 @@ public class PersistenceController extends AbstractCaptureController {
     updateAction = new UpdateAction(this);
     deleteAction = new DeleteAction(this);
     noneAction = new NoneAction(this);
-    mapperFactory = new NetRelayMapperFactory(getNetRelay());
+    mapperFactory = getNetRelay().getNetRelayMapperFactory();
     String upDir = readProperty(PersistenceController.UPLOAD_DIRECTORY_PROP, null, true);
     FileSystem fs = getVertx().fileSystem();
     if (!fs.existsBlocking(upDir)) {
