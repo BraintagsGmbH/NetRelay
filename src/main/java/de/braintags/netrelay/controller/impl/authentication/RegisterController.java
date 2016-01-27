@@ -26,6 +26,8 @@ import de.braintags.io.vertx.pojomapper.util.QueryHelper;
 import de.braintags.io.vertx.util.exception.InitException;
 import de.braintags.netrelay.RequestUtil;
 import de.braintags.netrelay.controller.impl.AbstractController;
+import de.braintags.netrelay.controller.impl.api.MailController;
+import de.braintags.netrelay.controller.impl.persistence.PersistenceController;
 import de.braintags.netrelay.mapping.NetRelayMapperFactory;
 import de.braintags.netrelay.model.IAuthenticatable;
 import de.braintags.netrelay.model.Member;
@@ -38,25 +40,51 @@ import io.vertx.ext.web.RoutingContext;
 
 /**
  * This controller performs a registration by using double-opt-in.
+ * The first is a form, you will create, which must contain minimal two fields with the field names
+ * {@value #EMAIL_FIELD_NAME} and {@value #PASSWORD_FIELD_NAME}. Additional fields can be defined by using the same
+ * structure than in the {@link PersistenceController}, like mapperName.fieldName ( for example: "customer.lastName" )
+ * <br/>
+ * The controller knows two actions:<br/>
+ * - the start of a registration,<br/>
+ * where a user filled out a registration form and sends that. The start of the
+ * registration is activated, when the request contains a form parameter {@value #PASSWORD_FIELD_NAME}<br/>
+ * - the confirmation of a registration<br/>
+ * which is typically performed when a user clicked a link in a confirmation mail and is activated, when the request
+ * contains the parameter {@value #VALIDATION_ID_PARAM}<br/>
+ * If none of this fits, then the controller will throw an exception java.lang.IllegalArgumentException: invalid action
+ * for registration<br/>
+ * <br/>
+ * <br/>
  * At first, for the registration, the system is performing some ( optional ) checks, for instance, wether the email for
- * the registrar exists already in the datastore. If every check is fine, the controller creates a new instance of
+ * the registrator exists already in the datastore. If every check is fine, the controller creates a new instance of
  * {@link RegisterClaim}, which contains all needed data to finish the registration. Previously created instances of
- * RegisterClaim with the same email address are deactivated. Then it will call the success page, which will create the
- * conformation mail, where inside the activation link should be contained.<br/>
- * The confirmation process is activated on the defined url, when the parameter {@value #VALIDATION_ID_PARAM} exists.
- * The system searches an existing instance of {@link RegisterClaim}. If found, it uses the information to create a new
- * account. If not, an error page is called
+ * RegisterClaim with the same email address are deactivated. <br/>
+ * The id of the RegisterClaim is stored in the context under the property {@value #VALIDATION_ID_PARAM}, additionally
+ * the RegisterClaim itself is stored inside the context under "RegisterClaim". After that the success page, defined by
+ * {@value #REG_START_SUCCESS_URL_PROP}, is called. <br/>
+ * This page should send the confirmation mail to the email address of the registration person, where the confirmation
+ * link is contained. You can reach that by activating the {@link MailController} on this page, for instance. Therefor
+ * the email address is stored in the context under the parameter {@link MailController#TO_PARAMETER}, so that the
+ * MailController can use it<br/>
+ * The confirmation link has the structure:<br/>
+ * confirmationPage?{@value #VALIDATION_ID_PARAM}=ID<br/>
+ * The confirmation page can be any virtual page and must be defined as route for the RegisterController, so that it is
+ * reacting to it. The ID is the ID, which was stored before in the context.<br/>
+ * When a user clicks the link in the mail, the RegistrationController will perform the confirmation. It will fetch the
+ * instance of RegisterClaim, which was previously created and generate a member, customer etc. from it and save it in
+ * the datastore. After that it will call the success page, defined by {@value #REG_CONFIRM_SUCCESS_URL_PROP}
  * 
- * The controller reads several properties from the current request, performs a password check, creates and saves a new
- * member and performs a login for the new member.
- * The properties, which must be sent by a request are:
- * 
- * After the action the page defined by the properties registerSuccess or registerFailure is called
  * 
  * Config-Parameter:<br/>
  * <UL>
- * <LI>{@value #REG_START_SUCCESS_URL_PROP} - defines the url which is used, when the registration claim was successful
+ * <LI>{@value #REG_START_SUCCESS_URL_PROP} - defines the url which is used, when the registration claim was successful.
+ * Under this address the mail should be sent, where the confirmation link is integrated, like described up.
  * <LI>{@value #REG_START_FAIL_URL_PROP} - defines the url which is used, when the registration claim raised an error
+ * <LI>{@value #REG_CONFIRM_SUCCESS_URL_PROP} - defines the url which is used, when the registration confirmation was
+ * successfull
+ * <LI>{@value #REG_CONFIRM_FAIL_URL_PROP} - defines the url which is used, when the registration confirmation raised an
+ * error
+ * 
  * <LI>{@value #AUTHENTICATABLE_CLASS_PROP} - the property name, which defines the class, which will be used to generate
  * a new member, user, customer etc.
  * </UL>
@@ -216,6 +244,7 @@ public class RegisterController extends AbstractController {
             handler.handle(Future.failedFuture(sr.cause()));
           } else {
             context.put(RegisterClaim.class.getSimpleName(), rc);
+            context.put(MailController.TO_PARAMETER, email);
             handler.handle(Future.succeededFuture(rc));
           }
         });
@@ -324,7 +353,8 @@ public class RegisterController extends AbstractController {
         IAuthenticatable user = (IAuthenticatable) result.result().getEntity();
         user.setEmail(rc.email);
         user.setPassword(rc.password);
-        IWrite<Object> write = (IWrite<Object>) getNetRelay().getDatastore().createWrite(authenticatableCLass);
+        IWrite<IAuthenticatable> write = (IWrite<IAuthenticatable>) getNetRelay().getDatastore()
+            .createWrite(authenticatableCLass);
         write.add(user);
         write.save(wr -> {
           if (wr.failed()) {

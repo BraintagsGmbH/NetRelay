@@ -54,7 +54,7 @@ import io.vertx.ext.web.templ.ThymeleafTemplateEngine;
 
 Parameter ( lassen sich entweder per config oder per request parameter setzen:
 
-to - an wen geht die Mail
+to - an wen geht die Mail, gelesen aus Config, Request-Parametern oder Context
 from: absender
 subject: titel der Mail
 mailText: text einer Mail für textbasierten Inhalt
@@ -171,7 +171,7 @@ public class MailController extends AbstractController {
     if (bounceAddress != null) {
       email.setBounceAddress(bounceAddress);
     }
-    email.setTo(readParameterOrProperty(context, TO_PARAMETER, null, true));
+    email.setTo(readParameterOrPropertyOrContext(context, TO_PARAMETER, null, true));
     email.setSubject(readParameterOrProperty(context, SUBJECT_PARAMETER, "undefined", false));
     String template = readParameterOrProperty(context, TEMPLATE_PARAM, null, false);
     email.setHtml(readParameterOrProperty(context, HTML_PARAMETER, "", false));
