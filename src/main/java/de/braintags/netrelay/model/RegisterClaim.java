@@ -30,6 +30,7 @@ public class RegisterClaim extends AbstractRecord {
   public String email;
   public String password;
   public boolean active = true;
+  public IAuthenticatable user;
   public Map<String, String> requestParameter = new HashMap<>();
 
   public RegisterClaim() {

@@ -148,6 +148,9 @@ public class MailController extends AbstractController {
   public static void sendMail(RoutingContext context, MailClient mailClient, MailPreferences prefs,
       Handler<AsyncResult<MailSendResult>> handler) {
     try {
+      if (mailClient == null) {
+        throw new InitException(UNCONFIGURED_ERROR);
+      }
       createMailMessage(context, prefs, result -> {
         if (result.failed()) {
           LOGGER.error("", result.cause());
@@ -239,9 +242,6 @@ public class MailController extends AbstractController {
    */
   @Override
   public void initProperties(Properties properties) {
-    if (getNetRelay().getMailClient() == null) {
-      throw new InitException(UNCONFIGURED_ERROR);
-    }
     prefs = createMailPreferences(properties);
   }
 

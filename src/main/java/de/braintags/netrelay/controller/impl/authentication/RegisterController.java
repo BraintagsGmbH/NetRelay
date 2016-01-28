@@ -62,7 +62,8 @@ import io.vertx.ext.web.RoutingContext;
  * The id of the RegisterClaim is stored in the context under the property {@value #VALIDATION_ID_PARAM}, additionally
  * the RegisterClaim itself is stored inside the context under "RegisterClaim". Further the email address of the current
  * client is stored in the context under the parameter {@link MailController#TO_PARAMETER}, so that the MailController
- * can use it later on to send the message.<br/>
+ * can use it later on to send the message. Additionally all request parameters are added to the context, so that they
+ * can be used as content for the generated mail.<br/>
  * After this, the MailController is called to compose and send the conformation mail to the client. The configuration
  * of the MailController must be contained inside the configuration of this RegisterController. The template, which is
  * part of that configuration, will be used to compose the confirmation mail, where the confirmation link must be
@@ -231,6 +232,7 @@ public class RegisterController extends AbstractController {
                   context.reroute(failUrl);
                 } else {
                   RegisterClaim rc = rcRes.result();
+                  addParameterToContext(context, rc);
                   MailController.sendMail(context, getNetRelay().getMailClient(), mailPrefs, result -> {
                     MailController.MailSendResult msResult = result.result();
                     if (msResult.success) {
@@ -251,6 +253,10 @@ public class RegisterController extends AbstractController {
       context.put(REGISTER_ERROR_PARAM, e.getMessage());
       context.reroute(failUrl);
     }
+  }
+
+  private void addParameterToContext(RoutingContext context, RegisterClaim claim) {
+    claim.requestParameter.entrySet().forEach(entry -> context.put(entry.getKey(), entry.getValue()));
   }
 
   private void createRegisterClaim(RoutingContext context, String email, String password,
