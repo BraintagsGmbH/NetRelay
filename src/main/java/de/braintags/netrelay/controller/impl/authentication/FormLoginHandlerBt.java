@@ -149,7 +149,8 @@ public class FormLoginHandlerBt implements FormLoginHandler {
     if (e != null) {
       context.put(authenticationErrorParameter, e.toString());
     }
-    if (loginPage != null) {
+    String currentPage = context.request().path();
+    if (loginPage != null && !currentPage.equals(loginPage)) {
       context.reroute(loginPage);
       // doRedirect(context.response(), loginPage);
     } else {

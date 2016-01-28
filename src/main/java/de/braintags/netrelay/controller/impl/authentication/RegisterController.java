@@ -27,6 +27,7 @@ import de.braintags.io.vertx.util.exception.InitException;
 import de.braintags.netrelay.RequestUtil;
 import de.braintags.netrelay.controller.impl.AbstractController;
 import de.braintags.netrelay.controller.impl.api.MailController;
+import de.braintags.netrelay.controller.impl.api.MailController.MailSendResult;
 import de.braintags.netrelay.controller.impl.persistence.PersistenceController;
 import de.braintags.netrelay.mapping.NetRelayMapperFactory;
 import de.braintags.netrelay.model.IAuthenticatable;
@@ -54,27 +55,33 @@ import io.vertx.ext.web.RoutingContext;
  * If none of this fits, then the controller will throw an exception java.lang.IllegalArgumentException: invalid action
  * for registration<br/>
  * <br/>
- * <br/>
  * At first, for the registration, the system is performing some ( optional ) checks, for instance, wether the email for
  * the registrator exists already in the datastore. If every check is fine, the controller creates a new instance of
  * {@link RegisterClaim}, which contains all needed data to finish the registration. Previously created instances of
  * RegisterClaim with the same email address are deactivated. <br/>
  * The id of the RegisterClaim is stored in the context under the property {@value #VALIDATION_ID_PARAM}, additionally
- * the RegisterClaim itself is stored inside the context under "RegisterClaim". After that the success page, defined by
- * {@value #REG_START_SUCCESS_URL_PROP}, is called. <br/>
- * This page should send the confirmation mail to the email address of the registration person, where the confirmation
- * link is contained. You can reach that by activating the {@link MailController} on this page, for instance. Therefor
- * the email address is stored in the context under the parameter {@link MailController#TO_PARAMETER}, so that the
- * MailController can use it<br/>
- * The confirmation link has the structure:<br/>
+ * the RegisterClaim itself is stored inside the context under "RegisterClaim". Further the email address of the current
+ * client is stored in the context under the parameter {@link MailController#TO_PARAMETER}, so that the MailController
+ * can use it later on to send the message.<br/>
+ * After this, the MailController is called to compose and send the conformation mail to the client. The configuration
+ * of the MailController must be contained inside the configuration of this RegisterController. The template, which is
+ * part of that configuration, will be used to compose the confirmation mail, where the confirmation link must be
+ * contained. The confirmation link has the structure:
+ * <p>
  * confirmationPage?{@value #VALIDATION_ID_PARAM}=ID<br/>
  * The confirmation page can be any virtual page and must be defined as route for the RegisterController, so that it is
  * reacting to it. The ID is the ID, which was stored before in the context.<br/>
+ * </p>
+ * 
+ * After successfully processing the MailController, the success page, defined by {@value #REG_START_SUCCESS_URL_PROP},
+ * is called. <br/>
+ * 
  * When a user clicks the link in the mail, the RegistrationController will perform the confirmation. It will fetch the
  * instance of RegisterClaim, which was previously created and generate a member, customer etc. from it and save it in
  * the datastore. After that it will call the success page, defined by {@value #REG_CONFIRM_SUCCESS_URL_PROP}
  * 
- * 
+ * <br/>
+ * <br/>
  * Config-Parameter:<br/>
  * <UL>
  * <LI>{@value #REG_START_SUCCESS_URL_PROP} - defines the url which is used, when the registration claim was successful.
@@ -84,11 +91,12 @@ import io.vertx.ext.web.RoutingContext;
  * successfull
  * <LI>{@value #REG_CONFIRM_FAIL_URL_PROP} - defines the url which is used, when the registration confirmation raised an
  * error
- * 
  * <LI>{@value #AUTHENTICATABLE_CLASS_PROP} - the property name, which defines the class, which will be used to generate
  * a new member, user, customer etc.
+ * <LI>Additionally the config-parameters of {@link MailController} must be set
  * </UL>
  * <br>
+ * 
  * Request-Parameter:<br/>
  * <UL>
  * <LI>for the start of a registration, a new instance of {@link RegisterClaim} is created by two fields first:
@@ -102,6 +110,7 @@ import io.vertx.ext.web.RoutingContext;
  * 
  * </UL>
  * <br/>
+ * 
  * Result-Parameter:<br/>
  * <UL>
  * <LI>{@value #REGISTER_ERROR_PARAM} the parameter, where an error String of a failed registration is stored in
@@ -162,6 +171,12 @@ public class RegisterController extends AbstractController {
   public static final String VALIDATION_ID_PARAM = "validationId";
 
   /**
+   * The name of the property which is used to store the {@link MailSendResult} in the context, if the mail sending
+   * failed
+   */
+  private static final String MAIL_SEND_RESULT_PROP = "mailSendResult";
+
+  /**
    * The name of the field used to send the password
    */
   public static final String PASSWORD_FIELD_NAME = "password";
@@ -177,6 +192,7 @@ public class RegisterController extends AbstractController {
   private String failConfirmUrl;
   private Class<? extends IAuthenticatable> authenticatableCLass;
   private boolean allowDuplicateEmail;
+  private MailController.MailPreferences mailPrefs;
 
   /*
    * (non-Javadoc)
@@ -215,7 +231,15 @@ public class RegisterController extends AbstractController {
                   context.reroute(failUrl);
                 } else {
                   RegisterClaim rc = rcRes.result();
-                  RequestUtil.sendRedirect(context.response(), successUrl + "?" + VALIDATION_ID_PARAM + "=" + rc.id);
+                  MailController.sendMail(context, getNetRelay().getMailClient(), mailPrefs, result -> {
+                    MailController.MailSendResult msResult = result.result();
+                    if (msResult.success) {
+                      RequestUtil.sendRedirect(context.response(), successUrl);
+                    } else {
+                      context.put(MAIL_SEND_RESULT_PROP, msResult);
+                      context.reroute(failUrl);
+                    }
+                  });
                 }
               });
             }
@@ -245,6 +269,7 @@ public class RegisterController extends AbstractController {
           } else {
             context.put(RegisterClaim.class.getSimpleName(), rc);
             context.put(MailController.TO_PARAMETER, email);
+            context.put(VALIDATION_ID_PARAM, rc.id);
             handler.handle(Future.succeededFuture(rc));
           }
         });
@@ -417,6 +442,7 @@ public class RegisterController extends AbstractController {
       throw new InitException(e);
     }
     allowDuplicateEmail = Boolean.valueOf(readProperty(ALLOW_DUPLICATION_EMAIL_PROP, "false", false));
+    mailPrefs = MailController.createMailPreferences(properties);
   }
 
   /**

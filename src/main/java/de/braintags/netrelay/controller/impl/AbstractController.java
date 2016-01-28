@@ -118,6 +118,28 @@ public abstract class AbstractController implements IController {
   }
 
   /**
+   * Read the property with the given name
+   * 
+   * @param properties
+   *          the properties to read from
+   * @param propertyName
+   *          the name of the property to be read
+   * @param defaultValue
+   *          the default value to be returned
+   * @param required
+   *          is it required
+   * @return the value of the property or null
+   * @throws ParameterRequiredException,
+   *           if required parameter wasn't found
+   */
+  public static String readProperty(Properties properties, String propertyName, String defaultValue, boolean required) {
+    String value = (String) properties.get(propertyName);
+    if (value == null && required)
+      throw new ParameterRequiredException(propertyName);
+    return value == null ? defaultValue : value;
+  }
+
+  /**
    * Reads a value either from the request or - if not found there - from the configuration properties
    * 
    * @param context
@@ -137,6 +159,33 @@ public abstract class AbstractController implements IController {
     if (value == null) {
       value = readProperty(key, null, false);
     }
+    if (value == null && required)
+      throw new ParameterRequiredException(key);
+    return value == null ? defaultValue : value;
+  }
+
+  /**
+   * Reads a value either from the request or - if not found there - from the context
+   * 
+   * @param context
+   *          the context from the current request
+   * @param key
+   *          the key to search for
+   * @param defaultValue
+   *          the default value
+   * @param required
+   *          is the value required?
+   * @return a found value, the default value or null
+   * @throws ParameterRequiredException,
+   *           if required parameter wasn't found
+   */
+  public static String readParameterOrContext(RoutingContext context, String key, String defaultValue,
+      boolean required) {
+    String value = readParameter(context, key, false);
+    if (value == null) {
+      value = context.get(key);
+    }
+
     if (value == null && required)
       throw new ParameterRequiredException(key);
     return value == null ? defaultValue : value;
@@ -188,7 +237,7 @@ public abstract class AbstractController implements IController {
    * @throws ParameterRequiredException,
    *           if required parameter wasn't found
    */
-  public String readParameter(RoutingContext context, String key, boolean required) {
+  public static String readParameter(RoutingContext context, String key, boolean required) {
     String value = RequestUtil.readFormAttribute(context, key, null, false);
     if (value == null) {
       value = RequestUtil.readParameterAttribute(context, key, null, false);
@@ -207,7 +256,7 @@ public abstract class AbstractController implements IController {
    *          the key to lookup
    * @return true, if exists
    */
-  public boolean hasParameter(RoutingContext context, String key) {
+  public static boolean hasParameter(RoutingContext context, String key) {
     return context.request().params().contains(key)
         || (context.request().formAttributes() != null && context.request().formAttributes().contains(key));
   }

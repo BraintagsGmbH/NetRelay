@@ -18,13 +18,18 @@ import org.junit.Test;
 
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.testdatastore.DatastoreBaseTest;
+import de.braintags.netrelay.controller.impl.ThymeleafTemplateController;
+import de.braintags.netrelay.controller.impl.api.MailController;
 import de.braintags.netrelay.controller.impl.authentication.RegisterController;
 import de.braintags.netrelay.controller.impl.authentication.RegistrationCode;
+import de.braintags.netrelay.init.MailClientSettings;
+import de.braintags.netrelay.init.Settings;
 import de.braintags.netrelay.model.Member;
 import de.braintags.netrelay.model.RegisterClaim;
 import de.braintags.netrelay.routing.RouterDefinition;
 import de.braintags.netrelay.util.MultipartUtil;
 import io.vertx.core.http.HttpMethod;
+import io.vertx.ext.mail.StartTLSOptions;
 import io.vertx.ext.unit.TestContext;
 
 /**
@@ -41,7 +46,7 @@ public class TRegistration extends NetRelayBaseTest {
   /**
    * Comment for <code>USER_BRAINTAGS_DE</code>
    */
-  private static final String USER_BRAINTAGS_DE = "user@braintags.de";
+  private static final String USER_BRAINTAGS_DE = "mremme@braintags.de";
   /**
    * Comment for <code>CUSTOMER_DO_CONFIRMATION</code>
    */
@@ -56,6 +61,7 @@ public class TRegistration extends NetRelayBaseTest {
     String email = USER_BRAINTAGS_DE;
     try {
       DatastoreBaseTest.clearTable(context, RegisterClaim.class);
+      DatastoreBaseTest.clearTable(context, Member.class);
       resetRoutes();
       MultipartUtil mu = new MultipartUtil();
       mu.addFormField(RegisterController.EMAIL_FIELD_NAME, email);
@@ -158,8 +164,8 @@ public class TRegistration extends NetRelayBaseTest {
       LOGGER.info("RESPONSE: " + resp.content);
       LOGGER.info("HEADERS: " + resp.headers);
       context.assertNotNull(resp.headers.get("location"), "No location header set");
-      context.assertTrue(resp.headers.get("location").contains(RegisterController.VALIDATION_ID_PARAM),
-          "The parameter for the validation id is not set");
+      context.assertTrue(resp.headers.get("location").contains("/customer/registerSuccess.html"),
+          "The success page isn't called");
     } , 302, "Found", null);
   }
 
@@ -183,7 +189,25 @@ public class TRegistration extends NetRelayBaseTest {
         .getNamedDefinition(RegisterController.class.getSimpleName());
     def.setRoutes(new String[] { REGISTER_URL, CUSTOMER_DO_CONFIRMATION });
     def.getHandlerProperties().put(RegisterController.REG_START_FAIL_URL_PROP, "/customer/registerError.html");
+    def.getHandlerProperties().put(MailController.FROM_PARAM, "unknown@braintags.de");
+    def.getHandlerProperties().put(MailController.SUBJECT_PARAMETER, "Please finish registration");
+    def.getHandlerProperties().put(MailController.TEMPLATE_PARAM, "/customer/confirmationMail.html");
+    def.getHandlerProperties().put(ThymeleafTemplateController.TEMPLATE_DIRECTORY_PROPERTY, "testTemplates");
     netRelay.resetRoutes();
+  }
+
+  @Override
+  protected void modifySettings(TestContext context, Settings settings) {
+    super.modifySettings(context, settings);
+    MailClientSettings ms = settings.getMailClientSettings();
+    ms.setHostname("mail.braintags.net");
+    ms.setPort(8025);
+    ms.setName("mailclient");
+    ms.setUsername("dev-test@braintags.net");
+    ms.setPassword("thoo4ati");
+    ms.setSsl(false);
+    ms.setStarttls(StartTLSOptions.DISABLED);
+    ms.setActive(true);
   }
 
 }
