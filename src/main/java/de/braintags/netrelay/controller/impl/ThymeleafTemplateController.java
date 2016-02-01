@@ -16,6 +16,7 @@ import java.util.Properties;
 import java.util.Set;
 
 import org.thymeleaf.TemplateEngine;
+import org.thymeleaf.extras.conditionalcomments.dialect.ConditionalCommentsDialect;
 import org.thymeleaf.templateresolver.ITemplateResolver;
 import org.thymeleaf.templateresolver.TemplateResolver;
 
@@ -129,6 +130,8 @@ public class ThymeleafTemplateController extends AbstractController {
     if (properties.containsKey(CACHE_ENABLED_PROPERTY)) {
       boolean cachable = Boolean.valueOf(properties.getProperty(CACHE_ENABLED_PROPERTY));
       TemplateEngine te = thEngine.getThymeleafTemplateEngine();
+      ConditionalCommentsDialect ccd = new ConditionalCommentsDialect();
+      te.addDialect(ccd);
       Set<ITemplateResolver> trs = te.getTemplateResolvers();
       for (ITemplateResolver tr : trs) {
         ((TemplateResolver) tr).setCacheable(cachable);
