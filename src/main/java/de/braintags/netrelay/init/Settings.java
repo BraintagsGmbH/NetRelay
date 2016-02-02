@@ -54,6 +54,7 @@ public class Settings {
   public static final String LOCAL_USER_DIRECTORY = System.getProperty("user.home") + "/" + ".netrelay";
 
   private int serverPort = 8080;
+  private String hostName = "localhost";
   private String defaultLoginPage = "/backend/login.html";
   private RouterDefinitions routerDefinitions = new RouterDefinitions();
   private DataStoreSettings datastoreSettings;
@@ -242,6 +243,23 @@ public class Settings {
    */
   public final void setDefaultLoginPage(String defaultLoginPage) {
     this.defaultLoginPage = defaultLoginPage;
+  }
+
+  /**
+   * Get the name of the host
+   * 
+   * @return the hostName
+   */
+  public final String getHostName() {
+    return hostName;
+  }
+
+  /**
+   * @param hostName
+   *          the hostName to set
+   */
+  public final void setHostName(String hostName) {
+    this.hostName = hostName;
   }
 
 }

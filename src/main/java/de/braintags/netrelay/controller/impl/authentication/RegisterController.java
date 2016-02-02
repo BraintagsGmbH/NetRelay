@@ -232,6 +232,7 @@ public class RegisterController extends AbstractController {
                   context.reroute(failUrl);
                 } else {
                   RegisterClaim rc = rcRes.result();
+                  LOGGER.info("Created RegisterClaim id is " + rc.id);
                   addParameterToContext(context, rc);
                   MailController.sendMail(context, getNetRelay().getMailClient(), mailPrefs, result -> {
                     MailController.MailSendResult msResult = result.result();

@@ -12,6 +12,7 @@
  */
 package de.braintags.netrelay.controller.impl;
 
+import java.net.URI;
 import java.util.Properties;
 
 import de.braintags.netrelay.controller.impl.persistence.PersistenceController;
@@ -20,7 +21,18 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;
 
 /**
- * A Controller, which creates and uses a {@link BodyHandler}
+ * A Controller, which creates and uses a {@link BodyHandler}.
+ * The BodyHandler creates som variables and stores them inside the context either:<br/>
+ * 
+ * <UL>
+ * <LI>REQUEST_HOST<br/>
+ * the name of the host of the current request
+ * <LI>REQUEST_PORT<br/>
+ * the port of the host of the current request
+ * <LI>REQUEST_SCHEME<br/>
+ * the scheme of the host of the current request
+ * 
+ * </UL>
  * 
  * <br/>
  * <br/>
@@ -34,6 +46,9 @@ import io.vertx.ext.web.handler.BodyHandler;
  * 
  */
 public class BodyController extends AbstractController {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(BodyController.class);
+
   private BodyHandler bodyHandler;
 
   /**
@@ -58,6 +73,14 @@ public class BodyController extends AbstractController {
    */
   @Override
   public void handle(RoutingContext event) {
+    try {
+      URI uri = URI.create(event.request().absoluteURI());
+      event.put("REQUEST_HOST", uri.getHost());
+      event.put("REQUEST_PORT", uri.getPort());
+      event.put("REQUEST_SCHEME", uri.getScheme());
+    } catch (Exception e) {
+      LOGGER.warn(e.toString());
+    }
     bodyHandler.handle(event);
   }
 
