@@ -30,6 +30,7 @@ import de.braintags.netrelay.routing.RouterDefinition;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientRequest;
 import io.vertx.core.http.HttpMethod;
@@ -87,6 +88,7 @@ public class MailController extends AbstractController {
 
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(MailController.class);
+  private static final Pattern IMG_PATTERN = Pattern.compile("(<img [^>]*src=\")([^\"]+)(\"[^>]*>)");
 
   /**
    * The parameter inside the configuration properties by which the sender of mails is defined
@@ -131,8 +133,6 @@ public class MailController extends AbstractController {
   private static final String UNCONFIGURED_ERROR = "The MailClient of NetRelay is not started, check the configuration and restart server!";
 
   private MailPreferences prefs;
-  private HttpClient httpClient;
-  private boolean inline = true;
 
   /*
    * (non-Javadoc)
@@ -225,9 +225,6 @@ public class MailController extends AbstractController {
     String subject = prefs.subject == null ? readParameterOrContext(context, SUBJECT_PARAMETER, null, false)
         : prefs.subject;
     email.setSubject(subject);
-    String html = prefs.html == null || prefs.html.hashCode() == 0
-        ? readParameterOrContext(context, HTML_PARAMETER, null, false) : prefs.html;
-    email.setHtml(html);
     String text = prefs.text == null || prefs.text.hashCode() == 0
         ? readParameterOrContext(context, TEXT_PARAMETER, null, false) : prefs.text;
     email.setText(text);
@@ -238,17 +235,18 @@ public class MailController extends AbstractController {
       prefs.templateEngine.render(context, file, res -> {
         if (res.succeeded()) {
           email.setHtml(res.result().toString());
-          handler.handle(Future.succeededFuture(email));
+          parseInlineMessage(context, prefs, email, handler);
         } else {
           handler.handle(Future.failedFuture(res.cause()));
         }
       });
     } else {
-      handler.handle(Future.succeededFuture(email));
+      String html = prefs.html == null || prefs.html.hashCode() == 0
+          ? readParameterOrContext(context, HTML_PARAMETER, null, false) : prefs.html;
+      email.setHtml(html);
+      parseInlineMessage(context, prefs, email, handler);
     }
   }
-
-  private static final Pattern IMG_PATTERN = Pattern.compile("(<img [^>]*src=\")([^\"]+)(\"[^>]*>)");
 
   /**
    * Replaces src-attributes of img-tags with cid to represent the correct inline-attachment
@@ -257,68 +255,85 @@ public class MailController extends AbstractController {
    * @param textValue
    * @param helper
    */
-  public void parseInlineMessage(RoutingContext context, MailMessage msg, Handler<AsyncResult<Void>> handler) {
-    List<MailAttachment> attachments = new ArrayList<>();
-    int counter = 0;
-    String imgKeyName = "img";
-    StringBuffer result = new StringBuffer();
+  public static void parseInlineMessage(RoutingContext context, MailPreferences prefs, MailMessage msg,
+      Handler<AsyncResult<MailMessage>> handler) {
+    if (prefs.inline) {
+      List<MailAttachment> attachments = new ArrayList<>();
+      int counter = 0;
+      String imgKeyName = "img";
+      StringBuffer result = new StringBuffer();
 
-    // group1: everything before the image src, group2:filename inside the "" of the src element, group4: everything
-    // after the image src
-    Matcher matcher = IMG_PATTERN.matcher(msg.getHtml());
-    while (matcher.find()) {
-      String imageSource = matcher.group(2);
-      StringBuilder cid = new StringBuilder(imgKeyName);
-      cid.append(counter++);
-      String extension = FilenameUtils.getExtension(imageSource);
-      if (extension != null)
-        cid.append(".").append(extension);
+      // group1: everything before the image src, group2:filename inside the "" of the src element, group4: everything
+      // after the image src
+      Matcher matcher = IMG_PATTERN.matcher(msg.getHtml());
+      while (matcher.find()) {
+        String imageSource = matcher.group(2);
+        StringBuilder cid = new StringBuilder(imgKeyName);
+        cid.append(counter++);
+        String extension = FilenameUtils.getExtension(imageSource);
+        if (extension != null)
+          cid.append(".").append(extension);
 
-      URI imgUrl = makeAbsoluteURI(context, imageSource);
-      if (imgUrl != null) {
-        String cidName = cid.toString();
-        MailAttachment attachment = createAttachment(context, imgUrl, cidName);
-        matcher.appendReplacement(result, "$1cid:" + cidName + "$3");
-        attachments.add(attachment);
-      } else {
-        matcher.appendReplacement(result, "$0");
-      }
-    }
-    matcher.appendTail(result);
-    msg.setHtml(result.toString());
-    CounterObject co = new CounterObject<>(attachments.size(), handler);
-    for (MailAttachment attachment : attachments) {
-      readData(context, (UriMailAttachment) attachment, rr -> {
-        if (rr.failed()) {
-          co.setThrowable(rr.cause());
+        URI imgUrl = makeAbsoluteURI(context, imageSource);
+        if (imgUrl != null) {
+          String cidName = cid.toString();
+          MailAttachment attachment = createAttachment(context, imgUrl, cidName);
+          matcher.appendReplacement(result, "$1cid:" + cidName + "$3");
+          attachments.add(attachment);
         } else {
-          if (co.reduce()) {
-            msg.setAttachment(attachments);
-            handler.handle(Future.succeededFuture());
+          matcher.appendReplacement(result, "$0");
+        }
+      }
+      matcher.appendTail(result);
+      msg.setHtml(result.toString());
+      if (attachments.isEmpty()) {
+        handler.handle(Future.succeededFuture(msg));
+      } else {
+        CounterObject co = new CounterObject<>(attachments.size(), handler);
+        for (MailAttachment attachment : attachments) {
+          readData(context, prefs, (UriMailAttachment) attachment, rr -> {
+            if (rr.failed()) {
+              co.setThrowable(rr.cause());
+            } else {
+              if (co.reduce()) {
+                msg.setAttachment(attachments);
+                handler.handle(Future.succeededFuture(msg));
+              }
+            }
+          });
+          if (co.isError()) {
+            break;
           }
         }
-      });
-      if (co.isError()) {
-        break;
       }
+    } else {
+      handler.handle(Future.succeededFuture(msg));
     }
-
   }
 
-  private MailAttachment createAttachment(RoutingContext context, URI uri, String cidName) {
+  private static MailAttachment createAttachment(RoutingContext context, URI uri, String cidName) {
     UriMailAttachment attachment = new UriMailAttachment(uri);
     attachment.setContentType(getContentType(context, uri));
     attachment.setDisposition("inline");
     return attachment;
   }
 
-  private void readData(RoutingContext context, UriMailAttachment attachment, Handler<AsyncResult<Void>> handler) {
-    HttpClientRequest req = httpClient.request(HttpMethod.GET, attachment.getUri().toString(), resp -> {
+  private static void readData(RoutingContext context, MailPreferences prefs, UriMailAttachment attachment,
+      Handler<AsyncResult<Void>> handler) {
+    String url = attachment.getUri().toString();
+    HttpClientRequest req = prefs.httpClient.request(HttpMethod.GET, url, resp -> {
+
+      resp.exceptionHandler(ex -> {
+        ex.printStackTrace();
+      });
+      LOGGER.info(resp.statusCode());
+
       resp.bodyHandler(buff -> {
         try {
           attachment.setData(buff);
           handler.handle(Future.succeededFuture());
         } catch (Exception e) {
+          LOGGER.error("", e);
           handler.handle(Future.failedFuture(e));
         }
       });
@@ -346,8 +361,8 @@ public class MailController extends AbstractController {
    *          the properties to be used
    * @return a new instance
    */
-  public static MailPreferences createMailPreferences(Properties properties) {
-    return new MailPreferences(properties);
+  public static MailPreferences createMailPreferences(Vertx vertx, Properties properties) {
+    return new MailPreferences(vertx, properties);
   }
 
   /*
@@ -357,9 +372,7 @@ public class MailController extends AbstractController {
    */
   @Override
   public void initProperties(Properties properties) {
-    prefs = createMailPreferences(properties);
-    httpClient = getVertx().createHttpClient();
-    inline = Boolean.valueOf(readProperty(INLINE_PROP, "true", false));
+    prefs = createMailPreferences(getVertx(), properties);
   }
 
   /**
@@ -409,11 +422,13 @@ public class MailController extends AbstractController {
     private String template;
     private String html;
     private String text;
+    private boolean inline = true;
+    private HttpClient httpClient;
 
     /**
      * 
      */
-    MailPreferences(Properties props) {
+    MailPreferences(Vertx vertx, Properties props) {
       from = readProperty(props, FROM_PARAM, null, false);
       bounceAddress = readProperty(props, BOUNCE_ADDRESS_PARAM, null, false);
       to = readProperty(props, TO_PARAMETER, null, false);
@@ -423,6 +438,8 @@ public class MailController extends AbstractController {
       templateDirectory = ThymeleafTemplateController.getTemplateDirectory(props);
       html = readProperty(props, HTML_PARAMETER, "", false);
       text = readProperty(props, TEXT_PARAMETER, "", false);
+      inline = Boolean.valueOf(readProperty(props, INLINE_PROP, "true", false));
+      httpClient = vertx.createHttpClient();
     }
 
   }

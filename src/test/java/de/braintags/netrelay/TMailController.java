@@ -35,8 +35,8 @@ import io.vertx.ext.unit.TestContext;
 public class TMailController extends NetRelayBaseTest {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(TMailController.class);
-  public static final String TESTS_RECIPIENT = "testAccount@braintags.de";
-  public static final String TEST_IMAGE_URI = "https://www.google.de/images/nav_logo242.png";
+  public static final String TESTS_RECIPIENT = "mremme@braintags.de";
+  public static final String TEST_IMAGE_URI = "http://www.braintags.de/images/design/logo.png";
 
   @Test
   public void sendSimpleMail(TestContext context) {

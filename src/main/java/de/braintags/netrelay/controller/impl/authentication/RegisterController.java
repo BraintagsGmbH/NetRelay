@@ -449,7 +449,7 @@ public class RegisterController extends AbstractController {
       throw new InitException(e);
     }
     allowDuplicateEmail = Boolean.valueOf(readProperty(ALLOW_DUPLICATION_EMAIL_PROP, "false", false));
-    mailPrefs = MailController.createMailPreferences(properties);
+    mailPrefs = MailController.createMailPreferences(getVertx(), properties);
   }
 
   /**
