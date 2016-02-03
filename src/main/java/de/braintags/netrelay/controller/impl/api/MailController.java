@@ -12,8 +12,16 @@
  */
 package de.braintags.netrelay.controller.impl.api;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import org.apache.commons.io.FilenameUtils;
+
+import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.io.vertx.util.exception.InitException;
 import de.braintags.netrelay.NetRelay;
 import de.braintags.netrelay.controller.impl.AbstractController;
@@ -22,8 +30,12 @@ import de.braintags.netrelay.routing.RouterDefinition;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.http.HttpClient;
+import io.vertx.core.http.HttpClientRequest;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.Json;
+import io.vertx.ext.mail.MailAttachment;
 import io.vertx.ext.mail.MailClient;
 import io.vertx.ext.mail.MailMessage;
 import io.vertx.ext.mail.MailResult;
@@ -49,7 +61,8 @@ import io.vertx.ext.web.templ.ThymeleafTemplateEngine;
         "templateDirectory" : "templates",
         "mode" : "XHTML",
         "cacheEnabled" : "true",
-        "from" : "address@sender.com"
+        "from" : "address@sender.com",
+        "inline" : "true"
       },
       "captureCollection" : null
     }
@@ -109,9 +122,17 @@ public class MailController extends AbstractController {
    */
   public static final String TEMPLATE_PARAM = "template";
 
+  /**
+   * With this parameter it is defined, wether images, which are referenced inside the mail content, shall be integrated
+   * inline
+   */
+  public static final String INLINE_PROP = "inline";
+
   private static final String UNCONFIGURED_ERROR = "The MailClient of NetRelay is not started, check the configuration and restart server!";
 
   private MailPreferences prefs;
+  private HttpClient httpClient;
+  private boolean inline = true;
 
   /*
    * (non-Javadoc)
@@ -198,17 +219,20 @@ public class MailController extends AbstractController {
     if (prefs.bounceAddress != null) {
       email.setBounceAddress(prefs.bounceAddress);
     }
-    String to = prefs.to == null ? readParameterOrContext(context, TO_PARAMETER, null, true) : prefs.to;
+    String to = prefs.to == null || prefs.to.hashCode() == 0 ? readParameterOrContext(context, TO_PARAMETER, null, true)
+        : prefs.to;
     email.setTo(to);
-    String subject = prefs.subject == null ? readParameterOrContext(context, SUBJECT_PARAMETER, null, true)
+    String subject = prefs.subject == null ? readParameterOrContext(context, SUBJECT_PARAMETER, null, false)
         : prefs.subject;
     email.setSubject(subject);
-    String html = prefs.html == null ? readParameterOrContext(context, HTML_PARAMETER, null, true) : prefs.html;
+    String html = prefs.html == null || prefs.html.hashCode() == 0
+        ? readParameterOrContext(context, HTML_PARAMETER, null, false) : prefs.html;
     email.setHtml(html);
-    String text = prefs.text == null ? readParameterOrContext(context, TEXT_PARAMETER, null, true) : prefs.text;
+    String text = prefs.text == null || prefs.text.hashCode() == 0
+        ? readParameterOrContext(context, TEXT_PARAMETER, null, false) : prefs.text;
     email.setText(text);
-    String template = prefs.template == null ? readParameterOrContext(context, TEMPLATE_PARAM, null, false)
-        : prefs.template;
+    String template = prefs.template == null || prefs.template.hashCode() == 0
+        ? readParameterOrContext(context, TEMPLATE_PARAM, null, false) : prefs.template;
     if (template != null && template.hashCode() != 0) {
       String file = prefs.templateDirectory + "/" + template;
       prefs.templateEngine.render(context, file, res -> {
@@ -221,6 +245,97 @@ public class MailController extends AbstractController {
       });
     } else {
       handler.handle(Future.succeededFuture(email));
+    }
+  }
+
+  private static final Pattern IMG_PATTERN = Pattern.compile("(<img [^>]*src=\")([^\"]+)(\"[^>]*>)");
+
+  /**
+   * Replaces src-attributes of img-tags with cid to represent the correct inline-attachment
+   * 
+   * @param msg
+   * @param textValue
+   * @param helper
+   */
+  public void parseInlineMessage(RoutingContext context, MailMessage msg, Handler<AsyncResult<Void>> handler) {
+    List<MailAttachment> attachments = new ArrayList<>();
+    int counter = 0;
+    String imgKeyName = "img";
+    StringBuffer result = new StringBuffer();
+
+    // group1: everything before the image src, group2:filename inside the "" of the src element, group4: everything
+    // after the image src
+    Matcher matcher = IMG_PATTERN.matcher(msg.getHtml());
+    while (matcher.find()) {
+      String imageSource = matcher.group(2);
+      StringBuilder cid = new StringBuilder(imgKeyName);
+      cid.append(counter++);
+      String extension = FilenameUtils.getExtension(imageSource);
+      if (extension != null)
+        cid.append(".").append(extension);
+
+      URI imgUrl = makeAbsoluteURI(context, imageSource);
+      if (imgUrl != null) {
+        String cidName = cid.toString();
+        MailAttachment attachment = createAttachment(context, imgUrl, cidName);
+        matcher.appendReplacement(result, "$1cid:" + cidName + "$3");
+        attachments.add(attachment);
+      } else {
+        matcher.appendReplacement(result, "$0");
+      }
+    }
+    matcher.appendTail(result);
+    msg.setHtml(result.toString());
+    CounterObject co = new CounterObject<>(attachments.size(), handler);
+    for (MailAttachment attachment : attachments) {
+      readData(context, (UriMailAttachment) attachment, rr -> {
+        if (rr.failed()) {
+          co.setThrowable(rr.cause());
+        } else {
+          if (co.reduce()) {
+            msg.setAttachment(attachments);
+            handler.handle(Future.succeededFuture());
+          }
+        }
+      });
+      if (co.isError()) {
+        break;
+      }
+    }
+
+  }
+
+  private MailAttachment createAttachment(RoutingContext context, URI uri, String cidName) {
+    UriMailAttachment attachment = new UriMailAttachment(uri);
+    attachment.setContentType(getContentType(context, uri));
+    attachment.setDisposition("inline");
+    return attachment;
+  }
+
+  private void readData(RoutingContext context, UriMailAttachment attachment, Handler<AsyncResult<Void>> handler) {
+    HttpClientRequest req = httpClient.request(HttpMethod.GET, attachment.getUri().toString(), resp -> {
+      resp.bodyHandler(buff -> {
+        try {
+          attachment.setData(buff);
+          handler.handle(Future.succeededFuture());
+        } catch (Exception e) {
+          handler.handle(Future.failedFuture(e));
+        }
+      });
+    });
+    req.end();
+  }
+
+  private static String getContentType(RoutingContext context, URI uri) {
+    return null;
+  }
+
+  private static URI makeAbsoluteURI(RoutingContext context, String url) {
+    URI ret = URI.create(url);
+    if (ret.isAbsolute()) {
+      return ret;
+    } else {
+      throw new UnsupportedOperationException("image urls must be absolute");
     }
   }
 
@@ -243,6 +358,8 @@ public class MailController extends AbstractController {
   @Override
   public void initProperties(Properties properties) {
     prefs = createMailPreferences(properties);
+    httpClient = getVertx().createHttpClient();
+    inline = Boolean.valueOf(readProperty(INLINE_PROP, "true", false));
   }
 
   /**
@@ -268,6 +385,7 @@ public class MailController extends AbstractController {
   public static Properties getDefaultProperties() {
     Properties json = new Properties();
     json.put(FROM_PARAM, "address@sender.com");
+    json.put(INLINE_PROP, "true");
     json.put(ThymeleafTemplateController.TEMPLATE_MODE_PROPERTY, ThymeleafTemplateEngine.DEFAULT_TEMPLATE_MODE);
     json.put(ThymeleafTemplateController.CACHE_ENABLED_PROPERTY, "true");
     json.put(ThymeleafTemplateController.TEMPLATE_DIRECTORY_PROPERTY,
