@@ -48,32 +48,46 @@ public class DisplayAction extends AbstractAction {
   @Override
   void handle(String entityName, RoutingContext context, CaptureMap map, Handler<AsyncResult<Void>> handler) {
     IMapper mapper = getMapper(entityName);
-    String id = map.get(PersistenceController.ID_KEY);
+    String id = map.get(PersistenceController.ID_CAPTURE_KEY);
     if (id == null) {
-      handleList(entityName, context, mapper, id, handler);
+      handleList(entityName, context, map, mapper, id, handler);
     } else {
       handleSingleRecord(entityName, context, mapper, id, handler);
     }
   }
 
-  protected void handleList(String entityName, RoutingContext context, IMapper mapper, String id,
+  protected void handleList(String entityName, RoutingContext context, CaptureMap map, IMapper mapper, String id,
       Handler<AsyncResult<Void>> handler) {
     IQuery<?> query = getPersistenceController().getNetRelay().getDatastore().createQuery(mapper.getMapperClass());
-    query.execute(result -> {
-      if (result.failed()) {
-        handler.handle(Future.failedFuture(result.cause()));
-      } else {
-        IQueryResult<?> qr = result.result();
-        qr.toArray(arr -> {
-          if (arr.failed()) {
-            handler.handle(Future.failedFuture(arr.cause()));
-          } else {
-            addToContext(context, entityName, Arrays.asList(arr.result()));
-            handler.handle(Future.succeededFuture());
-          }
-        });
+    try {
+      if (map.containsKey(PersistenceController.SELECTION_SIZE_CAPTURE_KEY)) {
+        query.setLimit(Integer.parseInt(map.get(PersistenceController.SELECTION_SIZE_CAPTURE_KEY)));
       }
-    });
+      if (map.containsKey(PersistenceController.SELECTION_START_CAPTURE_KEY)) {
+        query.setStart(Integer.parseInt(map.get(PersistenceController.SELECTION_START_CAPTURE_KEY)));
+      }
+      if (map.containsKey(PersistenceController.ORDERBY_CAPTURE_KEY)) {
+        query.setOrderBy(map.get(PersistenceController.ORDERBY_CAPTURE_KEY));
+      }
+
+      query.execute(result -> {
+        if (result.failed()) {
+          handler.handle(Future.failedFuture(result.cause()));
+        } else {
+          IQueryResult<?> qr = result.result();
+          qr.toArray(arr -> {
+            if (arr.failed()) {
+              handler.handle(Future.failedFuture(arr.cause()));
+            } else {
+              addToContext(context, entityName, Arrays.asList(arr.result()));
+              handler.handle(Future.succeededFuture());
+            }
+          });
+        }
+      });
+    } catch (Exception e) {
+      handler.handle(Future.failedFuture(e));
+    }
   }
 
   protected void handleSingleRecord(String entityName, RoutingContext context, IMapper mapper, String id,

@@ -37,11 +37,14 @@ import io.vertx.ext.web.RoutingContext;
  * <br/>
  * possible paramters are:
  * <br/>
- * {@value #MAPPER_KEY}<br/>
- * {@value #ID_KEY}<br/>
- * {@value #ACTION_KEY}<br/>
- * {@value #UPLOAD_DIRECTORY_PROP}<br/>
- * {@value #UPLOAD_RELATIVE_PATH_PROP}<br/>
+ * {@value #MAPPER_CAPTURE_KEY} - the name of the parameter, which specifies the mapper to be used<br/>
+ * {@value #ID_CAPTURE_KEY} - the name of the parameter, which specifies the id of a record<br/>
+ * {@value #ACTION_CAPTURE_KEY} - possible actions are defined by {@link Action}<br/>
+ * {@value #UPLOAD_DIRECTORY_PROP} - The name of the property, which defines the directory, where uploaded files are
+ * transferred into. This can be "webroot/images/" for instance<br/>
+ * {@value #UPLOAD_RELATIVE_PATH_PROP} - The name of the property, which defines the relative path for uploaded files.
+ * If the {@link #UPLOAD_DIRECTORY_PROP} is defined as "webroot/images/" for instance, then the relative path here could
+ * be "images/"<br/>
  * 
  * Further parameters {@link AbstractCaptureController}
  * 
@@ -67,15 +70,33 @@ public class PersistenceController extends AbstractCaptureController {
   /**
    * The name of a the property in the request, which specifies the mapper
    */
-  public static final String MAPPER_KEY = "mapper";
+  public static final String MAPPER_CAPTURE_KEY = "mapper";
+
   /**
    * The name of the property in the request, which specifies the ID of a record
    */
-  public static final String ID_KEY = "ID";
+  public static final String ID_CAPTURE_KEY = "ID";
+
+  /**
+   * The name of the property in the request, which defines the number of records of a selection. This property is used
+   * in case of action display, when a list of records shall be displayed
+   */
+  public static final String SELECTION_SIZE_CAPTURE_KEY = "selectionSize";
+
+  /**
+   * The name of the property in the request, which defines the start of a selection
+   */
+  public static final String SELECTION_START_CAPTURE_KEY = "selectionStart";
+
+  /**
+   * The name of the property in the request, which defines the fields to sort a selection
+   */
+  public static final String ORDERBY_CAPTURE_KEY = "orderBy";
+
   /**
    * The name of the property in the request, which specifies the action
    */
-  public static final String ACTION_KEY = "action";
+  public static final String ACTION_CAPTURE_KEY = "action";
 
   private IMapperFactory mapperFactory;
 
@@ -114,14 +135,14 @@ public class PersistenceController extends AbstractCaptureController {
 
   private void handle(RoutingContext context, CaptureMap map, Handler<AsyncResult<Void>> handler) {
     AbstractAction action = resolveAction(map);
-    String mapperName = map.get(PersistenceController.MAPPER_KEY);
+    String mapperName = map.get(PersistenceController.MAPPER_CAPTURE_KEY);
 
     LOGGER.info(String.format("handling action %s on mapper %s", action, mapperName));
     action.handle(mapperName, context, map, handler);
   }
 
   private AbstractAction resolveAction(CaptureMap map) {
-    String actionKey = map.get(ACTION_KEY);
+    String actionKey = map.get(ACTION_CAPTURE_KEY);
     Action action = actionKey == null ? Action.DISPLAY : Action.valueOf(actionKey);
     switch (action) {
     case DISPLAY:
@@ -187,9 +208,13 @@ public class PersistenceController extends AbstractCaptureController {
 
   private static CaptureCollection[] createDefaultCaptureCollection() {
     CaptureDefinition[] defs = new CaptureDefinition[3];
-    defs[0] = new CaptureDefinition("entity", PersistenceController.MAPPER_KEY, false);
-    defs[1] = new CaptureDefinition("ID", PersistenceController.ID_KEY, false);
-    defs[2] = new CaptureDefinition("action", PersistenceController.ACTION_KEY, false);
+    defs[0] = new CaptureDefinition("entity", PersistenceController.MAPPER_CAPTURE_KEY, false);
+    defs[1] = new CaptureDefinition("ID", PersistenceController.ID_CAPTURE_KEY, false);
+    defs[2] = new CaptureDefinition("action", PersistenceController.ACTION_CAPTURE_KEY, false);
+    defs[3] = new CaptureDefinition("selectionSize", PersistenceController.SELECTION_SIZE_CAPTURE_KEY, false);
+    defs[4] = new CaptureDefinition("selectionStart", PersistenceController.SELECTION_START_CAPTURE_KEY, false);
+    defs[5] = new CaptureDefinition("orderBy", PersistenceController.ORDERBY_CAPTURE_KEY, false);
+
     CaptureCollection collection = new CaptureCollection();
     collection.setCaptureDefinitions(defs);
     CaptureCollection[] cc = new CaptureCollection[] { collection };

@@ -268,12 +268,8 @@ public class MailController extends AbstractController {
       Matcher matcher = IMG_PATTERN.matcher(msg.getHtml());
       while (matcher.find()) {
         String imageSource = matcher.group(2);
-        StringBuilder cid = new StringBuilder(imgKeyName);
-        cid.append(counter++);
+        String cid = getContentId();
         String extension = FilenameUtils.getExtension(imageSource);
-        if (extension != null)
-          cid.append(".").append(extension);
-
         URI imgUrl = makeAbsoluteURI(context, imageSource);
         if (imgUrl != null) {
           String cidName = cid.toString();
@@ -311,8 +307,33 @@ public class MailController extends AbstractController {
     }
   }
 
+  private static int seq;
+  private static String hostname = "localhost";
+
+  /**
+   * Sequence goes from 0 to 100K, then starts up at 0 again. This is large enough,
+   * and saves
+   * 
+   * @return
+   */
+  public static synchronized int getSeq() {
+    return (seq++) % 100000;
+  }
+
+  /**
+   * One possible way to generate very-likely-unique content IDs.
+   * 
+   * @return A content id that uses the hostname, the current time, and a sequence number
+   *         to avoid collision.
+   */
+  public static String getContentId() {
+    int c = getSeq();
+    return c + "." + System.currentTimeMillis() + "@" + hostname;
+  }
+
   private static MailAttachment createAttachment(RoutingContext context, URI uri, String cidName) {
     UriMailAttachment attachment = new UriMailAttachment(uri);
+    attachment.setName(cidName);
     attachment.setContentType(getContentType(context, uri));
     attachment.setDisposition("inline");
     return attachment;
@@ -320,14 +341,10 @@ public class MailController extends AbstractController {
 
   private static void readData(RoutingContext context, MailPreferences prefs, UriMailAttachment attachment,
       Handler<AsyncResult<Void>> handler) {
-    String url = attachment.getUri().toString();
-    HttpClientRequest req = prefs.httpClient.request(HttpMethod.GET, url, resp -> {
-
-      resp.exceptionHandler(ex -> {
-        ex.printStackTrace();
-      });
-      LOGGER.info(resp.statusCode());
-
+    URI uri = attachment.getUri();
+    HttpClient client = prefs.httpClient;
+    int port = uri.getPort() > 0 ? uri.getPort() : 80;
+    HttpClientRequest req = client.request(HttpMethod.GET, port, uri.getHost(), uri.getPath(), resp -> {
       resp.bodyHandler(buff -> {
         try {
           attachment.setData(buff);
@@ -342,11 +359,15 @@ public class MailController extends AbstractController {
   }
 
   private static String getContentType(RoutingContext context, URI uri) {
+    if (uri.getPath().endsWith(".png")) {
+      return "image/png";
+    }
     return null;
   }
 
   private static URI makeAbsoluteURI(RoutingContext context, String url) {
     URI ret = URI.create(url);
+
     if (ret.isAbsolute()) {
       return ret;
     } else {

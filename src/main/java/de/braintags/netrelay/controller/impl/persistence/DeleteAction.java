@@ -41,7 +41,7 @@ public class DeleteAction extends AbstractAction {
   @Override
   void handle(String entityName, RoutingContext context, CaptureMap captureMap, Handler<AsyncResult<Void>> handler) {
     IMapper mapper = getMapper(entityName);
-    String id = captureMap.get(PersistenceController.ID_KEY);
+    String id = captureMap.get(PersistenceController.ID_CAPTURE_KEY);
     IDataStore datastore = getPersistenceController().getNetRelay().getDatastore();
     IDelete<?> delete = datastore.createDelete(mapper.getMapperClass());
     IQuery query = getPersistenceController().getNetRelay().getDatastore().createQuery(mapper.getMapperClass());

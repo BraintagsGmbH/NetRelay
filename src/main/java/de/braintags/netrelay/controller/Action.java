@@ -20,10 +20,26 @@ package de.braintags.netrelay.controller;
  *
  */
 public enum Action {
+  /**
+   * request for an action to insert a record
+   */
   INSERT(),
+  /**
+   * request for an action to update a record
+   */
   UPDATE(),
+  /**
+   * request for an action to display a record or a list of records
+   */
   DISPLAY(),
+  /**
+   * request for an action to delete a record
+   */
   DELETE(),
+  /**
+   * request for an action to perform no action. This action could be used, if one template shall be used for inserting
+   * a new record and displaying the inserted result
+   */
   NONE();
 
 }

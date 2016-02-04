@@ -44,7 +44,7 @@ public class UpdateAction extends InsertAction {
   protected Map<String, String> extractProperties(String entityName, CaptureMap captureMap, RoutingContext context,
       IMapper mapper) {
     Map<String, String> map = super.extractProperties(entityName, captureMap, context, mapper);
-    String id = captureMap.get(PersistenceController.ID_KEY);
+    String id = captureMap.get(PersistenceController.ID_CAPTURE_KEY);
     if (id == null || id.hashCode() == 0) {
       throw new ParameterRequiredException("ID");
     }

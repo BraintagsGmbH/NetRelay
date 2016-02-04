@@ -125,6 +125,11 @@ public class TPersistenceController_Display extends AbstractPersistenceControlle
     context.fail(new UnsupportedOperationException());
   }
 
+  @Test
+  public void testDisplayList_Sorted(TestContext context) {
+    context.fail(new UnsupportedOperationException());
+  }
+
   /*
    * (non-Javadoc)
    * 

@@ -140,7 +140,7 @@ public class InsertAction extends AbstractAction {
    * current request
    * 
    * @param entityName
-   *          the name, like it was specified by the parameter {@link PersistenceController#MAPPER_KEY}
+   *          the name, like it was specified by the parameter {@link PersistenceController#MAPPER_CAPTURE_KEY}
    * @param captureMap
    *          the resolved capture parameters for the current request
    * @param context

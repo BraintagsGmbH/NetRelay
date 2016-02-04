@@ -36,7 +36,23 @@ import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
 /**
- * A controller, which
+ * A controller, which generates the input for a jquery datatable
+ * 
+ * <br/>
+ * <br/>
+ * Config-Parameter:<br/>
+ * <br>
+ * 
+ * Request-Parameter:<br/>
+ * <UL>
+ * <LI>{@value #MAPPER_KEY} - the name of the property, which specifies the mapper to be used
+ * </UL>
+ * <br/>
+ * 
+ * Result-Parameter:<br/>
+ * sends the result as Json in the required form
+ * <br/>
+ * 
  * 
  * @author Michael Remme
  * 
@@ -92,7 +108,6 @@ public class DataTablesController extends AbstractController {
           });
         }
       });
-
     }
   }
 

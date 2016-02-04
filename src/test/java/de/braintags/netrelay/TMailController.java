@@ -35,6 +35,7 @@ import io.vertx.ext.unit.TestContext;
 public class TMailController extends NetRelayBaseTest {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(TMailController.class);
+  // public static final String TESTS_RECIPIENT = "martin.rau@braintags.de";
   public static final String TESTS_RECIPIENT = "mremme@braintags.de";
   public static final String TEST_IMAGE_URI = "http://www.braintags.de/images/design/logo.png";
 
@@ -46,7 +47,7 @@ public class TMailController extends NetRelayBaseTest {
       testRequest(context, HttpMethod.POST, url, req -> {
         Buffer buffer = Buffer.buffer();
         buffer.appendString("to=" + TESTS_RECIPIENT);
-        buffer.appendString("&subject=").appendString(RequestUtil.encodeText("TEstnachrich per mail"));
+        buffer.appendString("&subject=").appendString(RequestUtil.encodeText("Test sendSimpleMail"));
         buffer.appendString("&mailText=").appendString(RequestUtil.encodeText("super cleverer text als nachricht"));
 
         req.headers().set("content-length", String.valueOf(buffer.length()));
@@ -70,7 +71,7 @@ public class TMailController extends NetRelayBaseTest {
       testRequest(context, HttpMethod.POST, url, req -> {
         Buffer buffer = Buffer.buffer();
         buffer.appendString("to=" + TESTS_RECIPIENT);
-        buffer.appendString("&subject=").appendString(RequestUtil.encodeText("TEstnachrich per mail"));
+        buffer.appendString("&subject=").appendString(RequestUtil.encodeText("Test sendHtmlMessage"));
         buffer.appendString("&mailText=").appendString(RequestUtil.encodeText("super cleverer text als nachricht"));
         buffer.appendString("&htmlText=")
             .appendString(RequestUtil.encodeText("this is html text <a href=\"braintags.de\">braintags.de</a>"));
@@ -96,11 +97,11 @@ public class TMailController extends NetRelayBaseTest {
       testRequest(context, HttpMethod.POST, url, req -> {
         Buffer buffer = Buffer.buffer();
         buffer.appendString("to=" + TESTS_RECIPIENT);
-        buffer.appendString("&subject=").appendString(RequestUtil.encodeText("TEstnachrich per mail"));
-        buffer.appendString("&mailText=").appendString(RequestUtil.encodeText("super cleverer text als nachricht"));
+        buffer.appendString("&subject=").appendString(RequestUtil.encodeText("Test sendHtmlMessageWithInlineImage"));
+        // buffer.appendString("&mailText=").appendString(RequestUtil.encodeText("super cleverer text als nachricht"));
         buffer.appendString("&htmlText=").appendString(
             RequestUtil.encodeText("this is html text <a href=\"braintags.de\">braintags.de</a> with an <img src=\""
-                + TEST_IMAGE_URI + "\">here is an image<img/>"));
+                + TEST_IMAGE_URI + "\"/>"));
 
         req.headers().set("content-length", String.valueOf(buffer.length()));
         req.headers().set("content-type", "application/x-www-form-urlencoded");
@@ -123,7 +124,7 @@ public class TMailController extends NetRelayBaseTest {
       testRequest(context, HttpMethod.POST, url, req -> {
         Buffer buffer = Buffer.buffer();
         buffer.appendString("to=" + TESTS_RECIPIENT);
-        buffer.appendString("&subject=").appendString(RequestUtil.encodeText("TEstnachrich per mail"));
+        buffer.appendString("&subject=").appendString(RequestUtil.encodeText("Test sendHtmlMessageByTemplate"));
         buffer.appendString("&mailText=").appendString(RequestUtil.encodeText("super cleverer text als nachricht"));
         buffer.appendString("&template=").appendString(RequestUtil.encodeText("mailing/customerMail.html"));
 
