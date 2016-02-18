@@ -138,6 +138,8 @@ public class PersistenceController extends AbstractCaptureController {
     String mapperName = map.get(PersistenceController.MAPPER_CAPTURE_KEY);
 
     LOGGER.info(String.format("handling action %s on mapper %s", action, mapperName));
+    LOGGER.info("REQUEST-PARAMS: " + context.request().params().toString());
+    LOGGER.info("FORM_PARAMS: " + context.request().formAttributes().toString());
     action.handle(mapperName, context, map, handler);
   }
 
