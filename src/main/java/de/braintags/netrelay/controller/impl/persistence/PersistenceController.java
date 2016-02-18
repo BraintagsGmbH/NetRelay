@@ -207,7 +207,7 @@ public class PersistenceController extends AbstractCaptureController {
   }
 
   private static CaptureCollection[] createDefaultCaptureCollection() {
-    CaptureDefinition[] defs = new CaptureDefinition[3];
+    CaptureDefinition[] defs = new CaptureDefinition[6];
     defs[0] = new CaptureDefinition("entity", PersistenceController.MAPPER_CAPTURE_KEY, false);
     defs[1] = new CaptureDefinition("ID", PersistenceController.ID_CAPTURE_KEY, false);
     defs[2] = new CaptureDefinition("action", PersistenceController.ACTION_CAPTURE_KEY, false);
