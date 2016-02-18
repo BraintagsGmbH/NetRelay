@@ -30,7 +30,9 @@ import de.braintags.netrelay.routing.RouterDefinition;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
+import io.vertx.core.http.CaseInsensitiveHeaders;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientRequest;
 import io.vertx.core.http.HttpMethod;
@@ -45,7 +47,7 @@ import io.vertx.ext.web.templ.ThymeleafTemplateEngine;
 
 /**
  * A controller which is sending mails by using the {@link NetRelay#getMailClient()}. As a reply a JsonObject with the
- * result will be sent.
+ * result will be sent. ff
  * 
  * <pre>
  * config:
@@ -273,7 +275,7 @@ public class MailController extends AbstractController {
         URI imgUrl = makeAbsoluteURI(context, imageSource);
         if (imgUrl != null) {
           String cidName = cid.toString();
-          MailAttachment attachment = createAttachment(context, imgUrl, cidName);
+          MailAttachment attachment = createInlineAttachment(context, imgUrl, cidName);
           matcher.appendReplacement(result, "$1cid:" + cidName + "$3");
           attachments.add(attachment);
         } else {
@@ -292,7 +294,7 @@ public class MailController extends AbstractController {
               co.setThrowable(rr.cause());
             } else {
               if (co.reduce()) {
-                msg.setAttachment(attachments);
+                msg.setInlineAttachment(attachments);
                 handler.handle(Future.succeededFuture(msg));
               }
             }
@@ -331,11 +333,14 @@ public class MailController extends AbstractController {
     return c + "." + System.currentTimeMillis() + "@" + hostname;
   }
 
-  private static MailAttachment createAttachment(RoutingContext context, URI uri, String cidName) {
+  private static MailAttachment createInlineAttachment(RoutingContext context, URI uri, String cidName) {
     UriMailAttachment attachment = new UriMailAttachment(uri);
     attachment.setName(cidName);
     attachment.setContentType(getContentType(context, uri));
     attachment.setDisposition("inline");
+    MultiMap headers = new CaseInsensitiveHeaders();
+    headers.add("Content-ID", "<" + cidName + ">");
+    attachment.setHeaders(headers);
     return attachment;
   }
 
