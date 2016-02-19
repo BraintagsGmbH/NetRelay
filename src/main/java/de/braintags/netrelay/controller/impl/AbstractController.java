@@ -26,6 +26,31 @@ import io.vertx.ext.web.RoutingContext;
 /**
  * An abstract implementation of {@link IController}
  * 
+ * <br/>
+ * Documentation Template for Controllers:<br/>
+ * Config-Parameter:<br/>
+ * possible parameters, which are read from the configuration
+ * <UL>
+ * <LI>parameter1 - describe the sense of the parameter
+ * <LI>parameter2 - describe the sense of the parameter
+ * </UL>
+ * <br>
+ * 
+ * Request-Parameter:<br/>
+ * possible parameters, which are read from a request
+ * <UL>
+ * <LI>parameter1 - describe the sense of the parameter
+ * <LI>parameter2 - describe the sense of the parameter
+ * </UL>
+ * <br/>
+ * 
+ * Result-Parameter:<br/>
+ * possible paramters, which will be placed into the context
+ * <UL>
+ * <LI>parameter1 - describe the content, which is stored under the given parameter name
+ * </UL>
+ * <br/>
+ * 
  * @author Michael Remme
  * 
  */

@@ -12,26 +12,18 @@
  */
 package de.braintags.netrelay.model;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import io.vertx.core.MultiMap;
 import io.vertx.core.http.HttpServerRequest;
 
 /**
- * RegisterClaim stores all information about a registration, performed by a customer or member.
+ * RegisterClaim stores all information about a registration, performed by an {@link IAuthenticatable} ( Member etc ).
  * It is used as source to send the double opt in message and to improve the registration, when the user clicked the
  * link sent by the double opt in process
  * 
  * @author Michael Remme
  * 
  */
-public class RegisterClaim extends AbstractRecord {
-  public String email;
+public class RegisterClaim extends PasswordLostClaim {
   public String password;
-  public boolean active = true;
-  public IAuthenticatable user;
-  public Map<String, String> requestParameter = new HashMap<>();
 
   public RegisterClaim() {
   }
@@ -42,14 +34,8 @@ public class RegisterClaim extends AbstractRecord {
    * @param request
    */
   public RegisterClaim(String email, String password, HttpServerRequest request) {
-    this.email = email;
+    super(email, request);
     this.password = password;
-    transfer(request.formAttributes(), requestParameter);
-    transfer(request.params(), requestParameter);
-  }
-
-  private void transfer(MultiMap mm, Map<String, String> destination) {
-    mm.entries().forEach(entry -> destination.put(entry.getKey(), entry.getValue()));
   }
 
 }

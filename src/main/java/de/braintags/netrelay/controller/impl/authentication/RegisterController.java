@@ -151,7 +151,7 @@ public class RegisterController extends AbstractController {
 
   /**
    * The name of the class - as instance of {@link IAuthenticatable} - which will be used to save a successful and
-   * improved registration
+   * improved registration as {@link Member} for instance
    */
   public static final String AUTHENTICATABLE_CLASS_PROP = "authenticatableClass";
 
@@ -463,7 +463,7 @@ public class RegisterController extends AbstractController {
     def.setBlocking(false);
     def.setController(RegisterController.class);
     def.setHandlerProperties(getDefaultProperties());
-    def.setRoutes(new String[] { "/customer/doRegister" });
+    def.setRoutes(new String[] { "/customer/doRegister", "/customer/verifyRegistration" });
     return def;
   }
 
