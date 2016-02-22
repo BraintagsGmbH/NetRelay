@@ -223,7 +223,8 @@ public class PasswordLostController extends AbstractController {
     } else if (hasParameter(context, VALIDATION_ID_PARAM)) {
       passwordLostConfirm(context);
     } else {
-      context.fail(new IllegalArgumentException("invalid action for password lost process"));
+      context.put(RESET_ERROR_PARAM, PasswordLostCode.INVALID_ACTION.toString());
+      context.reroute(failUrl);
     }
   }
 

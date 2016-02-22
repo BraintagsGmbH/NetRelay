@@ -29,6 +29,7 @@ import de.braintags.netrelay.controller.impl.ThymeleafTemplateController;
 import de.braintags.netrelay.controller.impl.TimeoutController;
 import de.braintags.netrelay.controller.impl.api.MailController;
 import de.braintags.netrelay.controller.impl.authentication.AuthenticationController;
+import de.braintags.netrelay.controller.impl.authentication.PasswordLostController;
 import de.braintags.netrelay.controller.impl.authentication.RegisterController;
 import de.braintags.netrelay.controller.impl.persistence.PersistenceController;
 import de.braintags.netrelay.init.MailClientSettings;
@@ -244,6 +245,7 @@ public abstract class NetRelay extends AbstractVerticle {
     settings.getRouterDefinitions().add(StaticController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(AuthenticationController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(RegisterController.createDefaultRouterDefinition());
+    settings.getRouterDefinitions().add(PasswordLostController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(CurrentMemberController.createDefaultRouterDefinition());
 
     settings.getRouterDefinitions().addAfter(BodyController.class.getSimpleName(),

@@ -27,5 +27,9 @@ public enum PasswordLostCode {
   EMAIL_REQUIRED,
   NO_ACCOUNT,
   CONFIRMATION_FAILURE,
-  INVALID_EMAIL;
+  INVALID_EMAIL,
+  /**
+   * the action could not be recognized
+   */
+  INVALID_ACTION;
 }
