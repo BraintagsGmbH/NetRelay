@@ -117,13 +117,17 @@ import io.vertx.ext.web.RoutingContext;
  * Result-Parameter:<br/>
  * possible paramters, which will be placed into the context
  * <UL>
- * <LI>{@value #RESET_ERROR_PARAM} the parameter, where an error String of a failed registration is stored in
- * the context. The codes are defined by {@link RegistrationCode}
- * <LI>{@value #MAIL_SEND_RESULT_PROP} if sending tóf the confirmation mail failed, it is stored under this property
- * <LI>{@value #VALIDATION_ID_PARAM} - on a successfull create action, the ID of {@link PasswordLostClaim} is stored
+ * <LI>{@value #AUTHENTICATABLE_PROP} - in step 1 and 2, if successfull, the Member etc. is stored under this property
+ * <LI>{@value #RESET_ERROR_PARAM} if an error occured in Step 1 or 2, the code of the error is stored under this
+ * property. Possible codes are defined by {@link PasswordLostCode}
+ * <LI>{@value #MAIL_SEND_RESULT_PROP} STEPT 1 - if sending of the confirmation mail failed, it is stored under this
+ * property
+ * <LI>{@value #VALIDATION_ID_PARAM} - STEP 1 - on a successfull create action, the ID of {@link PasswordLostClaim} is
+ * stored
  * here and the request is redirected to the success page, where the confirmation mail is created and sent. This
  * parameter is keeping the confirmation id, which must be integrated into the link
- * <LI>PasswordLostClaim - on a successfull create action, the {@link PasswordLostClaim} is stored here
+ * <LI>PasswordLostClaim - Step 1 - on a successfull create action, the {@link PasswordLostClaim} is stored here
+ * 
  * </UL>
  * <br/>
  * 
@@ -240,7 +244,7 @@ public class PasswordLostController extends AbstractController {
             } else {
               PasswordLostClaim rc = rcRes.result();
               LOGGER.info("Created PasswordLostClaim id is " + rc.id);
-              context.put(member.getClass().getSimpleName(), member);
+              context.put(AUTHENTICATABLE_PROP, member);
               addParameterToContext(context, rc);
               MailController.sendMail(context, getNetRelay().getMailClient(), mailPrefs, result -> {
                 MailController.MailSendResult msResult = result.result();
