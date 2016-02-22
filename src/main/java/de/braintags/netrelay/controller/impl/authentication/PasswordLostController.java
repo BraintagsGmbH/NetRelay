@@ -188,7 +188,7 @@ public class PasswordLostController extends AbstractController {
    * When the confirmation link was clicked, then the system fetches the instance of {@link IAuthenticatable}, like a
    * {@link Member}, and stores it under this property into the context
    */
-  public static final String AUTHENTICATABLE_PROP = "authentitcatable";
+  public static final String AUTHENTICATABLE_PROP = "authenticatable";
 
   /**
    * The name of the property which is used to store the {@link MailSendResult} in the context, if the mail sending
@@ -334,7 +334,7 @@ public class PasswordLostController extends AbstractController {
           if (qr.result().size() == 0) {
             handler.handle(Future.failedFuture(PasswordLostCode.NO_ACCOUNT.toString()));
           } else {
-            handler.handle((AsyncResult<IAuthenticatable>) Future.succeededFuture(qr.result().get(0)));
+            handler.handle(Future.succeededFuture((IAuthenticatable) qr.result().get(0)));
           }
         }
       });
