@@ -12,14 +12,12 @@
  */
 package de.braintags.netrelay.processor;
 
-import java.util.Properties;
-
 import de.braintags.netrelay.NetRelay;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 
 /**
- * 
+ * An IProcessor is a unit, which executes some actions in a time based manner
  * 
  * @author Michael Remme
  * 
@@ -27,11 +25,16 @@ import io.vertx.core.Vertx;
 public interface IProcessor extends Handler<Long> {
 
   /**
+   * Initializes the processor by using the given {@link ProcessorDefinition} and launches the processor as timer or
+   * periodic timer
+   * 
    * @param vertx
+   *          the instance of {@link Vertx} to be used
    * @param netRelay
-   * @param processorProperties
-   * @param name
+   *          the parent {@link NetRelay} to be used
+   * @param def
+   *          the definition, by which the behaviour of the processor is defined
    */
-  void init(Vertx vertx, NetRelay netRelay, Properties processorProperties, String name);
+  void init(Vertx vertx, NetRelay netRelay, ProcessorDefinition def);
 
 }

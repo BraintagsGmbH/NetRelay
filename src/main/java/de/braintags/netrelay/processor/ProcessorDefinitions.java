@@ -10,30 +10,30 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.netrelay.routing;
+package de.braintags.netrelay.processor;
 
 import java.util.ArrayList;
 
 import de.braintags.netrelay.init.Settings;
 
 /**
- * TimerDefinitions is a part of the {@link Settings} and defines the existing list of {@link TimerDefinition}
+ * ProcessorDefinitions is a part of the {@link Settings} and defines the existing list of {@link ProcessorDefinition}
  * 
  * @author Michael Remme
  * 
  */
-public class TimerDefinitions {
+public class ProcessorDefinitions {
 
-  private ArrayList<TimerDefinition> timerDefinitions = new ArrayList<>();
+  private ArrayList<ProcessorDefinition> processorDefinitions = new ArrayList<>();
 
   /**
    * Add a new definition at the end of the definitions
    * 
    * @param definition
-   *          the {@link TimerDefinition} to be added
+   *          the {@link ProcessorDefinition} to be added
    */
-  public void add(TimerDefinition definition) {
-    timerDefinitions.add(definition);
+  public void add(ProcessorDefinition definition) {
+    processorDefinitions.add(definition);
   }
 
   /**
@@ -42,10 +42,10 @@ public class TimerDefinitions {
    * @param position
    *          the position where to add the new element
    * @param definition
-   *          the {@link TimerDefinition} to be added
+   *          the {@link ProcessorDefinition} to be added
    */
-  public void add(int position, TimerDefinition definition) {
-    timerDefinitions.add(position, definition);
+  public void add(int position, ProcessorDefinition definition) {
+    processorDefinitions.add(position, definition);
   }
 
   /**
@@ -56,12 +56,12 @@ public class TimerDefinitions {
    * @param def
    *          the definition to be added
    */
-  public void addBefore(String definitionName, TimerDefinition def) {
+  public void addBefore(String definitionName, ProcessorDefinition def) {
     int position = getPosition(definitionName);
     if (position < 0) {
       throw new IndexOutOfBoundsException("Could not find definition with name '" + definitionName + "'");
     }
-    timerDefinitions.add(position, def);
+    processorDefinitions.add(position, def);
   }
 
   /**
@@ -72,57 +72,61 @@ public class TimerDefinitions {
    * @param def
    *          the definition to be added
    */
-  public void addAfter(String definitionName, TimerDefinition def) {
+  public void addAfter(String definitionName, ProcessorDefinition def) {
     int position = getPosition(definitionName);
     if (position < 0) {
       throw new IndexOutOfBoundsException("Could not find definition with name '" + definitionName + "'");
     }
-    if (position + 1 > timerDefinitions.size()) {
-      timerDefinitions.add(def);
+    if (position + 1 > processorDefinitions.size()) {
+      processorDefinitions.add(def);
     } else {
-      timerDefinitions.add(position + 1, def);
+      processorDefinitions.add(position + 1, def);
     }
   }
 
   /**
-   * @return the routerDefinitions
+   * The list of {@link ProcessorDefinition}
+   * 
+   * @return the processorDefinitions
    */
-  public final ArrayList<TimerDefinition> getTimerDefinitions() {
-    return timerDefinitions;
+  public final ArrayList<ProcessorDefinition> getProcessorDefinitions() {
+    return processorDefinitions;
   }
 
   /**
-   * @param routerDefinitions
-   *          the routerDefinitions to set
+   * The list of {@link ProcessorDefinition}
+   * 
+   * @param processorDefinitions
+   *          the processorDefinitions to set
    */
-  public final void setTimerDefinitions(ArrayList<TimerDefinition> timerDefinitions) {
-    this.timerDefinitions = timerDefinitions;
+  public final void setProcessorDefinitions(ArrayList<ProcessorDefinition> processorDefinitions) {
+    this.processorDefinitions = processorDefinitions;
   }
 
   /**
-   * Remove the {@link TimerDefinition} with the specified name
+   * Remove the {@link ProcessorDefinition} with the specified name
    * 
    * @param defName
    *          the name of the definition to be removed
-   * @return the removed {@link TimerDefinition} or null
+   * @return the removed {@link ProcessorDefinition} or null
    */
-  public TimerDefinition remove(String defName) {
+  public ProcessorDefinition remove(String defName) {
     int position = getPosition(defName);
     if (position >= 0) {
-      return timerDefinitions.remove(position);
+      return processorDefinitions.remove(position);
     }
     return null;
   }
 
   /**
-   * Get the {@link TimerDefinition} with the specified name
+   * Get the {@link ProcessorDefinition} with the specified name
    * 
    * @param name
    *          the name of the definition to search for
    * @return a definition with the given name or null
    */
-  public TimerDefinition getNamedDefinition(String name) {
-    for (TimerDefinition def : timerDefinitions) {
+  public ProcessorDefinition getNamedDefinition(String name) {
+    for (ProcessorDefinition def : processorDefinitions) {
       if (def.getName().equals(name)) {
         return def;
       }
@@ -138,8 +142,8 @@ public class TimerDefinitions {
    * @return the position or -2 if not existing
    */
   public int getPosition(String name) {
-    for (int i = 0; i < timerDefinitions.size(); i++) {
-      TimerDefinition def = timerDefinitions.get(i);
+    for (int i = 0; i < processorDefinitions.size(); i++) {
+      ProcessorDefinition def = processorDefinitions.get(i);
       if (def.getName().equals(name)) {
         return i;
       }

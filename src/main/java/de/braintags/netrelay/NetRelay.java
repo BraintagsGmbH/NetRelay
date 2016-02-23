@@ -35,6 +35,7 @@ import de.braintags.netrelay.controller.impl.persistence.PersistenceController;
 import de.braintags.netrelay.init.MailClientSettings;
 import de.braintags.netrelay.init.Settings;
 import de.braintags.netrelay.mapping.NetRelayMapperFactory;
+import de.braintags.netrelay.processor.ProcessorDefinition;
 import de.braintags.netrelay.routing.RouterDefinition;
 import de.braintags.netrelay.routing.RoutingInit;
 import examples.mapper.SimpleNetRelayMapper;
@@ -100,7 +101,8 @@ public abstract class NetRelay extends AbstractVerticle {
       router = Router.router(vertx);
       mapperFactory = new NetRelayMapperFactory(this);
       initMailClient();
-      initControlller(router);
+      initController(router);
+      initProcessors(router);
       initHttpServer(router, result -> {
         if (result.failed()) {
           startFuture.fail(result.cause());
@@ -143,11 +145,23 @@ public abstract class NetRelay extends AbstractVerticle {
   }
 
   /**
+   * Init the definitions inside {@link Settings#getProcessorDefinitons()}
+   * 
+   * @throws Exception
+   */
+  protected void initProcessors(Router router) throws Exception {
+    List<ProcessorDefinition> rd = settings.getProcessorDefinitons().getProcessorDefinitions();
+    for (ProcessorDefinition def : rd) {
+      def.initProcessorDefinition(vertx, this);
+    }
+  }
+
+  /**
    * Init the definitions inside {@link Settings#getRouterDefinitions()}
    * 
    * @throws Exception
    */
-  protected void initControlller(Router router) throws Exception {
+  protected void initController(Router router) throws Exception {
     List<RouterDefinition> rd = settings.getRouterDefinitions().getRouterDefinitions();
     for (RouterDefinition def : rd) {
       RoutingInit.initRoutingDefinition(vertx, this, router, def);
@@ -230,9 +244,19 @@ public abstract class NetRelay extends AbstractVerticle {
   public Settings createDefaultSettings() {
     Settings settings = new Settings();
     addDefaultRouterDefinitions(settings);
+    addDefaultProcessorDefinitions(settings);
     settings.setDatastoreSettings(MongoDataStoreInit.createDefaultSettings());
     settings.getMappingDefinitions().addMapperDefinition("SimpleNetRelayMapper", SimpleNetRelayMapper.class);
     return settings;
+  }
+
+  protected void addDefaultProcessorDefinitions(Settings settings) {
+    ProcessorDefinition def = new ProcessorDefinition();
+    def.setActive(false);
+    def.setName("dummyprocessor");
+    def.getProcessorProperties().put("demoKey", "demoValue");
+    def.setTimeDef("60000");
+    settings.getProcessorDefinitons().add(def);
   }
 
   protected void addDefaultRouterDefinitions(Settings settings) {
@@ -280,7 +304,7 @@ public abstract class NetRelay extends AbstractVerticle {
    */
   public void resetRoutes() throws Exception {
     getRouter().clear();
-    initControlller(router);
+    initController(router);
   }
 
   /**

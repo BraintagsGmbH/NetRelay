@@ -15,6 +15,7 @@ package de.braintags.netrelay.init;
 import de.braintags.io.vertx.pojomapper.init.DataStoreSettings;
 import de.braintags.io.vertx.util.exception.InitException;
 import de.braintags.netrelay.NetRelay;
+import de.braintags.netrelay.processor.ProcessorDefinitions;
 import de.braintags.netrelay.routing.RouterDefinitions;
 import io.vertx.core.Context;
 import io.vertx.core.Vertx;
@@ -57,6 +58,7 @@ public class Settings {
   private String hostName = "localhost";
   private String defaultLoginPage = "/backend/login.html";
   private RouterDefinitions routerDefinitions = new RouterDefinitions();
+  private ProcessorDefinitions processorDefinitons = new ProcessorDefinitions();
   private DataStoreSettings datastoreSettings;
   private boolean edited = false;
   private MappingDefinitions mappingDefinitions = new MappingDefinitions();
@@ -98,6 +100,25 @@ public class Settings {
    */
   public final void setRouterDefinitions(RouterDefinitions routerDefinitions) {
     this.routerDefinitions = routerDefinitions;
+  }
+
+  /**
+   * The {@link ProcessorDefinitions} of the current settings
+   * 
+   * @return the processorDefinitons
+   */
+  public final ProcessorDefinitions getProcessorDefinitons() {
+    return processorDefinitons;
+  }
+
+  /**
+   * The {@link ProcessorDefinitions} of the current settings
+   * 
+   * @param processorDefinitons
+   *          the processorDefinitons to set
+   */
+  public final void setProcessorDefinitons(ProcessorDefinitions processorDefinitons) {
+    this.processorDefinitons = processorDefinitons;
   }
 
   /**

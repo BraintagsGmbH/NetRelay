@@ -23,6 +23,7 @@ import de.braintags.netrelay.RequestUtil;
 import de.braintags.netrelay.controller.impl.AbstractController;
 import de.braintags.netrelay.controller.impl.api.MailController;
 import de.braintags.netrelay.controller.impl.api.MailController.MailSendResult;
+import de.braintags.netrelay.controller.impl.persistence.PersistenceController;
 import de.braintags.netrelay.model.IAuthenticatable;
 import de.braintags.netrelay.model.Member;
 import de.braintags.netrelay.model.PasswordLostClaim;
@@ -66,8 +67,7 @@ import io.vertx.ext.web.RoutingContext;
  * <p>
  * confirmationPage?{@value #VALIDATION_ID_PARAM}=ID<br/>
  * The confirmation page can be any virtual page and must be defined as route for the PasswordLostController, so that it
- * is
- * reacting to it. The ID is the ID, which was stored before in the context.<br/>
+ * is reacting to it. The ID is the ID, which was stored before in the context.<br/>
  * </p>
  * 
  * After successfully processing the MailController, the success page, defined by {@value #REG_START_SUCCESS_URL_PROP},
@@ -79,10 +79,10 @@ import io.vertx.ext.web.RoutingContext;
  * instance of PasswordLostClaim, which was previously created, will fetch the IAuthenticatable from the datastore and
  * will store it under the property {@link #AUTHENTICATABLE_PROP} . After that it will call the success page, defined by
  * {@value #PW_RESET_SUCCESS_URL_PROP}. If anything failed, then the information about the error are stored under the
- * parameter {@value #RESET_ERROR_PARAM} inside the contenxt and the error page defined by
- * {@value #PW_RESET_FAIL_URL_PROP} is called.
- * 
- * 
+ * parameter {@value #RESET_ERROR_PARAM} inside the context and the error page defined by
+ * {@value #PW_RESET_FAIL_URL_PROP} is called. The success page will typically display a form, where the new password
+ * and a confirmation password can be entered and saved. The form then will refer to a page, where the
+ * {@link PersistenceController} is executed.
  * 
  * <br/>
  * <br/>

@@ -10,16 +10,16 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.netrelay.routing;
+package de.braintags.netrelay.processor;
 
 import java.util.Properties;
 
+import de.braintags.io.vertx.util.ExceptionUtil;
 import de.braintags.netrelay.NetRelay;
-import de.braintags.netrelay.processor.IProcessor;
 import io.vertx.core.Vertx;
 
 /**
- * A TimerDefinition defines, which {@link IProcessor} shall be periodically executed
+ * A ProcessorDefinition defines, which {@link IProcessor} shall be periodically executed
  * 
  * Currently the timeDef supports the following definitions:
  * <UL>
@@ -32,49 +32,49 @@ import io.vertx.core.Vertx;
  * @author Michael Remme
  * 
  */
-public class TimerDefinition {
+public class ProcessorDefinition {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(ProcessorDefinition.class);
+
   private boolean cancelOnError = false;
   private String timeDef;
   protected String name;
   private boolean active = true;
-  private Class<? extends IProcessor> processor;
+  private Class<? extends IProcessor> processorClass;
   private Properties processorProperties = new Properties();
+  private transient IProcessor processor;
 
   /**
-   * Initialize the given definition, so that it is executed regular like planned
+   * Create an instance of the defined IProcessor and init it with the current definition
    * 
    * @param vertx
    *          the instance of vertx to be used
    * @param netRelay
    *          the instance of NetRelay to be used
    */
-  public void initTimerDefinition(Vertx vertx, NetRelay netRelay) {
-    // IProcessor processor = instantiateProcessor(vertx, netRelay);
-
+  public void initProcessorDefinition(Vertx vertx, NetRelay netRelay) {
+    try {
+      if (active) {
+        LOGGER.info("initializing processor " + getName() + " | " + getProcessorClass().getName());
+        processor = getProcessorClass().newInstance();
+        processor.init(vertx, netRelay, this);
+      }
+    } catch (Exception e) {
+      throw ExceptionUtil.createRuntimeException(e);
+    }
   }
 
   /**
-   * Create an instance of the defined IProcessor and init it with the defined properties
+   * Defines, whether a processorClass shall be completely finished, if an error occured
    * 
-   * @return the intialized IProcessor
-   */
-  public IProcessor instantiateProcessor(Vertx vertx, NetRelay netRelay) throws Exception {
-    IProcessor processor = getProcessor().newInstance();
-    processor.init(vertx, netRelay, getProcessorProperties(), name);
-    return processor;
-  }
-
-  /**
-   * Defines, whether a timer shall be completely finished, if an error occured
-   * 
-   * @return true, if timer shall be finished
+   * @return true, if processorClass shall be finished on an error
    */
   public final boolean isCancelOnError() {
     return cancelOnError;
   }
 
   /**
-   * Defines, whether a timer shall be completely finished, if an error occured
+   * Defines, whether a processorClass shall be completely finished, if an error occured
    * 
    * @param cancelOnError
    *          the cancelOnError to set
@@ -84,7 +84,7 @@ public class TimerDefinition {
   }
 
   /**
-   * The definition of the time periode(s), where the timer shall be executed
+   * The definition of the time periode(s), where the processorClass shall be executed
    * 
    * @return the timeDef
    */
@@ -93,7 +93,7 @@ public class TimerDefinition {
   }
 
   /**
-   * The definition of the time periode(s), where the timer shall be executed
+   * The definition of the time periode(s), where the processorClass shall be executed
    * 
    * @param timeDef
    *          the timeDef to set
@@ -145,20 +145,20 @@ public class TimerDefinition {
   /**
    * Get the {@link IProcessor} which shall be executed
    * 
-   * @return the processor
+   * @return the processorClass
    */
-  public Class<? extends IProcessor> getProcessor() {
-    return processor;
+  public Class<? extends IProcessor> getProcessorClass() {
+    return processorClass;
   }
 
   /**
    * Set the {@link IProcessor} which shall be executed
    * 
-   * @param processor
-   *          the processor to set
+   * @param processorClass
+   *          the processorClass to set
    */
-  public final void setProcessor(Class<? extends IProcessor> processor) {
-    this.processor = processor;
+  public final void setProcessorClass(Class<? extends IProcessor> processor) {
+    this.processorClass = processor;
   }
 
   /**
