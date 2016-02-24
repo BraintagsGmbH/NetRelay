@@ -45,6 +45,7 @@ public abstract class AbstractProcessor implements IProcessor {
   @Override
   public void handle(Long timerId) {
     if (running) {
+      LOGGER.info("still running");
       return;
     } else {
       running = true;
@@ -60,6 +61,7 @@ public abstract class AbstractProcessor implements IProcessor {
           }
           running = false;
         } else {
+          LOGGER.info("successfully finished processor");
           running = false;
         }
       });

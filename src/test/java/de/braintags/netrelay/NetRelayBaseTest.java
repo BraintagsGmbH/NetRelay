@@ -29,6 +29,7 @@ import de.braintags.io.vertx.pojomapper.testdatastore.ResultContainer;
 import de.braintags.io.vertx.pojomapper.testdatastore.TestHelper;
 import de.braintags.io.vertx.util.ErrorObject;
 import de.braintags.io.vertx.util.ResultObject;
+import de.braintags.io.vertx.util.exception.InitException;
 import de.braintags.netrelay.controller.impl.ThymeleafTemplateController;
 import de.braintags.netrelay.impl.NetRelayExt_InternalSettings;
 import de.braintags.netrelay.init.MailClientSettings;
@@ -316,13 +317,22 @@ public class NetRelayBaseTest {
     List<String> cookies;
   }
 
+  // "-DmailClientUserName=dev-test@braintags.net -DmailClientPassword=thoo4ati "
   protected void initMailClient(Settings settings) {
+    String mailUserName = System.getProperty("mailClientUserName");
+    if (mailUserName == null || mailUserName.hashCode() == 0) {
+      throw new InitException("Need System parameter 'mailClientUserName'");
+    }
+    String mailClientPassword = System.getProperty("mailClientPassword");
+    if (mailClientPassword == null || mailClientPassword.hashCode() == 0) {
+      throw new InitException("Need System parameter 'mailClientPassword'");
+    }
     MailClientSettings ms = settings.getMailClientSettings();
     ms.setHostname("mail.braintags.net");
     ms.setPort(8025);
     ms.setName("mailclient");
-    ms.setUsername("dev-test@braintags.net");
-    ms.setPassword("thoo4ati");
+    ms.setUsername(mailUserName);
+    ms.setPassword(mailClientPassword);
     ms.setSsl(false);
     ms.setStarttls(StartTLSOptions.DISABLED);
     ms.setActive(true);
