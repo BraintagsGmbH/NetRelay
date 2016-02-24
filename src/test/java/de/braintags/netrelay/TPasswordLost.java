@@ -23,7 +23,6 @@ import de.braintags.netrelay.controller.impl.api.MailController;
 import de.braintags.netrelay.controller.impl.authentication.PasswordLostCode;
 import de.braintags.netrelay.controller.impl.authentication.PasswordLostController;
 import de.braintags.netrelay.controller.impl.authentication.RegisterController;
-import de.braintags.netrelay.init.MailClientSettings;
 import de.braintags.netrelay.init.Settings;
 import de.braintags.netrelay.model.Member;
 import de.braintags.netrelay.model.PasswordLostClaim;
@@ -31,7 +30,6 @@ import de.braintags.netrelay.model.RegisterClaim;
 import de.braintags.netrelay.routing.RouterDefinition;
 import de.braintags.netrelay.util.MultipartUtil;
 import io.vertx.core.http.HttpMethod;
-import io.vertx.ext.mail.StartTLSOptions;
 import io.vertx.ext.unit.TestContext;
 
 /**
@@ -183,7 +181,7 @@ public class TPasswordLost extends NetRelayBaseTest {
         .getNamedDefinition(PasswordLostController.class.getSimpleName());
     def.setRoutes(new String[] { LOST_START, LOST_CONFIRM });
     def.getHandlerProperties().put(PasswordLostController.PW_LOST_FAIL_URL_PROP, "/customer/passwordLostError.html");
-    def.getHandlerProperties().put(MailController.FROM_PARAM, "unknown@braintags.de");
+    def.getHandlerProperties().put(MailController.FROM_PARAM, TESTS_MAIL_FROM);
     def.getHandlerProperties().put(MailController.SUBJECT_PARAMETER, "Reset password");
     def.getHandlerProperties().put(MailController.TEMPLATE_PARAM, "/customer/passwordLostMail.html");
     def.getHandlerProperties().put(ThymeleafTemplateController.TEMPLATE_DIRECTORY_PROPERTY, "testTemplates");
@@ -201,15 +199,7 @@ public class TPasswordLost extends NetRelayBaseTest {
   @Override
   protected void modifySettings(TestContext context, Settings settings) {
     super.modifySettings(context, settings);
-    MailClientSettings ms = settings.getMailClientSettings();
-    ms.setHostname("mail.braintags.net");
-    ms.setPort(8025);
-    ms.setName("mailclient");
-    ms.setUsername("dev-test@braintags.net");
-    ms.setPassword("thoo4ati");
-    ms.setSsl(false);
-    ms.setStarttls(StartTLSOptions.DISABLED);
-    ms.setActive(true);
+    initMailClient(settings);
   }
 
 }

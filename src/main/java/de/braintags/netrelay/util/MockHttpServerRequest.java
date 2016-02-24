@@ -38,6 +38,9 @@ import io.vertx.core.net.SocketAddress;
  */
 public class MockHttpServerRequest implements HttpServerRequest {
   private final HttpServerResponse response;
+  private MultiMap params = MultiMap.caseInsensitiveMultiMap();
+  private MultiMap headers = MultiMap.caseInsensitiveMultiMap();
+  private MultiMap attributes = MultiMap.caseInsensitiveMultiMap();
 
   private URI uri;
 
@@ -166,27 +169,17 @@ public class MockHttpServerRequest implements HttpServerRequest {
    */
   @Override
   public MultiMap headers() {
-    return null;
+    return headers;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see io.vertx.core.http.HttpServerRequest#getHeader(java.lang.String)
-   */
   @Override
-  public @Nullable String getHeader(String headerName) {
-    return null;
+  public String getHeader(String headerName) {
+    return headers().get(headerName);
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see io.vertx.core.http.HttpServerRequest#getHeader(java.lang.CharSequence)
-   */
   @Override
   public String getHeader(CharSequence headerName) {
-    return null;
+    return headers().get(headerName);
   }
 
   /*
@@ -196,7 +189,7 @@ public class MockHttpServerRequest implements HttpServerRequest {
    */
   @Override
   public MultiMap params() {
-    return null;
+    return params;
   }
 
   /*
@@ -206,7 +199,7 @@ public class MockHttpServerRequest implements HttpServerRequest {
    */
   @Override
   public @Nullable String getParam(String paramName) {
-    return null;
+    return params().get(paramName);
   }
 
   /*
@@ -299,24 +292,14 @@ public class MockHttpServerRequest implements HttpServerRequest {
     return null;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see io.vertx.core.http.HttpServerRequest#formAttributes()
-   */
   @Override
   public MultiMap formAttributes() {
-    return null;
+    return attributes;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see io.vertx.core.http.HttpServerRequest#getFormAttribute(java.lang.String)
-   */
   @Override
-  public @Nullable String getFormAttribute(String attributeName) {
-    return null;
+  public String getFormAttribute(String attributeName) {
+    return formAttributes().get(attributeName);
   }
 
   /*

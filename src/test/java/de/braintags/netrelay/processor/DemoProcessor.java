@@ -12,9 +12,9 @@
  */
 package de.braintags.netrelay.processor;
 
-import de.braintags.netrelay.TProcessorDefs;
 import de.braintags.netrelay.processor.impl.AbstractProcessor;
 import io.vertx.core.Future;
+import io.vertx.ext.unit.Async;
 
 /**
  * 
@@ -27,6 +27,7 @@ public class DemoProcessor extends AbstractProcessor {
       .getLogger(DemoProcessor.class);
 
   public static final String DEMO_PROPERTY_KEY = "demoKey";
+  public static Async async;
 
   /*
    * (non-Javadoc)
@@ -49,6 +50,7 @@ public class DemoProcessor extends AbstractProcessor {
     LOGGER.info("executing processor");
     TProcessorDefs.eventProcessed = true;
     future.complete();
+    async.complete();
   }
 
 }

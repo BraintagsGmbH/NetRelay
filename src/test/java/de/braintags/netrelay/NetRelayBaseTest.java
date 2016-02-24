@@ -31,6 +31,7 @@ import de.braintags.io.vertx.util.ErrorObject;
 import de.braintags.io.vertx.util.ResultObject;
 import de.braintags.netrelay.controller.impl.ThymeleafTemplateController;
 import de.braintags.netrelay.impl.NetRelayExt_InternalSettings;
+import de.braintags.netrelay.init.MailClientSettings;
 import de.braintags.netrelay.init.Settings;
 import de.braintags.netrelay.model.Member;
 import de.braintags.netrelay.routing.RouterDefinition;
@@ -43,6 +44,7 @@ import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpClientRequest;
 import io.vertx.core.http.HttpClientResponse;
 import io.vertx.core.http.HttpMethod;
+import io.vertx.ext.mail.StartTLSOptions;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.Timeout;
@@ -59,6 +61,8 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 public class NetRelayBaseTest {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(NetRelayBaseTest.class);
+  public static final String TESTS_MAIL_RECIPIENT = "mremme@braintags.de";
+  public static final String TESTS_MAIL_FROM = "netrelayTesting@braintags.de";
 
   protected static Vertx vertx;
   protected static HttpClient client;
@@ -312,4 +316,15 @@ public class NetRelayBaseTest {
     List<String> cookies;
   }
 
+  protected void initMailClient(Settings settings) {
+    MailClientSettings ms = settings.getMailClientSettings();
+    ms.setHostname("mail.braintags.net");
+    ms.setPort(8025);
+    ms.setName("mailclient");
+    ms.setUsername("dev-test@braintags.net");
+    ms.setPassword("thoo4ati");
+    ms.setSsl(false);
+    ms.setStarttls(StartTLSOptions.DISABLED);
+    ms.setActive(true);
+  }
 }

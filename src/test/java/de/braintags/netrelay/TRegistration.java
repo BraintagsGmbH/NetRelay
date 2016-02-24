@@ -22,14 +22,12 @@ import de.braintags.netrelay.controller.impl.ThymeleafTemplateController;
 import de.braintags.netrelay.controller.impl.api.MailController;
 import de.braintags.netrelay.controller.impl.authentication.RegisterController;
 import de.braintags.netrelay.controller.impl.authentication.RegistrationCode;
-import de.braintags.netrelay.init.MailClientSettings;
 import de.braintags.netrelay.init.Settings;
 import de.braintags.netrelay.model.Member;
 import de.braintags.netrelay.model.RegisterClaim;
 import de.braintags.netrelay.routing.RouterDefinition;
 import de.braintags.netrelay.util.MultipartUtil;
 import io.vertx.core.http.HttpMethod;
-import io.vertx.ext.mail.StartTLSOptions;
 import io.vertx.ext.unit.TestContext;
 
 /**
@@ -189,7 +187,7 @@ public class TRegistration extends NetRelayBaseTest {
         .getNamedDefinition(RegisterController.class.getSimpleName());
     def.setRoutes(new String[] { REGISTER_URL, CUSTOMER_DO_CONFIRMATION });
     def.getHandlerProperties().put(RegisterController.REG_START_FAIL_URL_PROP, "/customer/registerError.html");
-    def.getHandlerProperties().put(MailController.FROM_PARAM, "unknown@braintags.de");
+    def.getHandlerProperties().put(MailController.FROM_PARAM, TESTS_MAIL_FROM);
     def.getHandlerProperties().put(MailController.SUBJECT_PARAMETER, "Please finish registration");
     def.getHandlerProperties().put(MailController.TEMPLATE_PARAM, "/customer/confirmationMail.html");
     def.getHandlerProperties().put(ThymeleafTemplateController.TEMPLATE_DIRECTORY_PROPERTY, "testTemplates");
@@ -199,15 +197,7 @@ public class TRegistration extends NetRelayBaseTest {
   @Override
   protected void modifySettings(TestContext context, Settings settings) {
     super.modifySettings(context, settings);
-    MailClientSettings ms = settings.getMailClientSettings();
-    ms.setHostname("mail.braintags.net");
-    ms.setPort(8025);
-    ms.setName("mailclient");
-    ms.setUsername("dev-test@braintags.net");
-    ms.setPassword("thoo4ati");
-    ms.setSsl(false);
-    ms.setStarttls(StartTLSOptions.DISABLED);
-    ms.setActive(true);
+    initMailClient(settings);
   }
 
 }

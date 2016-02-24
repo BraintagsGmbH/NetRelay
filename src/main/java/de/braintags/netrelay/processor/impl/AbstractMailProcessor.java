@@ -12,24 +12,24 @@
  */
 package de.braintags.netrelay.processor.impl;
 
+import de.braintags.netrelay.controller.impl.api.MailController;
+import de.braintags.netrelay.controller.impl.api.MailController.MailPreferences;
+import de.braintags.netrelay.controller.impl.api.MailController.MailSendResult;
 import de.braintags.netrelay.processor.IProcessor;
 import de.braintags.netrelay.processor.ProcessorDefinition;
-import io.vertx.core.Future;
+import io.vertx.core.AsyncResult;
+import io.vertx.core.Handler;
+import io.vertx.ext.web.RoutingContext;
 
 /**
  * An abstract implementation of an {@link IProcessor}, which is used to send emails, where the content is created by a
- * template
+ * template. The properties must contain the same than in the {@link MailController}
  * 
  * @author Michael Remme
  * 
  */
 public abstract class AbstractMailProcessor extends AbstractProcessor {
-
-  /**
-   * 
-   */
-  public AbstractMailProcessor() {
-  }
+  private MailPreferences mailPrefs;
 
   /*
    * (non-Javadoc)
@@ -39,15 +39,19 @@ public abstract class AbstractMailProcessor extends AbstractProcessor {
    */
   @Override
   protected void internalInit(ProcessorDefinition def) {
+    mailPrefs = MailController.createMailPreferences(vertx, def.getProcessorProperties());
   }
 
-  /*
-   * (non-Javadoc)
+  /**
+   * Send a mail by using the template, which is defined inside the {@link MailPreferences} as content template.
    * 
-   * @see de.braintags.netrelay.processor.impl.AbstractProcessor#handleEvent(io.vertx.core.Future)
+   * @param context
+   *          the routing context, which contains all data needed by the defined template
+   * @param handler
+   *          the handler to be informed
    */
-  @Override
-  protected void handleEvent(Future<Void> future) {
+  protected void sendMail(RoutingContext context, Handler<AsyncResult<MailSendResult>> handler) {
+    MailController.sendMail(context, netRelay.getMailClient(), mailPrefs, handler);
   }
 
 }

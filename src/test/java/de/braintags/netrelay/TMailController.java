@@ -17,13 +17,11 @@ import org.junit.Test;
 import de.braintags.netrelay.controller.impl.BodyController;
 import de.braintags.netrelay.controller.impl.ThymeleafTemplateController;
 import de.braintags.netrelay.controller.impl.api.MailController;
-import de.braintags.netrelay.init.MailClientSettings;
 import de.braintags.netrelay.init.Settings;
 import de.braintags.netrelay.routing.RouterDefinition;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
-import io.vertx.ext.mail.StartTLSOptions;
 import io.vertx.ext.unit.TestContext;
 
 /**
@@ -35,8 +33,6 @@ import io.vertx.ext.unit.TestContext;
 public class TMailController extends NetRelayBaseTest {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(TMailController.class);
-  // public static final String TESTS_RECIPIENT = "martin.rau@braintags.de";
-  public static final String TESTS_RECIPIENT = "mremme@braintags.de";
   public static final String TEST_IMAGE_URI = "http://www.braintags.de/images/design/logo.png";
 
   @Test
@@ -46,7 +42,7 @@ public class TMailController extends NetRelayBaseTest {
       Buffer responseBuffer = Buffer.buffer();
       testRequest(context, HttpMethod.POST, url, req -> {
         Buffer buffer = Buffer.buffer();
-        buffer.appendString("to=" + TESTS_RECIPIENT);
+        buffer.appendString("to=" + NetRelayBaseTest.TESTS_MAIL_RECIPIENT);
         buffer.appendString("&subject=").appendString(RequestUtil.encodeText("Test sendSimpleMail"));
         buffer.appendString("&mailText=").appendString(RequestUtil.encodeText("super cleverer text als nachricht"));
 
@@ -70,7 +66,7 @@ public class TMailController extends NetRelayBaseTest {
       Buffer responseBuffer = Buffer.buffer();
       testRequest(context, HttpMethod.POST, url, req -> {
         Buffer buffer = Buffer.buffer();
-        buffer.appendString("to=" + TESTS_RECIPIENT);
+        buffer.appendString("to=" + NetRelayBaseTest.TESTS_MAIL_RECIPIENT);
         buffer.appendString("&subject=").appendString(RequestUtil.encodeText("Test sendHtmlMessage"));
         buffer.appendString("&mailText=").appendString(RequestUtil.encodeText("super cleverer text als nachricht"));
         buffer.appendString("&htmlText=")
@@ -96,7 +92,7 @@ public class TMailController extends NetRelayBaseTest {
       Buffer responseBuffer = Buffer.buffer();
       testRequest(context, HttpMethod.POST, url, req -> {
         Buffer buffer = Buffer.buffer();
-        buffer.appendString("to=" + TESTS_RECIPIENT);
+        buffer.appendString("to=" + NetRelayBaseTest.TESTS_MAIL_RECIPIENT);
         buffer.appendString("&subject=").appendString(RequestUtil.encodeText("Test sendHtmlMessageWithInlineImage"));
         // buffer.appendString("&mailText=").appendString(RequestUtil.encodeText("super cleverer text als nachricht"));
         buffer.appendString("&htmlText=").appendString(
@@ -123,7 +119,7 @@ public class TMailController extends NetRelayBaseTest {
       Buffer responseBuffer = Buffer.buffer();
       testRequest(context, HttpMethod.POST, url, req -> {
         Buffer buffer = Buffer.buffer();
-        buffer.appendString("to=" + TESTS_RECIPIENT);
+        buffer.appendString("to=" + NetRelayBaseTest.TESTS_MAIL_RECIPIENT);
         buffer.appendString("&subject=").appendString(RequestUtil.encodeText("Test sendHtmlMessageByTemplate"));
         buffer.appendString("&mailText=").appendString(RequestUtil.encodeText("super cleverer text als nachricht"));
         buffer.appendString("&template=").appendString(RequestUtil.encodeText("mailing/customerMail.html"));
@@ -144,17 +140,9 @@ public class TMailController extends NetRelayBaseTest {
   @Override
   protected void modifySettings(TestContext context, Settings settings) {
     super.modifySettings(context, settings);
-    MailClientSettings ms = settings.getMailClientSettings();
-    ms.setHostname("mail.braintags.net");
-    ms.setPort(8025);
-    ms.setName("mailclient");
-    ms.setUsername("dev-test@braintags.net");
-    ms.setPassword("thoo4ati");
-    ms.setSsl(false);
-    ms.setStarttls(StartTLSOptions.DISABLED);
-    ms.setActive(true);
+    initMailClient(settings);
     RouterDefinition def = defineRouterDefinition(MailController.class, "/api/sendMail");
-    def.getHandlerProperties().put(MailController.FROM_PARAM, "unknown@braintags.de");
+    def.getHandlerProperties().put(MailController.FROM_PARAM, TESTS_MAIL_FROM);
     def.getHandlerProperties().put(ThymeleafTemplateController.TEMPLATE_DIRECTORY_PROPERTY, "testTemplates");
     def.getHandlerProperties().put(MailController.INLINE_PROP, "true");
 

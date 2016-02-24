@@ -265,22 +265,25 @@ public class MailController extends AbstractController {
 
       // group1: everything before the image src, group2:filename inside the "" of the src element, group4: everything
       // after the image src
-      Matcher matcher = IMG_PATTERN.matcher(msg.getHtml());
-      while (matcher.find()) {
-        String imageSource = matcher.group(2);
-        String cid = getContentId();
-        String extension = FilenameUtils.getExtension(imageSource);
-        URI imgUrl = makeAbsoluteURI(context, imageSource);
-        if (imgUrl != null) {
-          String cidName = cid.toString();
-          MailAttachment attachment = createAttachment(context, imgUrl, cidName);
-          matcher.appendReplacement(result, "$1cid:" + cidName + "$3");
-          attachments.add(attachment);
-        } else {
-          matcher.appendReplacement(result, "$0");
+      String htmlMessage = msg.getHtml();
+      if (htmlMessage != null) {
+        Matcher matcher = IMG_PATTERN.matcher(htmlMessage);
+        while (matcher.find()) {
+          String imageSource = matcher.group(2);
+          String cid = getContentId();
+          String extension = FilenameUtils.getExtension(imageSource);
+          URI imgUrl = makeAbsoluteURI(context, imageSource);
+          if (imgUrl != null) {
+            String cidName = cid.toString();
+            MailAttachment attachment = createAttachment(context, imgUrl, cidName);
+            matcher.appendReplacement(result, "$1cid:" + cidName + "$3");
+            attachments.add(attachment);
+          } else {
+            matcher.appendReplacement(result, "$0");
+          }
         }
+        matcher.appendTail(result);
       }
-      matcher.appendTail(result);
       msg.setHtml(result.toString());
       if (attachments.isEmpty()) {
         handler.handle(Future.succeededFuture(msg));

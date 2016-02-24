@@ -26,6 +26,7 @@ import io.vertx.ext.web.impl.RoutingContextImpl;
  * 
  */
 public class MockRoutingContext extends RoutingContextImpl {
+  private Vertx vertx;
 
   /**
    * @param mountPoint
@@ -35,10 +36,21 @@ public class MockRoutingContext extends RoutingContextImpl {
    */
   public MockRoutingContext(Vertx vertx, URI uri) {
     super(null, null, createRequest(vertx, uri), new ConcurrentSkipListSet<>());
+    this.vertx = vertx;
   }
 
   private static final HttpServerRequest createRequest(Vertx vertx, URI uri) {
     return new MockHttpServerRequest(uri, new MockHttpServerResponse());
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see io.vertx.ext.web.impl.RoutingContextImpl#vertx()
+   */
+  @Override
+  public Vertx vertx() {
+    return vertx;
   }
 
 }

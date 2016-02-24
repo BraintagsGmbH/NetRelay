@@ -16,6 +16,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
+import de.braintags.netrelay.processor.TProcessorSuite;
+
 /**
  * LET TSettings the last class
  * 
@@ -25,7 +27,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses({ TRequestUtil.class, TStandardRequests.class, TTemplateController.class, TCaptureParameters.class,
     TPersistenceSuite.class, TAuthentication.class, TRegistration.class, TPasswordLost.class,
-    TDataTablesController.class, TMailController.class, TProcessorDefs.class, TSettings.class })
+    TDataTablesController.class, TMailController.class, TProcessorSuite.class, TSettings.class })
 public class TestAllNetRelay {
   // -DBlockedThreadCheckInterval=10000000 -DWarningExceptionTime=10000000 -DtestTimeout=5
   // -Djava.util.logging.config.file=src/main/resources/logging.properties

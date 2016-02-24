@@ -35,6 +35,7 @@ public abstract class AbstractProcessor implements IProcessor {
    */
   protected Long timerId;
   private boolean finishOnError = false;
+  private boolean running = false;
 
   /*
    * (non-Javadoc)
@@ -43,21 +44,27 @@ public abstract class AbstractProcessor implements IProcessor {
    */
   @Override
   public void handle(Long timerId) {
-    this.timerId = timerId;
-    Future<Void> future = Future.future();
-    future.setHandler(ar -> {
-      if (ar.failed()) {
-        if (finishOnError) {
-          LOGGER.warn("Finishing processor " + getClass().getName() + " cause of an error", ar.cause());
-          vertx.cancelTimer(timerId);
+    if (running) {
+      return;
+    } else {
+      running = true;
+      this.timerId = timerId;
+      Future<Void> future = Future.future();
+      future.setHandler(ar -> {
+        if (ar.failed()) {
+          if (finishOnError) {
+            LOGGER.warn("Finishing processor " + getClass().getName() + " cause of an error", ar.cause());
+            vertx.cancelTimer(timerId);
+          } else {
+            LOGGER.warn("Error occured in processor " + getClass().getName(), ar.cause());
+          }
+          running = false;
         } else {
-          LOGGER.warn("Error occured in processor " + getClass().getName(), ar.cause());
+          running = false;
         }
-      } else {
-        // nothing to do at the time
-      }
-    });
-    handleEvent(future);
+      });
+      handleEvent(future);
+    }
   }
 
   /*
