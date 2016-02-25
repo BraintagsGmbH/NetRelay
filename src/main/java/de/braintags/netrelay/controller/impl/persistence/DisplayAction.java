@@ -67,7 +67,7 @@ public class DisplayAction extends AbstractAction {
         query.setStart(Integer.parseInt(map.get(PersistenceController.SELECTION_START_CAPTURE_KEY)));
       }
       if (map.containsKey(PersistenceController.ORDERBY_CAPTURE_KEY)) {
-        query.setOrderBy(map.get(PersistenceController.ORDERBY_CAPTURE_KEY));
+        query.addSort(map.get(PersistenceController.ORDERBY_CAPTURE_KEY));
       }
 
       query.execute(result -> {
