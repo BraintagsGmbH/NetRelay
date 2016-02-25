@@ -181,10 +181,6 @@ public class FormLoginHandlerBt implements FormLoginHandler {
     return false;
   }
 
-  private void doRedirectdd(RoutingContext context, String url) {
-    RequestUtil.sendRedirect(context.response(), context.request(), url);
-  }
-
   private static final String DEFAULT_DIRECT_LOGGED_IN_OK_PAGE = ""
       + "<html><body><h1>Login successful</h1></body></html>";
 
