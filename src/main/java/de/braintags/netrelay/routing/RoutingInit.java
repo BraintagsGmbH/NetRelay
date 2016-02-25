@@ -29,6 +29,8 @@ import io.vertx.ext.web.Router;
  * 
  */
 public class RoutingInit {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(RoutingInit.class);
 
   /**
    * 
@@ -58,6 +60,7 @@ public class RoutingInit {
 
   private static void initFailureDefinition(Vertx vertx, NetRelay netRelay, Router router, RouterDefinition def)
       throws Exception {
+    LOGGER.info("init Failure Definition: " + def.getName());
     IController controller = def.instantiateController(vertx, netRelay);
     List<Route> routes = getRoutes(router, def);
     for (Route route : routes) {
