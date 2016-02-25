@@ -42,7 +42,7 @@ public class TFailureController extends NetRelayBaseTest {
         LOGGER.info("RESPONSE: " + resp.content);
         LOGGER.info("HEADERS: " + resp.headers);
         context.assertNotNull(resp.headers.get("location"), "no redirect executed");
-        context.assertTrue(resp.headers.get("location").contains("/error/NotFound.html"),
+        context.assertTrue(resp.headers.get("location").contains("/error/exception.html"),
             "redirect expected to errorpage");
       } , 302, "Found", null);
 
