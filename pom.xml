@@ -21,7 +21,7 @@
 		<pojomapper.version>1.0.1-SNAPSHOT</pojomapper.version>
 		<vertx.web.version>3.2.1</vertx.web.version>
 		<asciidoc.dir>${project.basedir}/src/docs/asciidoc</asciidoc.dir>
-		<maven.test.skip>true</maven.test.skip>
+		<maven.test.skip>false</maven.test.skip>
 		<doc.skip>false</doc.skip>
 		<source.skip>false</source.skip>
 		<testjar.skip>false</testjar.skip>

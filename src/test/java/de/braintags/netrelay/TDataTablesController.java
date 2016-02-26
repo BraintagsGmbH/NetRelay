@@ -84,12 +84,6 @@ public class TDataTablesController extends NetRelayBaseTest {
   //
 
   @Test
-  public void testObjectWithNullField(TestContext context) throws Exception {
-    // Mapper mit Field erzeugen, das NULL als value hat; einmal Feld als String, einmal als Object
-    throw new UnsupportedOperationException();
-  }
-
-  @Test
   public void testAllRecords(TestContext context) throws Exception {
     String url = LINK.toString();
     testParameters1(context, url, 3, 3);
@@ -98,13 +92,13 @@ public class TDataTablesController extends NetRelayBaseTest {
   @Test
   public void testSearchUsername(TestContext context) throws Exception {
     String url = LINK2.toString();
-    testParameters1(context, url, 1, 1);
+    testParameters1(context, url, 3, 1);
   }
 
   @Test
   public void testLimitRecords(TestContext context) throws Exception {
     String url = LINK3.toString();
-    testParameters1(context, url, 3, 2);
+    testParameters1(context, url, 3, 3);
   }
 
   public void testParameters1(TestContext context, String link, int total, int selection) throws Exception {
@@ -113,10 +107,10 @@ public class TDataTablesController extends NetRelayBaseTest {
         String response = resp.content.toString();
         LOGGER.info("RESPONSE: " + response);
         JsonObject json = new JsonObject(response);
-        checkKey(context, json, "iTotalRecords");
-        checkKey(context, json, "iTotalDisplayRecords");
-        context.assertEquals(total, json.getInteger("iTotalRecords"));
-        context.assertEquals(selection, json.getInteger("iTotalDisplayRecords"));
+        checkKey(context, json, "recordsTotal");
+        checkKey(context, json, "recordsFiltered");
+        context.assertEquals(total, json.getInteger("recordsTotal"));
+        context.assertEquals(selection, json.getInteger("recordsFiltered"));
       } , 200, "OK", null);
     } catch (Exception e) {
       context.fail(e);
