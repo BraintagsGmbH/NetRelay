@@ -67,7 +67,7 @@ public class DisplayAction extends AbstractAction {
         query.setStart(Integer.parseInt(map.get(PersistenceController.SELECTION_START_CAPTURE_KEY)));
       }
       if (map.containsKey(PersistenceController.ORDERBY_CAPTURE_KEY)) {
-        query.addSort(map.get(PersistenceController.ORDERBY_CAPTURE_KEY));
+        addSortDefintions(query, map);
       }
 
       query.execute(result -> {
@@ -88,6 +88,28 @@ public class DisplayAction extends AbstractAction {
     } catch (Exception e) {
       handler.handle(Future.failedFuture(e));
     }
+  }
+
+  private void addSortDefintions(IQuery<?> query, CaptureMap map) {
+    String str = map.get(PersistenceController.ORDERBY_CAPTURE_KEY);
+    String tmpString = str;
+    do {
+      tmpString = str;
+      str = str.replaceAll("  ", " ");
+      str = str.replaceAll(", ", ",");
+    } while (!tmpString.equals(str));
+
+    String[] defs = str.split(",");
+    for (String def : defs) {
+      String[] sort = def.split(" ");
+      if (sort.length == 1) {
+        query.addSort(sort[0]);
+      } else if (sort.length == 2) {
+        boolean ascending = sort[1].equalsIgnoreCase("asc");
+        query.addSort(sort[0], ascending);
+      }
+    }
+
   }
 
   protected void handleSingleRecord(String entityName, RoutingContext context, IMapper mapper, String id,

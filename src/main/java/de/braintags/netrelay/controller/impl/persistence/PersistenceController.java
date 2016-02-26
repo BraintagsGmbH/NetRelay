@@ -36,16 +36,23 @@ import io.vertx.ext.web.RoutingContext;
  * <br/>
  * <br/>
  * possible paramters are:
- * <br/>
- * {@value #MAPPER_CAPTURE_KEY} - the name of the parameter, which specifies the mapper to be used<br/>
- * {@value #ID_CAPTURE_KEY} - the name of the parameter, which specifies the id of a record<br/>
- * {@value #ACTION_CAPTURE_KEY} - possible actions are defined by {@link Action}<br/>
- * {@value #UPLOAD_DIRECTORY_PROP} - The name of the property, which defines the directory, where uploaded files are
+ * <UL>
+ * <LI>{@value #MAPPER_CAPTURE_KEY} - the name of the parameter, which specifies the mapper to be used<br/>
+ * <LI>{@value #ID_CAPTURE_KEY} - the name of the parameter, which specifies the id of a record<br/>
+ * <LI>{@value #ACTION_CAPTURE_KEY} - possible actions are defined by {@link Action}<br/>
+ * <LI>{@value #UPLOAD_DIRECTORY_PROP} - The name of the property, which defines the directory, where uploaded files are
  * transferred into. This can be "webroot/images/" for instance<br/>
- * {@value #UPLOAD_RELATIVE_PATH_PROP} - The name of the property, which defines the relative path for uploaded files.
+ * <LI>{@value #UPLOAD_RELATIVE_PATH_PROP} - The name of the property, which defines the relative path for uploaded
+ * files.
  * If the {@link #UPLOAD_DIRECTORY_PROP} is defined as "webroot/images/" for instance, then the relative path here could
- * be "images/"<br/>
- * 
+ * be "images/"
+ * <LI>{@value #SELECTION_SIZE_CAPTURE_KEY} - the name of the parameter, which defines the maximum size of a resulting
+ * selection
+ * <LI>{@value #SELECTION_START_CAPTURE_KEY} - the name of the parameter, which defines the position of the first record
+ * in a selection
+ * <LI>{@value #ORDERBY_CAPTURE_KEY} - the name of the parameter, which defines the sort arguments as comma separated
+ * list in the form of fieldname asc / desc.
+ * </UL>
  * Further parameters {@link AbstractCaptureController}
  * 
  * @author Michael Remme
@@ -89,7 +96,7 @@ public class PersistenceController extends AbstractCaptureController {
   public static final String SELECTION_START_CAPTURE_KEY = "selectionStart";
 
   /**
-   * The name of the property in the request, which defines the fields to sort a selection
+   * The name of the property in the request, which defines the fields to sort a selection.
    */
   public static final String ORDERBY_CAPTURE_KEY = "orderBy";
 
@@ -146,6 +153,7 @@ public class PersistenceController extends AbstractCaptureController {
   private AbstractAction resolveAction(CaptureMap map) {
     String actionKey = map.get(ACTION_CAPTURE_KEY);
     Action action = actionKey == null ? Action.DISPLAY : Action.valueOf(actionKey);
+    LOGGER.info("action is " + action);
     switch (action) {
     case DISPLAY:
       return displayAction;

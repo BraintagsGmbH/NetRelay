@@ -11,6 +11,7 @@
 					<h2>recordlist</h2>
 					<p th:each="mapper : ${ context.get( 'SimpleNetRelayMapper') }">
 						<h4 th:text="${mapper.name}"></h4>
+						<h4 th:text="${mapper.age}"></h4>
 					</p>
 				</div>
 
