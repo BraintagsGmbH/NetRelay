@@ -13,6 +13,7 @@
 package de.braintags.netrelay.controller.impl.api;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
@@ -26,7 +27,6 @@ import de.braintags.netrelay.controller.impl.AbstractController;
 import de.braintags.netrelay.controller.impl.api.DataTableLinkDescriptor.ColDef;
 import de.braintags.netrelay.mapping.NetRelayMapperFactory;
 import de.braintags.netrelay.routing.RouterDefinition;
-import edu.emory.mathcs.backport.java.util.Arrays;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
