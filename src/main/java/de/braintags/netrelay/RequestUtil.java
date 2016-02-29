@@ -42,7 +42,7 @@ import io.vertx.ext.web.templ.ThymeleafTemplateEngine;
  * 
  */
 public class RequestUtil {
-  private static final Logger logger = LoggerFactory.getLogger(RequestUtil.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(RequestUtil.class);
 
   /**
    * Encodes the text into a suitable format for UTF-8 for http requests for instance
@@ -155,6 +155,7 @@ public class RequestUtil {
    * @param path
    */
   public static void sendRedirect(HttpServerResponse response, HttpServerRequest request, String path) {
+    LOGGER.info("sending redirect to " + path);
     response.putHeader("location", createRedirectUrl(request, path));
     response.setStatusCode(302);
     response.end();

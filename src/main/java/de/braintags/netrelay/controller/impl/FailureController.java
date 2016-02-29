@@ -137,13 +137,13 @@ public class FailureController extends AbstractController {
   private void reactByException(RoutingContext context) {
     Throwable error = context.failure();
     String redirect = getRedirectByException(error);
+    LOGGER.error("", error);
     if (redirect != null && !context.request().path().equalsIgnoreCase(redirect)) {
       RequestUtil.sendRedirect(context.response(), redirect);
     } else {
       String reply = String.format("Statuscode %d for request %s", context.statusCode(), context.request().path());
       reply += "\n" + error.toString();
       reply += "\n" + ExceptionUtil.getStackTrace(error);
-      LOGGER.error("", error);
       if (!context.response().ended()) {
         context.response().end(reply);
       }

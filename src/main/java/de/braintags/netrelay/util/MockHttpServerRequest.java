@@ -322,4 +322,14 @@ public class MockHttpServerRequest implements HttpServerRequest {
     return false;
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see io.vertx.core.http.HttpServerRequest#isSSL()
+   */
+  @Override
+  public boolean isSSL() {
+    return false;
+  }
+
 }
