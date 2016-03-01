@@ -496,7 +496,7 @@ public class MailController extends AbstractController {
       inline = Boolean.valueOf(readProperty(props, INLINE_PROP, "true", false));
       httpClient = vertx.createHttpClient();
       hostName = readProperty(props, HOSTNAME_PROP, null, false);
-      port = Integer.parseInt(readProperty(props, PORT_PROP, null, false));
+      port = Integer.parseInt(readProperty(props, PORT_PROP, "-1", false));
       scheme = readProperty(props, SCHEME_PROP, null, false);
     }
 

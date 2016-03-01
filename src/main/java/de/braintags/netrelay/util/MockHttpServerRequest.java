@@ -139,7 +139,8 @@ public class MockHttpServerRequest implements HttpServerRequest {
    */
   @Override
   public String path() {
-    return uri.getPath();
+    String path = uri.getPath();
+    return path == null || path.hashCode() == 0 ? "/" : path;
   }
 
   /*

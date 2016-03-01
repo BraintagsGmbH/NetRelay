@@ -43,7 +43,7 @@ public class DemoMailProcessor extends AbstractMailProcessor {
   protected void handleEvent(Future<Void> future) {
     try {
       LOGGER.info("starting to send message");
-      MockRoutingContext context = new MockRoutingContext(vertx, new URI("/"));
+      MockRoutingContext context = new MockRoutingContext(vertx, new URI("http://localhost:8080/"));
       context.put(MailController.TO_PARAMETER, NetRelayBaseTest.TESTS_MAIL_RECIPIENT);
       context.put(MailController.SUBJECT_PARAMETER, "Mail gesendet von Processor");
       context.put("TestProperty", "echt ein Testvalue");
