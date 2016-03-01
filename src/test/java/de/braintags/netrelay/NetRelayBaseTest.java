@@ -22,6 +22,9 @@ import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 
+import de.braintags.io.vertx.keygenerator.KeyGeneratorSettings;
+import de.braintags.io.vertx.keygenerator.KeyGeneratorVerticle;
+import de.braintags.io.vertx.keygenerator.impl.DebugGenerator;
 import de.braintags.io.vertx.pojomapper.IDataStore;
 import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.testdatastore.DatastoreBaseTest;
@@ -68,6 +71,7 @@ public class NetRelayBaseTest {
   protected static Vertx vertx;
   protected static HttpClient client;
   protected static NetRelay netRelay;
+  protected KeyGeneratorVerticle keyGenVerticle;
 
   @Rule
   public Timeout rule = Timeout.seconds(Integer.parseInt(System.getProperty("testTimeout", "20")));
@@ -79,6 +83,20 @@ public class NetRelayBaseTest {
     LOGGER.info("Starting test: " + this.getClass().getSimpleName() + "#" + name.getMethodName());
     initNetRelay(context);
     DatastoreBaseTest.EXTERNAL_DATASTORE = netRelay.getDatastore();
+    if (keyGenVerticle == null) {
+      LOGGER.info("init Keygenerator");
+      Async async = context.async();
+      keyGenVerticle = createKeyGenerator(context);
+      vertx.deployVerticle(keyGenVerticle, result -> {
+        if (result.failed()) {
+          context.fail(result.cause());
+          async.complete();
+        } else {
+          async.complete();
+        }
+      });
+      async.awaitSuccess();
+    }
     initTest(context);
   }
 
@@ -107,6 +125,22 @@ public class NetRelayBaseTest {
       });
       async.awaitSuccess();
     }
+  }
+
+  public KeyGeneratorVerticle createKeyGenerator(TestContext context) {
+    KeyGeneratorSettings settings = new KeyGeneratorSettings();
+    modifyKeyGeneratorVerticleSettings(context, settings);
+    return new KeyGeneratorVerticle(settings);
+  }
+
+  /**
+   * Possibility to adapt the settings to the needs of the test
+   * 
+   * @param context
+   * @param settings
+   */
+  protected void modifyKeyGeneratorVerticleSettings(TestContext context, KeyGeneratorSettings settings) {
+    settings.setKeyGeneratorClass(DebugGenerator.class);
   }
 
   protected static VertxOptions getVertxOptions() {
