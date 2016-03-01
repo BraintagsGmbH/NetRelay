@@ -76,6 +76,12 @@ subject: titel der Mail
 mailText: text einer Mail für textbasierten Inhalt
 htmlText: HTML Inhalt einer Mail
 template: der Pfad eines Templates im Template-Verzeichnis. Wird geparsed mit Thymeleaf und dann als Inhalt geschickt. Überschreibt htmlText
+{@value #HOST_PROP}
+{@value #PORT_PROP}
+{@value #SCHEME_PROP}
+ * 
+ * 
+ * 
  * 
  * 
  * </pre>
@@ -130,6 +136,24 @@ public class MailController extends AbstractController {
    */
   public static final String INLINE_PROP = "inline";
 
+  /**
+   * Property by which the hostname can be set. The hostname will be placed into the context, before processing the
+   * template
+   */
+  public static final String HOSTNAME_PROP = "host";
+
+  /**
+   * Property by which the port can be set. The port will be placed into the context, before processing the
+   * template
+   */
+  public static final String PORT_PROP = "port";
+
+  /**
+   * Property by which the scheme can be set. The scheme will be placed into the context, before processing the
+   * template
+   */
+  public static final String SCHEME_PROP = "scheme";
+
   private static final String UNCONFIGURED_ERROR = "The MailClient of NetRelay is not started, check the configuration and restart server!";
 
   private MailPreferences prefs;
@@ -172,6 +196,10 @@ public class MailController extends AbstractController {
       if (mailClient == null) {
         throw new InitException(UNCONFIGURED_ERROR);
       }
+      URI uri = URI.create(context.request().absoluteURI());
+      context.put("REQUEST_HOST", prefs.hostName == null ? uri.getHost() : prefs.hostName);
+      context.put("REQUEST_PORT", prefs.port <= 0 ? uri.getPort() : prefs.port);
+      context.put("REQUEST_SCHEME", prefs.scheme == null ? uri.getScheme() : prefs.scheme);
       createMailMessage(context, prefs, result -> {
         if (result.failed()) {
           LOGGER.error("", result.cause());
@@ -448,6 +476,9 @@ public class MailController extends AbstractController {
     private String text;
     private boolean inline = true;
     private HttpClient httpClient;
+    private String hostName = null;
+    private int port = -1;
+    private String scheme = null;
 
     /**
      * 
@@ -464,6 +495,9 @@ public class MailController extends AbstractController {
       text = readProperty(props, TEXT_PARAMETER, "", false);
       inline = Boolean.valueOf(readProperty(props, INLINE_PROP, "true", false));
       httpClient = vertx.createHttpClient();
+      hostName = readProperty(props, HOSTNAME_PROP, null, false);
+      port = Integer.parseInt(readProperty(props, PORT_PROP, null, false));
+      scheme = readProperty(props, SCHEME_PROP, null, false);
     }
 
   }
