@@ -500,6 +500,114 @@ public class MailController extends AbstractController {
       scheme = readProperty(props, SCHEME_PROP, null, false);
     }
 
+    /**
+     * Get the defined recipient
+     * 
+     * @return the to
+     */
+    public final String getTo() {
+      return to;
+    }
+
+    /**
+     * get the defined sender
+     * 
+     * @return the from
+     */
+    public final String getFrom() {
+      return from;
+    }
+
+    /**
+     * get the defined subject
+     * 
+     * @return the subject
+     */
+    public final String getSubject() {
+      return subject;
+    }
+
+    /**
+     * get the defined bouncer address
+     * 
+     * @return the bounceAddress
+     */
+    public final String getBounceAddress() {
+      return bounceAddress;
+    }
+
+    /**
+     * get the defined template directory
+     * 
+     * @return the templateDirectory
+     */
+    public final String getTemplateDirectory() {
+      return templateDirectory;
+    }
+
+    /**
+     * get the path of a template to be used to create the content
+     * 
+     * @return the template
+     */
+    public final String getTemplate() {
+      return template;
+    }
+
+    /**
+     * get a static html text to be sent
+     * 
+     * @return the html
+     */
+    public final String getHtml() {
+      return html;
+    }
+
+    /**
+     * get a static text to be sent
+     * 
+     * @return the text
+     */
+    public final String getText() {
+      return text;
+    }
+
+    /**
+     * shall images be sent inline?
+     * 
+     * @return the inline
+     */
+    public final boolean isInline() {
+      return inline;
+    }
+
+    /**
+     * get the name of a defined host, which can be used inside templates to build links
+     * 
+     * @return the hostName
+     */
+    public final String getHostName() {
+      return hostName;
+    }
+
+    /**
+     * get the name of a defined port, which can be used inside templates to build links
+     * 
+     * @return the port
+     */
+    public final int getPort() {
+      return port;
+    }
+
+    /**
+     * get the name of a defined scheme, which can be used inside templates to build links
+     * 
+     * @return the scheme
+     */
+    public final String getScheme() {
+      return scheme;
+    }
+
   }
 
   /**

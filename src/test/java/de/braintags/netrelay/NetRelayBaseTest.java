@@ -344,11 +344,11 @@ public class NetRelayBaseTest {
   }
 
   public class ResponseCopy {
-    String content;
-    int code;
-    String statusMessage;
-    MultiMap headers;
-    List<String> cookies;
+    public String content;
+    public int code;
+    public String statusMessage;
+    public MultiMap headers;
+    public List<String> cookies;
   }
 
   // "-DmailClientUserName=dev-test@braintags.net -DmailClientPassword=thoo4ati "

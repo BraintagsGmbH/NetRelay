@@ -50,6 +50,17 @@ public class MappingDefinitions {
   }
 
   /**
+   * add a new entry into the mapper definition by using the simple name of the class. The name is the name, like it is
+   * used later inside templates and links to reference the mapper
+   * 
+   * @param mapperClass
+   *          the class of the mapper
+   */
+  public void addMapperDefinition(Class mapperClass) {
+    mapperMap.put(mapperClass.getSimpleName(), mapperClass);
+  }
+
+  /**
    * add a new entry into the mapper definition. The name is the name, like it is used later inside templates and links
    * to
    * reference the mapper
