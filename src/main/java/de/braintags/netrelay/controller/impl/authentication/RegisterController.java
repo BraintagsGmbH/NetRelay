@@ -37,6 +37,7 @@ import de.braintags.netrelay.routing.RouterDefinition;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.ext.auth.AuthProvider;
 import io.vertx.ext.web.RoutingContext;
 
 /**
@@ -194,6 +195,7 @@ public class RegisterController extends AbstractController {
   private Class<? extends IAuthenticatable> authenticatableCLass;
   private boolean allowDuplicateEmail;
   private MailController.MailPreferences mailPrefs;
+  private AuthProvider authProvider;
 
   /*
    * (non-Javadoc)
@@ -352,25 +354,32 @@ public class RegisterController extends AbstractController {
             context.put(REGISTER_ERROR_PARAM, RegistrationCode.CONFIRMATION_FAILURE);
             context.reroute(failConfirmUrl);
           } else {
-            RegisterClaim rc = (RegisterClaim) cr.result();
-            toAuthenticatable(context, rc, acRes -> {
-              if (acRes.failed()) {
-                LOGGER.error("", acRes.cause());
-                context.put(REGISTER_ERROR_PARAM, acRes.cause().getMessage());
-                context.reroute(failConfirmUrl);
-              } else {
-                RequestUtil.sendRedirect(context.response(), successConfirmUrl);
-              }
-            });
+            finishConfirm(context, cr);
           }
         }
       });
-
     } catch (Exception e) {
       LOGGER.error("", e);
       context.put(REGISTER_ERROR_PARAM, e.getMessage());
       context.reroute(failConfirmUrl);
     }
+  }
+
+  /**
+   * @param context
+   * @param cr
+   */
+  private void finishConfirm(RoutingContext context, AsyncResult<?> cr) {
+    RegisterClaim rc = (RegisterClaim) cr.result();
+    toAuthenticatable(context, rc, acRes -> {
+      if (acRes.failed()) {
+        LOGGER.error("", acRes.cause());
+        context.put(REGISTER_ERROR_PARAM, acRes.cause().getMessage());
+        context.reroute(failConfirmUrl);
+      } else {
+        RequestUtil.sendRedirect(context.response(), successConfirmUrl);
+      }
+    });
   }
 
   @SuppressWarnings({ "unchecked" })
@@ -392,22 +401,23 @@ public class RegisterController extends AbstractController {
           if (wr.failed()) {
             handler.handle(Future.failedFuture(wr.cause()));
           } else {
-            deactivateRegisterClaim(rc, handler);
+            deactivateRegisterClaim(rc);
+
+            handler.handle(Future.succeededFuture());
           }
         });
       }
     });
   }
 
-  private void deactivateRegisterClaim(RegisterClaim claim, Handler<AsyncResult<Void>> handler) {
+  // let it run async and don't wait
+  private void deactivateRegisterClaim(RegisterClaim claim) {
     claim.active = false;
     IWrite<RegisterClaim> write = getNetRelay().getDatastore().createWrite(RegisterClaim.class);
     write.add(claim);
     write.save(wr -> {
       if (wr.failed()) {
-        handler.handle(Future.failedFuture(wr.cause()));
-      } else {
-        handler.handle(Future.succeededFuture());
+        LOGGER.error("", wr.cause());
       }
     });
   }
