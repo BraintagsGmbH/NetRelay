@@ -7,7 +7,7 @@
  * Braintags GmbH
  * Version {version}
  * 
- * web application framework based on vertx
+ * web application framework based on vertx under MVC
  * 
  * == Quick-Start
  * 
