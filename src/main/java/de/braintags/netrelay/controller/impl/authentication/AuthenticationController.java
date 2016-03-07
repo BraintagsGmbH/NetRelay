@@ -36,20 +36,23 @@ import io.vertx.ext.web.handler.UserSessionHandler;
  * 
  * Config-Parameter:<br/>
  * <UL>
- * <LI>{@value #AUTH_PROVIDER_PROP} - defines the name of the {@link AuthProvider} to be used. Possible values are:
- * {@value #AUTH_PROVIDER_MONGO}
+ * <LI>{@value #LOGIN_ACTION_URL_PROP}
+ * <LI>{@value #LOGOUT_ACTION_URL_PROP}
+ * <LI>{@value #LOGOUT_DESTINATION_PAGE_PROP}
+ * <LI>{@value #DIRECT_LOGGED_IN_OK_URL_PROP}
+ * <LI>{@value #LOGOUT_MESSAGE_PROP}
+ * <LI>{@value #LOGIN_PAGE_PROP}
+ * 
  * <LI>{@value #AUTH_HANDLER_PROP} - the name of the property, which defines the {@link AuthHandler} to be used.
  * Possible values are:
  * {@link AuthHandlerEnum#BASIC}, {@link AuthHandlerEnum#REDIRECT}
- * <LI>{@value #LOGIN_PAGE_PROP} - the property name, which defines the path to the login page, which shall be used
  * </UL>
  * <br>
  * Request-Parameter:<br/>
  * <br/>
  * Result-Parameter:<br/>
  * {@value #AUTHENTICATION_ERROR_PARAM} the parameter, where an error String of a failed authentication is stored in
- * the
- * context
+ * the context
  * <br/>
  * 
  * 
@@ -60,6 +63,10 @@ public class AuthenticationController extends AbstractAuthProviderController {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(AuthenticationController.class);
 
+  /**
+   * If an error occurs during login, then the error is added into the context. With this parameter you can define the
+   * name of the parameter, by which it is added into the context.
+   */
   public static final String AUTHENTICATION_ERROR_PARAM = "authenticationError";
 
   /**

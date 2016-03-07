@@ -33,23 +33,24 @@ import io.vertx.ext.auth.mongo.MongoAuth;
  * Config-Parameter:<br/>
  * possible parameters, which are read from the configuration
  * <UL>
- * <LI>parameter1 - describe the sense of the parameter
- * <LI>parameter2 - describe the sense of the parameter
+ * <LI>{@value #AUTH_PROVIDER_PROP}
+ * <LI>{@value #MAPPERNAME_IN_PRINCIPAL}
+ * <LI>for {@link MongoAuth}, specific parameters for MongoAuth can be added, like
+ * {@link MongoAuth#PROPERTY_COLLECTION_NAME}
  * </UL>
  * <br>
  * 
  * Request-Parameter:<br/>
  * possible parameters, which are read from a request
  * <UL>
- * <LI>parameter1 - describe the sense of the parameter
- * <LI>parameter2 - describe the sense of the parameter
+ * <LI>none
  * </UL>
  * <br/>
  * 
  * Result-Parameter:<br/>
  * possible paramters, which will be placed into the context
  * <UL>
- * <LI>parameter1 - describe the content, which is stored under the given parameter name
+ * <LI>none
  * </UL>
  * <br/>
  * 
@@ -73,7 +74,7 @@ public abstract class AbstractAuthProviderController extends AbstractController 
   public static final String MAPPERNAME_IN_PRINCIPAL = "mapper";
 
   /**
-   * Defines the name of the {@link AuthProvider} to be used
+   * Defines the name of the {@link AuthProvider} to be used. Currently {@link #AUTH_PROVIDER_MONGO} is supported
    */
   public static final String AUTH_PROVIDER_PROP = "authProvider";
 
