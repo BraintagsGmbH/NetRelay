@@ -42,10 +42,10 @@ import io.vertx.ext.web.handler.UserSessionHandler;
  * <LI>{@value #DIRECT_LOGGED_IN_OK_URL_PROP}
  * <LI>{@value #LOGOUT_MESSAGE_PROP}
  * <LI>{@value #LOGIN_PAGE_PROP}
- * 
  * <LI>{@value #AUTH_HANDLER_PROP} - the name of the property, which defines the {@link AuthHandler} to be used.
  * Possible values are:
  * {@link AuthHandlerEnum#BASIC}, {@link AuthHandlerEnum#REDIRECT}
+ * <LI>additionally add the properties of {@link AbstractAuthProviderController}
  * </UL>
  * <br>
  * Request-Parameter:<br/>
