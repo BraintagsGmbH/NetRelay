@@ -25,7 +25,6 @@ import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.util.QueryHelper;
 import de.braintags.io.vertx.util.exception.InitException;
 import de.braintags.netrelay.RequestUtil;
-import de.braintags.netrelay.controller.impl.AbstractController;
 import de.braintags.netrelay.controller.impl.api.MailController;
 import de.braintags.netrelay.controller.impl.api.MailController.MailSendResult;
 import de.braintags.netrelay.controller.impl.persistence.PersistenceController;
@@ -37,7 +36,10 @@ import de.braintags.netrelay.routing.RouterDefinition;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.AuthProvider;
+import io.vertx.ext.auth.mongo.MongoAuth;
+import io.vertx.ext.auth.mongo.impl.MongoAuthImpl;
 import io.vertx.ext.web.RoutingContext;
 
 /**
@@ -126,7 +128,7 @@ import io.vertx.ext.web.RoutingContext;
  * @author Michael Remme
  *
  */
-public class RegisterController extends AbstractController {
+public class RegisterController extends AbstractAuthProviderController {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(RegisterController.class);
 
@@ -193,6 +195,7 @@ public class RegisterController extends AbstractController {
   private String successConfirmUrl;
   private String failConfirmUrl;
   private Class<? extends IAuthenticatable> authenticatableCLass;
+  private IMapper mapper;
   private boolean allowDuplicateEmail;
   private MailController.MailPreferences mailPrefs;
   private AuthProvider authProvider;
@@ -385,7 +388,6 @@ public class RegisterController extends AbstractController {
   @SuppressWarnings({ "unchecked" })
   private void toAuthenticatable(RoutingContext context, RegisterClaim rc, Handler<AsyncResult<Void>> handler) {
     NetRelayMapperFactory mapperFactory = (NetRelayMapperFactory) getNetRelay().getNetRelayMapperFactory();
-    IMapper mapper = mapperFactory.getMapper(authenticatableCLass);
     Map<String, String> props = extractPropertiesFromMap(mapper.getMapperClass().getSimpleName(), rc.requestParameter);
     mapperFactory.getStoreObjectFactory().createStoreObject(props, mapper, result -> {
       if (result.failed()) {
@@ -402,12 +404,46 @@ public class RegisterController extends AbstractController {
             handler.handle(Future.failedFuture(wr.cause()));
           } else {
             deactivateRegisterClaim(rc);
-
-            handler.handle(Future.succeededFuture());
+            doUserLogin(user, handler);
           }
         });
       }
     });
+  }
+
+  private void doUserLogin(IAuthenticatable user, Handler<AsyncResult<Void>> handler) {
+    AuthProvider auth = getAuthProvider();
+    if (auth instanceof AuthProviderProxy) {
+      try {
+        AuthProviderProxy mAuth = (AuthProviderProxy) auth;
+        JsonObject authInfo = getAuthObject(user, mAuth);
+        mAuth.authenticate(authInfo, res -> {
+          if (res.failed()) {
+            LOGGER.warn("Unsuccessfull login", res.cause());
+            handler.handle(Future.failedFuture(res.cause()));
+          } else {
+            LOGGER.info("direct login successfull");
+            handler.handle(Future.succeededFuture());
+          }
+        });
+      } catch (Exception e) {
+        handler.handle(Future.failedFuture(e));
+      }
+    } else {
+      handler.handle(Future.failedFuture(new UnsupportedOperationException(
+          "unsupported AuthProvider for direct login: " + auth.getClass().getName())));
+    }
+  }
+
+  private JsonObject getAuthObject(IAuthenticatable user, AuthProviderProxy proxy) {
+    AuthProvider prov = proxy.getProvider();
+    if (prov instanceof MongoAuthImpl) {
+      JsonObject authInfo = new JsonObject();
+      authInfo.put(((MongoAuthImpl) prov).getUsernameCredentialField(), user.getEmail())
+          .put(((MongoAuthImpl) prov).getPasswordCredentialField(), user.getPassword());
+      return authInfo;
+    }
+    throw new UnsupportedOperationException("Unsupported authprovider class: " + prov.getClass());
   }
 
   // let it run async and don't wait
@@ -458,6 +494,9 @@ public class RegisterController extends AbstractController {
     } catch (ClassNotFoundException e) {
       throw new InitException(e);
     }
+    NetRelayMapperFactory mapperFactory = (NetRelayMapperFactory) getNetRelay().getNetRelayMapperFactory();
+    mapper = mapperFactory.getMapper(authenticatableCLass);
+    super.initProperties(properties);
     allowDuplicateEmail = Boolean.valueOf(readProperty(ALLOW_DUPLICATION_EMAIL_PROP, "false", false));
     mailPrefs = MailController.createMailPreferences(getVertx(), properties);
   }
@@ -484,12 +523,18 @@ public class RegisterController extends AbstractController {
    */
   public static Properties getDefaultProperties() {
     Properties json = new Properties();
+    json.put(AUTH_PROVIDER_PROP, AUTH_PROVIDER_MONGO);
+    // coming from IAuthenticatable
+    json.put(MongoAuth.PROPERTY_PASSWORD_FIELD, "password");
+    json.put(MongoAuth.PROPERTY_USERNAME_FIELD, "email");
+
     json.put(REG_START_SUCCESS_URL_PROP, "/customer/registerSuccess.html");
     json.put(REG_START_FAIL_URL_PROP, "/customer/registerFail.html");
     json.put(REG_CONFIRM_SUCCESS_URL_PROP, "/customer/registerConfirmSuccess.html");
     json.put(REG_CONFIRM_FAIL_URL_PROP, "/customer/registerConfirmFail.html");
 
     json.put(AUTHENTICATABLE_CLASS_PROP, Member.class.getName());
+    json.put(MongoAuth.PROPERTY_COLLECTION_NAME, Member.class.getSimpleName());
     json.put(ALLOW_DUPLICATION_EMAIL_PROP, "false");
     return json;
   }

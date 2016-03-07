@@ -109,7 +109,8 @@ public class TRegistration extends NetRelayBaseTest {
     } , resp -> {
       LOGGER.info("RESPONSE: " + resp.content);
       LOGGER.info("HEADERS: " + resp.headers);
-      context.assertNotNull(resp.headers.get("location"), "No location header set");
+      context.assertNotNull(resp.headers.get("location"),
+          "No location header set, check for an exception or an error page!");
       context.assertTrue(resp.headers.get("location").contains("/customer/registerConfirmSuccess.html"),
           "no final redirect on confirmation success");
     } , 302, "Found", null);
@@ -183,14 +184,6 @@ public class TRegistration extends NetRelayBaseTest {
   }
 
   private void resetRoutes() throws Exception {
-    RouterDefinition def = netRelay.getSettings().getRouterDefinitions()
-        .getNamedDefinition(RegisterController.class.getSimpleName());
-    def.setRoutes(new String[] { REGISTER_URL, CUSTOMER_DO_CONFIRMATION });
-    def.getHandlerProperties().put(RegisterController.REG_START_FAIL_URL_PROP, "/customer/registerError.html");
-    def.getHandlerProperties().put(MailController.FROM_PARAM, TESTS_MAIL_FROM);
-    def.getHandlerProperties().put(MailController.SUBJECT_PARAMETER, "Please finish registration");
-    def.getHandlerProperties().put(MailController.TEMPLATE_PARAM, "/customer/confirmationMail.html");
-    def.getHandlerProperties().put(ThymeleafTemplateController.TEMPLATE_DIRECTORY_PROPERTY, "testTemplates");
     netRelay.resetRoutes();
   }
 
@@ -198,6 +191,19 @@ public class TRegistration extends NetRelayBaseTest {
   protected void modifySettings(TestContext context, Settings settings) {
     super.modifySettings(context, settings);
     initMailClient(settings);
+
+    RouterDefinition def = settings.getRouterDefinitions().getNamedDefinition(RegisterController.class.getSimpleName());
+    def.setRoutes(new String[] { REGISTER_URL, CUSTOMER_DO_CONFIRMATION });
+    def.getHandlerProperties().put(RegisterController.REG_START_FAIL_URL_PROP, "/customer/registerError.html");
+    def.getHandlerProperties().put(MailController.FROM_PARAM, TESTS_MAIL_FROM);
+    def.getHandlerProperties().put(MailController.SUBJECT_PARAMETER, "Please finish registration");
+    def.getHandlerProperties().put(MailController.TEMPLATE_PARAM, "/customer/confirmationMail.html");
+    def.getHandlerProperties().put(ThymeleafTemplateController.TEMPLATE_DIRECTORY_PROPERTY, "testTemplates");
+    def.getHandlerProperties().put("collectionName", "Member");
+    def.getHandlerProperties().put("passwordField", "password");
+    def.getHandlerProperties().put("usernameField", "email");
+    def.getHandlerProperties().put("roleField", "roles");
+
   }
 
 }

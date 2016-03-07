@@ -100,7 +100,7 @@ public abstract class AbstractAuthProviderController extends AbstractController 
   }
 
   private AuthProviderProxy createAuthProvider(Properties properties) {
-    String authProvider = (String) properties.get(AUTH_PROVIDER_PROP);
+    String authProvider = readProperty(AUTH_PROVIDER_PROP, AUTH_PROVIDER_MONGO, false);
     String mapper = readProperty(MongoAuth.PROPERTY_COLLECTION_NAME, null, true);
     if (authProvider.equals(AUTH_PROVIDER_MONGO)) {
       return new AuthProviderProxy(initMongoAuthProvider(mapper), mapper);
@@ -164,6 +164,15 @@ public abstract class AbstractAuthProviderController extends AbstractController 
           handler.handle(Future.succeededFuture(user));
         }
       });
+    }
+
+    /**
+     * Get the internal instance of {@link AuthProvider} to access specific configuration infos
+     * 
+     * @return the internal provider
+     */
+    public AuthProvider getProvider() {
+      return prov;
     }
 
   }
