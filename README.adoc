@@ -1,6 +1,8 @@
 = NetRelay
 
 NetRelay is a Web-Application Framework based on vertx
+It is based on vertx-web and is styled to allow a configurable, transparent definition of routings and controllers.
+Additionally it is styled to give a predefined structure of MVC
 
 == Init
 Standard: +

@@ -98,6 +98,8 @@ import io.vertx.ext.web.RoutingContext;
  * <LI>{@value #AUTHENTICATABLE_CLASS_PROP} - the property name, which defines the class, which will be used to generate
  * a new member, user, customer etc.
  * <LI>Additionally the config-parameters of {@link MailController} must be set
+ * <LI>additionally add the properties of {@link AbstractAuthProviderController} to allow direct login after successfull
+ * registration confirmation
  * </UL>
  * <br>
  * 
