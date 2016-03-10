@@ -65,7 +65,7 @@ public abstract class NetRelay extends AbstractVerticle {
   private Router router;
   private MailClient mailClient;
   /**
-   * Teh mapper factory which translates between the browser and the server
+   * The mapper factory which translates between the browser and the server
    */
   private IMapperFactory mapperFactory;
 

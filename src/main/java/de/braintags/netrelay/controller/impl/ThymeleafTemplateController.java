@@ -118,6 +118,13 @@ public class ThymeleafTemplateController extends AbstractController {
     return thEngine;
   }
 
+  /**
+   * Get the info about the defined template directory in the properties
+   * 
+   * @param props
+   *          the configuration
+   * @return the defined value inside the properties or {@value #DEFAULT_TEMPLATE_DIRECTORY}
+   */
   public static String getTemplateDirectory(Properties props) {
     return (String) props.getOrDefault(TEMPLATE_DIRECTORY_PROPERTY, DEFAULT_TEMPLATE_DIRECTORY);
   }
@@ -128,7 +135,7 @@ public class ThymeleafTemplateController extends AbstractController {
 
   private static void setCachable(ThymeleafTemplateEngine thEngine, Properties properties) {
     if (properties.containsKey(CACHE_ENABLED_PROPERTY)) {
-      boolean cachable = Boolean.valueOf(properties.getProperty(CACHE_ENABLED_PROPERTY));
+      boolean cachable = Boolean.parseBoolean(properties.getProperty(CACHE_ENABLED_PROPERTY));
       TemplateEngine te = thEngine.getThymeleafTemplateEngine();
       ConditionalCommentsDialect ccd = new ConditionalCommentsDialect();
       te.addDialect(ccd);
