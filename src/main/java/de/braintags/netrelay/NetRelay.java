@@ -38,7 +38,6 @@ import de.braintags.netrelay.mapping.NetRelayMapperFactory;
 import de.braintags.netrelay.processor.ProcessorDefinition;
 import de.braintags.netrelay.routing.RouterDefinition;
 import de.braintags.netrelay.routing.RoutingInit;
-import examples.mapper.SimpleNetRelayMapper;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -246,7 +245,7 @@ public abstract class NetRelay extends AbstractVerticle {
     addDefaultRouterDefinitions(settings);
     addDefaultProcessorDefinitions(settings);
     settings.setDatastoreSettings(MongoDataStoreInit.createDefaultSettings());
-    settings.getMappingDefinitions().addMapperDefinition("SimpleNetRelayMapper", SimpleNetRelayMapper.class);
+    // settings.getMappingDefinitions().addMapperDefinition("SimpleNetRelayMapper", SimpleNetRelayMapper.class);
     return settings;
   }
 
