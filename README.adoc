@@ -1,110 +1,26 @@
 = NetRelay
 
-NetRelay is a Web-Application Framework based on vertx
-It is based on vertx-web and is styled to allow a configurable, transparent definition of routings and controllers.
-Additionally it is styled to give a predefined structure of MVC
+*web application framework based on vert.x-web*
 
-== Init
-Standard: +
-load der Settings aus user.home/.netrelay/NetRelay.class.getName.settings.json
+NetRelay is a web application framework based on vert.x and vert.x-web. It is styled to allow a configurable, transparent 
+definition of routings inside a web application by using adjustable, reusable instances, the Controllers. Additionaly NetRelay 
+predefines the MVC-concept
 
-ODER +
-Setzen der Datei per Deployment-Options von Vertx:
+Key features
 
+* configurable, reusable Controllers, which are executed on a suitable route
+* structures the MVC concept
+* lots of ready to use Controllers like Persistence-Controller, AuthenticationController, RegisterController etc.
+* structures the use of configurable, reusable processors, which are executed regular as timer
+* uses vertx-pojo-mapper
 
-    DeploymentOptions options = new DeploymentOptions();
-    options.setConfig(new JsonObject().put(Settings.SETTINGS_LOCATION_PROPERTY, localSettingsFileNameTmpDir));
-    vertx.deployVerticle(NetRelayExt_FileBasedSettings.class.getName(), options, result -> {
+If you are searching for a very quick entry with a prepared, ready to use project based on NetRelay, you should go to 
 
-Existiert Datei nicht, wird Default-Datei angelegt und Exception geworfen. Dies ändern auf geänderte Frontend-Anzeige für jeden Request.
+*link:https://github.com/BraintagsGmbH/NetRelay-Demoproject[ Quickstart with NetRelay-Demoproject]*
 
+If you want to go more into detail, go here:
 
-== Router-Definitions
-Routendefinition auslagern in Datei, incl. Auth-Definitionen
-enthält auch Standard-Extension z.B. „HTML“
-hier existiert ein Default-Eintrag für Datenerhebungscontroller
-1 weiterer Eintrag für einen Controller, der die Konventionen unten ausführt
-Properties eines Eintrags:
-
-* name: +
-Name des Handlers - wird auf Existenz geprüft
-* Routes +
-die definierten Routen, die mit dieser Definition abgedeckt werden sollen
-* blocking: +
-soll er als blocking handker ausgeführt werden
-* handler: +
-handler class
-* HTTPMethod +
-method like POST, GET etc.
-* Capturing path parameters +
-Durch capturing path parameters können dynamische Parts einer URL definiert werden. Dem Eintrag wird mitgeteilt, welcher 
-Parametername einer Definition für die verschiedenen Bereiche steht ( Entity, ID, Aktion ).
-	** EntityParameterName +
-	für Routing-Definitionen mit capturing path-parameters der Parameter-Name, der die Entity definiert, wie z.B. in 
-	"/catalogue/products/:entity/:productid/" wäre dies "entity"
-	** IdParameterName +
-	für Routing-Definitionen mit capturing path-parameters der Parameter-Name, der die ID einer Entity definiert, wie z.B. in 
-	"/catalogue/products/:entity/:productid/" wäre dies "pruductid"
-	** ActionParameterName +
-	für Routing-Definitionen mit capturing path-parameters der Parameter-Name, der die Aktion definiert, wie z.B. in 
-	"/catalogue/products/:entity/:productid/:action/" wäre dies "action" + 
-	+ 
-Diese Einträge können mehrfach gesetzt werden, wenn z.B. in einer URL 2 unterschiedliche Entitäten referenziert werden sollen:
-/catalogue/products/:entity/:productid/:action/:customer/:custId/:custAction/ +
-KLÄRUNG nachher: Sind die aufgelösten, dynamischen Parts der URl tatsächlich Teil der URL für Templateing / Thymeleaf-Pfad?	
-* mimetypes +
-comma separated list von Mimetypes, wenn welche angewendet werden sollen 
-* AuthHandler +
-tbd tbd
+* link:src/docs/asciidoc/java/index.adoc[ java ]
 
 
-== CONTROLLER:
-
-=== DefaultPersistenceController
-Objekte sollen weitestgehend standardisiert persisitiert werden durch Auswertung der URI durch capturing path parameter ( s.o. ). 
-Der Controller erwartet die Definition von Capturing Path Parametern ( s.o.), mindestens von EntityParameterName.
-Die informationen aus den Parmatern EntityParameterName, IdParameterName und ActionParameterName führen dann zur entsprechenden Anwendung wie laden, löschen, anlegen eines Einzeldatensatzes oder Laden einer Selection
-Die dynamische Struktur der URI wird durch die Routing-Definition vorgegeben
-
-=== DefaultQueryController
-Dieser Controller fragt eine Lookup ab, bei der z.B. die aktuelle URL auf eine Serie von IQuery Instanzen verweisen kann, die dann ausgeführt werden
-Properties für die Queries werden aus Request geholt, was bedeuten würde, daß die entsprechenden Parameter hierfür über die RouterDefinition ( s.o. ) definiert werden können müssen.
-SelectionLength, Start als Parameter
-Paging-Informationen zurückgeben an Frontend
-
-=== MeController (?)
-Lade Daten eines eingeloggten Users
-
-
-=== ControllerController
-ControllerController ermittelt einen passenden Controllers nach Naming-Convention +
-Stammpackage für Controller: controller +
-Suche nach Standardcontrollern: +
-index.html: controller.IndexController +
-/meineDaten/ controller.meinedaten.IndexController +
-/backend/article/detail.html = controller. …  +
-/customer/12/edit = Datenerhebung + controller.customer.EditDetailController +
-/customer  = Datenerhebung + controller.customer.IndexListController +
-
-=== OFFEN: Formularauswertung
-Definition einer Systematik, der Formulare auswertet und in die Persistierung überführt.
-
-
-== VIEWS
-Thymeleaf
-
-
-== MODEL
-Standardpackage: model
-/customer/12 = es wird automatisch der Datensatz mit ID 12 von Mapper model.Customer geladen
-/customer/ = es wird automatisch die Liste von Mapper model.Customern geladen
-
-
-== Roles and Rights
-
-Admins Rollen und Rechte: Auth 1
-Customer etc.: Auth 2
-
-== Definition erforderlich
-Definition von Dev / Integration / Prod in Projektumfeld und Einbindung in Deployment
 
