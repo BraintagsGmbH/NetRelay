@@ -11,14 +11,13 @@
 	<parent>
 		<groupId>de.braintags</groupId>
 		<artifactId>btVertxBasePOM</artifactId>
-		<version>10-SNAPSHOT</version>
+		<version>11</version>
 	</parent>
 
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<thymeleaf.version>2.1.4.RELEASE</thymeleaf.version>
-		<pojomapper.version>1.0.1-SNAPSHOT</pojomapper.version>
 		<vertx.web.version>3.2.1</vertx.web.version>
 		<maven.test.skip>false</maven.test.skip>
 		<doc.skip>false</doc.skip>
@@ -37,7 +36,6 @@
 		<dependency>
 			<groupId>de.braintags</groupId>
 			<artifactId>vertx-pojo-mapper-mysql</artifactId>
-			<version>${pojomapper.version}</version>
 			<exclusions>
 				<exclusion>
 					<artifactId>netty-all</artifactId>
@@ -48,7 +46,6 @@
 		<dependency>
 			<groupId>de.braintags</groupId>
 			<artifactId>vertx-pojongo</artifactId>
-			<version>${pojomapper.version}</version>
 		</dependency>
 
 		<dependency>
@@ -66,7 +63,6 @@
 		<dependency>
 			<groupId>io.vertx</groupId>
 			<artifactId>vertx-web</artifactId>
-			<version>${vertx.web.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.vertx</groupId>
@@ -78,12 +74,10 @@
 		<dependency>
 			<groupId>io.vertx</groupId>
 			<artifactId>vertx-web-templ-thymeleaf</artifactId>
-			<version>${vertx.web.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.vertx</groupId>
 			<artifactId>vertx-auth-mongo</artifactId>
-			<version>${stack.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>io.vertx</groupId>
@@ -149,5 +143,11 @@
 			</plugins>
 		</pluginManagement>
 	</build>
+
+	<scm>
+		<connection>scm:git:git@github.com:BraintagsGmbH/netrelay.git</connection>
+		<developerConnection>scm:git:git@github.com:BraintagsGmbH/netrelay.git</developerConnection>
+		<url>git@github.com:BraintagsGmbH/netrelay.git</url>
+	</scm>
 
 </project>

@@ -25,6 +25,7 @@ import io.vertx.ext.auth.AuthProvider;
 import io.vertx.ext.auth.User;
 import io.vertx.ext.auth.mongo.HashSaltStyle;
 import io.vertx.ext.auth.mongo.MongoAuth;
+import io.vertx.ext.mongo.MongoClient;
 
 /**
  * An abstract implementation of IController, which initializes an {@link AuthProvider} to be used to perform
@@ -120,7 +121,7 @@ public abstract class AbstractAuthProviderController extends AbstractController 
     JsonObject config = new JsonObject();
     String saltStyle = readProperty(MongoAuth.PROPERTY_SALT_STYLE, HashSaltStyle.NO_SALT.toString(), false);
     config.put(MongoAuth.PROPERTY_SALT_STYLE, HashSaltStyle.valueOf(saltStyle));
-    MongoAuth auth = MongoAuth.create(((MongoDataStore) store).getMongoClient(), config);
+    MongoAuth auth = MongoAuth.create((MongoClient) ((MongoDataStore) store).getClient(), config);
 
     auth.setPasswordField(readProperty(MongoAuth.PROPERTY_PASSWORD_FIELD, null, true));
     auth.setUsernameField(readProperty(MongoAuth.PROPERTY_USERNAME_FIELD, null, true));
