@@ -54,7 +54,7 @@ import io.vertx.ext.web.Router;
  * @author Michael Remme
  * 
  */
-public abstract class NetRelay extends AbstractVerticle {
+public class NetRelay extends AbstractVerticle {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(NetRelay.class);
 

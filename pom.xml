@@ -16,10 +16,12 @@
 
 
 	<properties>
+		<maven.test.skip>true</maven.test.skip>
+
+		<maven.compiler.plugin>false</maven.compiler.plugin>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<thymeleaf.version>2.1.4.RELEASE</thymeleaf.version>
 		<vertx.web.version>3.2.1</vertx.web.version>
-		<maven.test.skip>false</maven.test.skip>
 		<doc.skip>false</doc.skip>
 		<source.skip>false</source.skip>
 		<testjar.skip>false</testjar.skip>

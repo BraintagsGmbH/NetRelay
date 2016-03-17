@@ -1,6 +1,6 @@
 = NetRelay
 
-*web application framework based on vert.x-web*
+*web application framework with MVC based on vert.x-web*
 
 NetRelay is a web application framework based on vert.x and vert.x-web. It is styled to allow a configurable, transparent 
 definition of routings inside a web application by using adjustable, reusable instances, the Controllers. Additionaly NetRelay 
@@ -15,12 +15,11 @@ Key features
 * uses vertx-pojo-mapper
 
 If you are searching for a very quick entry with a prepared, ready to use project based on NetRelay, you should go to 
-
 *link:https://github.com/BraintagsGmbH/NetRelay-Demoproject[ Quickstart with NetRelay-Demoproject]*
 
-If you want to go more into detail, go here:
 
-* link:src/docs/asciidoc/java/index.adoc[ java ]
+If you want to go more into detail, go to
+*link:src/docs/asciidoc/java/index.adoc[ NetRelay-documentation ]*
 
 
 
