@@ -12,25 +12,27 @@ It is styled to allow a configurable,
 transparent definition of routings inside a web application by using adjustable, reusable instances, the Controllers.
 
 == The idea
-Concentrates the routing definitions in one well defined configuration file rather than spreading them across the
+* Concentrates the routing definitions in one well defined configuration file rather than spreading them across the
 projects classes.
-Brings reusable entities like Controllers and Processors, so that a new project can be defined rather than programmed
+* Brings reusable entities like Controllers and Processors, so that a new project can be defined rather than
+programmed
 
 == Quick-Start
 If you are searching for a very quick entry with a prepared, ready to use project based on NetRelay, you should go to
 link:https://github.com/BraintagsGmbH/NetRelay-Demoproject[ Quickstart with NetRelay-Demoproject]
 
-=== Using NetRelay
+== Using NetRelay inside your build environments
 To use this project, add the following dependency to the _dependencies_ section of your build descriptor:
+
 
 * Maven (in your `pom.xml`):
 
 [source,xml,subs="+attributes"]
 ----
 <dependency>
-<groupId>de.braintags</groupId>
-<artifactId>{maven.artifactId}</artifactId>
-<version>{maven.version}</version>
+  <groupId>de.braintags</groupId>
+  <artifactId>netrelay</artifactId>
+  <version>10.0.0_SNAPSHOT</version>
 </dependency>
 ----
 
@@ -38,11 +40,175 @@ To use this project, add the following dependency to the _dependencies_ section 
 
 [source,groovy,subs="+attributes"]
 ----
-compile "de.braintags:{maven.artifactId}:{maven.version}"
+dependencies {
+  compile 'de.braintags:netrelay:10.0.0_SNAPSHOT'
+}
 ----
 
+=== Initializing NetRelay
+To create and launch an instance of NetRelay, we are creating a Main Verticle like in the example below:
+
+[source, java]
+----
+package examples;
+
+import de.braintags.netrelay.NetRelay;
+import de.braintags.netrelay.init.Settings;
+import io.vertx.core.AbstractVerticle;
+import io.vertx.core.DeploymentOptions;
+import io.vertx.core.Future;
+import io.vertx.core.json.JsonObject;
+import io.vertx.core.logging.Logger;
+import io.vertx.core.logging.LoggerFactory;
+import io.vertx.docgen.Source;
+
+@Source(translate = false)
+public class Main extends AbstractVerticle {
+ private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
+
+ @Override
+ public void start(Future<Void> startFuture) throws Exception {
+   String settingsPath = "src/main/resources/";
+   String settingsFile = settingsPath + "fairytale-settings.json";
+   DeploymentOptions options = new DeploymentOptions();
+   options.setConfig(new JsonObject().put(Settings.SETTINGS_LOCATION_PROPERTY, settingsFile));
+   vertx.deployVerticle(NetRelay.class.getName(), options, result -> {
+     if (result.failed()) {
+       LOGGER.error("", result.cause());
+       startFuture.fail(result.cause());
+     } else {
+       LOGGER.info(NetRelay.class.getSimpleName() + " successfully launched: " + result.result());
+     }
+   });
+ }
+}
+
+----
+
+In this example we are defining first the settings path, which will be used to read or generate the settings, by
+which NetRelay will be initialized.
+
+After we are adding this path to the deployment options and deploy NetRelay with
+it. If the path is not set, then the settings are searched or generated inside the users directory inside a
+subdirectory ".netrelay".
+
+==== Launching NetRelay in eclipse
+To launch NetRelay directly from eclipse, create a java run configuration and:
+
+* under "project" choose yours
+* set the Main-class to "io.vertx.core.Starter"
+* go to the tab "Arguments" and add "run de.braintags.netrelay.fairytale.Main" to the program arguments, where the
+class should be the classpath to your Main class, of course. +
+
+When you are now launching the application for the first time, it will shown an InitException like that:
+
+----
+de.braintags.io.vertx.util.exception.InitException: Settings file did not exist
+     and was created new in path src/main/resources/fairytale-settings.json.
+     NOTE: edit the file, set edited to true and restart the server
+       at de.braintags.netrelay.init.Settings.loadSettings(Settings.java:182)
+       at de.braintags.netrelay.init.Settings.loadSettings(Settings.java:159)
+       ...
+----
+
+If the settings file does't exist in the expected location, NetRelay will create one with some default adjustments
+and exit the application. If you would start again, then again an InitException would be thrown, which tells you,
+that you have to edit the settings. +
+
+==== Editing the default settings
+
+The minimum you will have to edit to get NetRelay running, is the edited flag and the datastoreSettings. In the upper
+part of the settings you find the flag "edited", which you will have to set to true. +
+Additionally you have to edit the datastoreSettings. In this example we are expecting, that at your place a MongoDb
+is running.
+
+[source, json]
+----
+{
+  "serverPort" : 8080,
+  "hostName" : "localhost",
+  "edited" : true,
+  "defaultLoginPage" : "/backend/login.html",
+  "datastoreSettings" : {
+  "datastoreInit" : "de.braintags.io.vertx.pojomapper.mongo.init.MongoDataStoreInit",
+  "properties" : {
+    "startMongoLocal" : "false",
+    "handleReferencedRecursive" : "true",
+    "localPort" : "27018",
+    "connection_string" : "mongodb://localhost:27017",
+    "shared" : "false"
+  },
+  "databaseName" : "fairytale",
+  ...
+}
+----
+
+If you prefer a MySql, then here is the suitable configuration template:
+
+[source, json]
+----
+
+  "datastoreSettings" : {
+    "datastoreInit" : "de.braintags.io.vertx.pojomapper.mysql.init.MySqlDataStoreinit",
+    "properties" : {
+    "host" : "localhost",
+    "port" : "3306",
+    "username" : "username",
+    "password" : "password",
+    "shared" : "false"
+  },
+  "databaseName" : "fairytale"
+},
+...
+
+----
+
+If you are now launching the application, you should no more get an exception. +
+To get a first success:
+
+* add a new directory to your project with the name "templates"
+* Add a new file "index.html" to the templates directory
+* add the magic text "Hello world" to this template and save it
+* open "localhost:8080" in a browser
+
+NOTE: When the default settings are generated they contain a definition, which uses Thymeleaf to serve dynamic pages.
+The adjustment indicates, that the Thymeleaf templates must reside inside a directory named "templates" and that is
+shall be activated on nearly any route.
 
 
+=== The structure of the settings
+
+The settings are consisting mainly of three parts:
+
+* some application specific adjustments like the port, where the server shall run, or the even the
+`link:unavailable[MailClientSettings]` to enable the system to send and receive emails by controllers
+or processors
+* the datastore settings to define, which `link:unavailable[IDataStore]` shall be used by
+NetRelay. ( This will include the use of the coming MultiDataStores from the project
+link:https://github.com/BraintagsGmbH/vertx-pojo-mapper[ vertx-pojo-mapper ] )
+* the Router / Controller definitions to configure `link:unavailable[IController]`s and to
+define, which Controller shall be executed under which route
+* the processor definitions contain the configuration of regular processed jobs
+* the mapping definitions contain the specification of the pojo-mappers, which are used by the current application
+
+
+
+
+=== Adding a KeyGenerator Verticle
+
+[source, java]
+----
+ vertx.deployVerticle(NetRelay.class.getName(), options, result -> {
+    if (result.failed()) {
+      LOGGER.error("", result.cause());
+      startFuture.fail(result.cause());
+    } else {
+      LOGGER.info(NetRelay.class.getSimpleName() + " successfully launched: " + result.result());
+      initKeyGeneratorVerticle(vertx, settingsPath, startFuture);
+    }
+  });
+
+----
 
 
 == Further links

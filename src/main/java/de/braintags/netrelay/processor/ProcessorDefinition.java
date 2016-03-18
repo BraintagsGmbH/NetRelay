@@ -36,11 +36,11 @@ public class ProcessorDefinition {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(ProcessorDefinition.class);
 
+  protected String name;
+  private Class<? extends IProcessor> processorClass;
   private boolean cancelOnError = false;
   private String timeDef;
-  protected String name;
   private boolean active = true;
-  private Class<? extends IProcessor> processorClass;
   private Properties processorProperties = new Properties();
   private transient IProcessor processor;
 

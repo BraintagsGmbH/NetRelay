@@ -56,13 +56,13 @@ public class Settings {
 
   private int serverPort = 8080;
   private String hostName = "localhost";
+  private boolean edited = false;
   private String defaultLoginPage = "/backend/login.html";
+  private DataStoreSettings datastoreSettings;
   private RouterDefinitions routerDefinitions = new RouterDefinitions();
   private ProcessorDefinitions processorDefinitons = new ProcessorDefinitions();
-  private DataStoreSettings datastoreSettings;
-  private boolean edited = false;
-  private MappingDefinitions mappingDefinitions = new MappingDefinitions();
   private MailClientSettings mailClientSettings = new MailClientSettings();
+  private MappingDefinitions mappingDefinitions = new MappingDefinitions();
 
   /**
    * The port, where the server shall run on
@@ -267,7 +267,7 @@ public class Settings {
   }
 
   /**
-   * Get the name of the host
+   * The name of the host
    * 
    * @return the hostName
    */
@@ -276,6 +276,8 @@ public class Settings {
   }
 
   /**
+   * The name of the host
+   * 
    * @param hostName
    *          the hostName to set
    */

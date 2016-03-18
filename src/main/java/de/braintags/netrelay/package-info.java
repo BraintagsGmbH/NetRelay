@@ -23,14 +23,15 @@
  * == Using NetRelay inside your build environments
  * To use this project, add the following dependency to the _dependencies_ section of your build descriptor:
  * 
+ * 
  * * Maven (in your `pom.xml`):
  *
  * [source,xml,subs="+attributes"]
  * ----
  * <dependency>
- * <groupId>de.braintags</groupId>
- * <artifactId>{maven.artifactId}</artifactId>
- * <version>{maven.version}</version>
+ *   <groupId>${maven.groupId}</groupId>
+ *   <artifactId>${maven.artifactId}</artifactId>
+ *   <version>${maven.version}</version>
  * </dependency>
  * ----
  *
@@ -38,13 +39,32 @@
  *
  * [source,groovy,subs="+attributes"]
  * ----
- * compile "de.braintags:{maven.artifactId}:{maven.version}"
+ * dependencies {
+ *   compile '${maven.groupId}:${maven.artifactId}:${maven.version}'
+ * }
  * ----
  *
- * 
- * === Initialize by Settings
+ * === Initializing NetRelay
  * {@link de.braintags.netrelay.init}
  * 
+ * 
+ * 
+ * 
+ * === Adding a KeyGenerator Verticle
+ * 
+ * [source, java]
+ * ----
+ *  vertx.deployVerticle(NetRelay.class.getName(), options, result -> {
+ *     if (result.failed()) {
+ *       LOGGER.error("", result.cause());
+ *       startFuture.fail(result.cause());
+ *     } else {
+ *       LOGGER.info(NetRelay.class.getSimpleName() + " successfully launched: " + result.result());
+ *       initKeyGeneratorVerticle(vertx, settingsPath, startFuture);
+ *     }
+ *   });
+ * 
+ * ----
  * 
  * 
  * == Further links
