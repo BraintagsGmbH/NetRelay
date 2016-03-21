@@ -31,12 +31,12 @@ import io.vertx.ext.web.Router;
  */
 public class RouterDefinition {
   private String name;
+  private Class<? extends IController> controller;
   private boolean active = true;
+  private HttpMethod httpMethod;
   private String[] routes;
   private boolean blocking = false;
   private boolean failureDefinition = false;
-  private Class<? extends IController> controller;
-  private HttpMethod httpMethod;
   private Properties handlerProperties = new Properties();
   private CaptureCollection[] captureCollection;
 

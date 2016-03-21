@@ -19,7 +19,7 @@
  * ==== Launching NetRelay in eclipse
  * To launch NetRelay directly from eclipse, create a java run configuration and:
  * 
- * * under "project" choose yours
+ * * under "project" choose your project
  * * set the Main-class to "io.vertx.core.Starter"
  * * go to the tab "Arguments" and add "run de.braintags.netrelay.fairytale.Main" to the program arguments, where the
  * class should be the classpath to your Main class, of course. +
@@ -96,7 +96,8 @@
  * * open "localhost:8080" in a browser
  * 
  * NOTE: When the default settings are generated they contain a definition, which uses Thymeleaf to serve dynamic pages.
- * The adjustment indicates, that the Thymeleaf templates must reside inside a directory named "templates" and that is
+ * The adjustment indicates, that the Thymeleaf templates must reside inside a directory named "templates" and that
+ * Thymeleaf
  * shall be activated on nearly any route.
  * 
  * 
@@ -115,6 +116,155 @@
  * * the processor definitions contain the configuration of regular processed jobs
  * * the mapping definitions contain the specification of the pojo-mappers, which are used by the current application
  * 
+ * ==== Controller / Router definitions
+ * 
+ * The Controller / Router definitions of the settings are determining, which logic is executed by which route.
+ * 
+ * In general such a definitions consists of:
+ * 
+ * * name +
+ * the name specified here is used for display
+ * * controller +
+ * the Class as instance of {@link de.braintags.netrelay.controller.IController}, which shall be executed here
+ * * active +
+ * possibility to deactivate an entry
+ * * routes +
+ * a comma separated list of routes, where the controller shall be executed, following the syntax defined by
+ * {@link io.vertx.ext.web}
+ * * httpMethod +
+ * if the controller shall be executed under a certain http method ( POST / GET etc. ), then this is defined here.
+ * Default is null.
+ * * blocking definition +
+ * if the Controller shall be executed blocking, then this value is set to true. Default is false.
+ * * failureDefinition +
+ * set it to true, to define the current entry to be used as failure definition, which is executed, when an error
+ * occured. Default is false. ( see the second example bleow )
+ * * handlerProperties +
+ * a sub object, where controller specific properties are defined ( see the examples below ). The controller specific
+ * properties should be contained inside the documentation of the controller
+ * * captureCollection *
+ * possibility to define captures like known from vertx web. Will be described more exact in the section of the
+ * PersistenceController
+ * 
+ * [source, json]
+ * ----
+ * 
+ * {
+ *   "name" : "ThymeleafTemplateController",
+ *   "controller" : "de.braintags.netrelay.controller.impl.ThymeleafTemplateController",
+ *   "active" : true,
+ *   "routes" : [ "/*" ],
+ *   "httpMethod" : null,
+ *   "blocking" : false,
+ *   "failureDefinition" : false,
+ *   "handlerProperties" : {
+ *     "templateDirectory" : "templates",
+ *     "mode" : "XHTML",
+ *     "contentType" : "text/html",
+ *     "cacheEnabled" : "false"
+ *   },
+ *   "captureCollection" : null
+ * }
+ * 
+ * ----
+ * 
+ * The example above displays the configuration of the template controller. The controller class uses Thymeleaf as
+ * template engine and is activated on any route. The properties contain the controller specific adjustments, like
+ * caching controle, for instance.
+ * 
+ * 
+ * 
+ * [source, json]
+ * ----
+ * 
+ * {
+ *   "name" : "FailureController",
+ *   "controller" : "de.braintags.netrelay.controller.impl.FailureController",
+ *   "routes" : null,
+ *   "httpMethod" : null,
+ *   "blocking" : false,
+ *   "failureDefinition" : true,
+ *   "handlerProperties" : {
+ *     "EX:java.lang.Exception" : "/error/exception.html",
+ *     "ERR:404" : "/error/NotFound.html",
+ *     "DEFAULT" : "/error/defaultError.html"
+ *   },
+ *   "captureCollection" : null
+ * }
+ * 
+ * ----
+ * The example above displays the specification of a failure controller by using the class
+ * {@link de.braintags.netrelay.controller.impl.FailureController}, where resulting errorpages can be defined in
+ * dependency to an exception or an error code
+ * 
+ * 
+ * 
+ * ==== Processor definitions
+ * 
+ * Processors are classes, which are executed regular inside a defined time frame. A definitions constists of:
+ * 
+ * * name +
+ * the name specified here is used for display
+ * * processorClass +
+ * a class as an extension of {@link de.braintags.netrelay.processor.IProcessor}, which is executed
+ * * active +
+ * possibility to deactivate a processor
+ * * timeDef +
+ * the definition of the sequence, when the processor is executed. Currently this are milliseconds, other formats will
+ * follow
+ * * cancelOnError +
+ * if set to true and an error occurs, then the processor is stopped
+ * * processorProperties +
+ * properties to configure the processor. The properties and their existing values must be taken from the documentation
+ * of the used processorClass
+ * 
+ * 
+ * [source, json]
+ * ----
+ * {
+ *   "name" : "WelcomeMailProcessor",
+ *   "processorClass" : "de.braintags.testproject.processor.WelcomMail",
+ *   "active" : true,
+ *   "timeDef" : "60000",
+ *   "cancelOnError" : false,
+ *   "processorProperties" : {
+ *     "templateDirectory" : "mailTemplates",
+ *     "mode" : "XHTML",
+ *     "cacheEnabled" : "false",
+ *     "from" : "info@test.de",
+ *     "template" : "/mails/welcome.html",
+ *     "subject" : "Welcome at test.de",
+ *     "inline" : "false",
+ *     "host" : "mailer.net",
+ *     "port" : "8080"
+ *   }
+ * }
+ * 
+ * 
+ * ----
+ * 
+ * The example cofiguration above displays the adjustments for a processor, which checks each 60 seconds for new members
+ * in the system and sends them a welcome mail, where the content of the mail is created by a thymeleaf template
+ * 
+ * 
+ * ==== Mapping definitions
+ * With this section you are specifying the existing mappers of the system. Each entry consists of a key and the class
+ * of the pojo mapper, which shall be connected to this key. The keys, which are defined here, will be used be the
+ * PersistenceController to reference onto a mapper.
+ * 
+ * 
+ * [source, json]
+ * ----
+ * 
+ * "mappingDefinitions" : {
+ *   "mapperMap" : {
+ *     "Member" : "de.braintags.netrelay.model.Member",
+ *     "Customer" : "de.braintags.testshop.web.model.Customer",
+ *     "ShopCart" : "de.braintags.testshop.web.model.ShopCart"
+ *   }
+ * }
+ * 
+ * ----
  * 
  * 
  */

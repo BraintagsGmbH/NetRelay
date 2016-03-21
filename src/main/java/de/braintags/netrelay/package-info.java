@@ -44,13 +44,15 @@
  * }
  * ----
  *
- * === Initializing NetRelay
+ * == Initializing NetRelay
  * {@link de.braintags.netrelay.init}
  * 
+ * {@link de.braintags.netrelay.controller}
+ * 
+ * {@link de.braintags.netrelay.processor}
  * 
  * 
- * 
- * === Adding a KeyGenerator Verticle
+ * == Adding a KeyGenerator Verticle
  * 
  * [source, java]
  * ----

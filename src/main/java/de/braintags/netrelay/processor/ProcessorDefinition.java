@@ -38,10 +38,11 @@ public class ProcessorDefinition {
 
   protected String name;
   private Class<? extends IProcessor> processorClass;
-  private boolean cancelOnError = false;
   private String timeDef;
   private boolean active = true;
+  private boolean cancelOnError = false;
   private Properties processorProperties = new Properties();
+
   private transient IProcessor processor;
 
   /**
