@@ -110,7 +110,9 @@ public class NetRelayBaseTest {
   @AfterClass
   public static void shutdown(TestContext context) throws Exception {
     LOGGER.debug("performing shutdown");
-    netRelay.stop();
+    if (netRelay != null) {
+      netRelay.stop();
+    }
     netRelay = null;
 
     if (vertx != null) {

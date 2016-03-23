@@ -12,6 +12,7 @@
  */
 package de.braintags.netrelay.unit;
 
+import org.junit.AfterClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -69,7 +70,7 @@ public class TSettings {
       }
     });
 
-    async.awaitSuccess();
+    async.await();
 
     final Async async2 = context.async();
     vertx.deployVerticle(NetRelayExt_FileBasedSettings.class.getName(), result -> {
@@ -83,29 +84,33 @@ public class TSettings {
         async2.complete();
       }
     });
-    async2.awaitSuccess();
+    async2.await();
 
     final Async async3 = context.async();
     NetRelayExt_FileBasedSettings netRelay = new NetRelayExt_FileBasedSettings(true);
     vertx.deployVerticle(netRelay, result -> {
-      if (result.failed()) {
-        context.fail(result.cause());
-      } else {
-        context.assertTrue(fs.existsBlocking(localSettingsFileNameUserDir));
-        context.assertNotNull(netRelay.getSettings(), "Settings are null");
-        context.assertNotNull(netRelay.getSettings().getDatastoreSettings(), "Settings.datastoreSettings are null");
-        context.assertNotNull(netRelay.getSettings().getRouterDefinitions(), "Settings.getRouterDefinitions are null");
-        context.assertNotNull(netRelay.getSettings().getMappingDefinitions(),
-            "Settings.getMappingDefinitions are null");
-        Class definedMapperClass = netRelay.getSettings().getMappingDefinitions()
-            .getMapperClass(NetRelayExt_FileBasedSettings.SIMPLEMAPPER_NAME);
-        context.assertNotNull(definedMapperClass,
-            "mapperclass is null for key " + NetRelayExt_FileBasedSettings.SIMPLEMAPPER_NAME);
-        context.assertEquals(SimpleNetRelayMapper.class, definedMapperClass);
+      try {
+        if (result.failed()) {
+          context.fail(result.cause());
+        } else {
+          context.assertTrue(fs.existsBlocking(localSettingsFileNameUserDir));
+          context.assertNotNull(netRelay.getSettings(), "Settings are null");
+          context.assertNotNull(netRelay.getSettings().getDatastoreSettings(), "Settings.datastoreSettings are null");
+          context.assertNotNull(netRelay.getSettings().getRouterDefinitions(),
+              "Settings.getRouterDefinitions are null");
+          context.assertNotNull(netRelay.getSettings().getMappingDefinitions(),
+              "Settings.getMappingDefinitions are null");
+          Class definedMapperClass = netRelay.getSettings().getMappingDefinitions()
+              .getMapperClass(NetRelayExt_FileBasedSettings.SIMPLEMAPPER_NAME);
+          context.assertNotNull(definedMapperClass,
+              "mapperclass is null for key " + NetRelayExt_FileBasedSettings.SIMPLEMAPPER_NAME);
+          context.assertEquals(SimpleNetRelayMapper.class, definedMapperClass);
+        }
+      } finally {
         async3.complete();
       }
     });
-
+    async3.await();
   }
 
   /**
@@ -136,21 +141,24 @@ public class TSettings {
         async.complete();
       }
     });
-    async.awaitSuccess(2000);
+    async.await();
 
     final Async async2 = context.async();
     vertx.deployVerticle(NetRelayExt_FileBasedSettings.class.getName(), options, result -> {
-      if (result.failed()) {
-        context.assertEquals(InitException.class, result.cause().getClass());
-        context.assertTrue(result.cause().getMessage().contains("The settings are not yet edited."),
-            "Expected errormessage which contains 'The settings are not yet edited.'");
-        context.assertTrue(fs.existsBlocking(localSettingsFileNameUserDir));
-        async2.complete();
-      } else {
-        context.fail("This test expects to fail, cause the settings were not edited yet");
+      try {
+        if (result.failed()) {
+          context.assertEquals(InitException.class, result.cause().getClass());
+          context.assertTrue(result.cause().getMessage().contains("The settings are not yet edited."),
+              "Expected errormessage which contains 'The settings are not yet edited.'");
+          context.assertTrue(fs.existsBlocking(localSettingsFileNameUserDir));
+        } else {
+          context.fail("This test expects to fail, cause the settings were not edited yet");
+        }
+      } finally {
         async2.complete();
       }
     });
+    async2.await();
   }
 
   private void deleteFileInDir(TestContext context, FileSystem fs, String path) {
@@ -158,6 +166,20 @@ public class TSettings {
       fs.deleteBlocking(path);
     }
     context.assertFalse(fs.existsBlocking(path));
+  }
+
+  @AfterClass
+  public static void shutdown(TestContext context) throws Exception {
+    LOGGER.debug("performing shutdown");
+    if (vertx != null) {
+      Async async = context.async();
+      vertx.close(ar -> {
+        vertx = null;
+        async.complete();
+      });
+      async.awaitSuccess();
+      LOGGER.debug("finished shutdown");
+    }
   }
 
 }
