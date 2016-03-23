@@ -27,7 +27,6 @@ import de.braintags.io.vertx.keygenerator.KeyGeneratorVerticle;
 import de.braintags.io.vertx.keygenerator.impl.DebugGenerator;
 import de.braintags.io.vertx.pojomapper.testdatastore.DatastoreBaseTest;
 import de.braintags.io.vertx.pojomapper.testdatastore.TestHelper;
-import de.braintags.io.vertx.util.ErrorObject;
 import de.braintags.io.vertx.util.ResultObject;
 import de.braintags.io.vertx.util.exception.InitException;
 import de.braintags.netrelay.NetRelay;
@@ -35,6 +34,7 @@ import de.braintags.netrelay.impl.NetRelayExt_InternalSettings;
 import de.braintags.netrelay.init.MailClientSettings;
 import de.braintags.netrelay.init.Settings;
 import de.braintags.netrelay.routing.RouterDefinition;
+import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
@@ -42,7 +42,6 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpClientRequest;
-import io.vertx.core.http.HttpClientResponse;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.ext.mail.StartTLSOptions;
 import io.vertx.ext.unit.Async;
@@ -159,6 +158,7 @@ public class NetRelayBaseTest {
    * @param settings
    */
   public void modifySettings(TestContext context, Settings settings) {
+    LOGGER.info("modifySettings");
     settings.getDatastoreSettings().setDatabaseName(getClass().getSimpleName());
   }
 
@@ -213,50 +213,24 @@ public class NetRelayBaseTest {
         responseBodyBuffer);
   }
 
-  protected final void testRequestBufferXX(TestContext context, HttpClient client, HttpMethod method, int port,
-      String path, Consumer<HttpClientRequest> requestAction, Consumer<HttpClientResponse> responseAction,
-      int statusCode, String statusMessage, Buffer responseBodyBuffer) throws Exception {
-    Async async = context.async(2);
-    ErrorObject<Exception> err = new ErrorObject<>(null);
-    HttpClientRequest req = client.request(method, port, "localhost", path, resp -> {
-      context.assertEquals(statusCode, resp.statusCode());
-      context.assertEquals(statusMessage, resp.statusMessage());
-      if (responseAction != null) {
-        try {
-          responseAction.accept(resp);
-        } catch (Exception e) {
-          err.setThrowable(e);
-        } finally {
-          async.countDown();
-        }
-      } else {
-        async.countDown();
-      }
-      if (responseBodyBuffer == null) {
-        async.countDown();
-      } else {
-        resp.bodyHandler(buff -> {
-          context.assertEquals(responseBodyBuffer, buff);
-          async.countDown();
-        });
-      }
-    });
-    if (requestAction != null) {
-      requestAction.accept(req);
-    }
-    req.end();
-    async.await();
-    if (err.isError()) {
-      context.fail(err.getThrowable());
-    }
-  }
-
   protected final void testRequestBuffer(TestContext context, HttpClient client, HttpMethod method, int port,
       String path, Consumer<HttpClientRequest> requestAction, Consumer<ResponseCopy> responseAction, int statusCode,
       String statusMessage, Buffer responseBodyBuffer) throws Exception {
     Async async = context.async();
     ResultObject<ResponseCopy> resultObject = new ResultObject<>(null);
+
+    Handler<Throwable> exceptionHandler = new Handler<Throwable>() {
+
+      @Override
+      public void handle(Throwable ex) {
+        LOGGER.error("", ex);
+        async.complete();
+      }
+    };
+
     HttpClientRequest req = client.request(method, port, "localhost", path, resp -> {
+      resp.exceptionHandler(exceptionHandler);
+
       ResponseCopy rc = new ResponseCopy();
       resp.bodyHandler(buff -> {
         rc.content = buff.toString();
@@ -269,6 +243,7 @@ public class NetRelayBaseTest {
         async.complete();
       });
     });
+    req.exceptionHandler(exceptionHandler);
     if (requestAction != null) {
       requestAction.accept(req);
     }
