@@ -10,11 +10,11 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.netrelay;
+package de.braintags.netrelay.unit;
 
 import org.junit.Test;
 
-import de.braintags.netrelay.mapper.TestCustomer;
+import de.braintags.netrelay.RequestUtil;
 import io.vertx.ext.unit.TestContext;
 
 /**
@@ -56,11 +56,6 @@ public class TRequestUtil extends NetRelayBaseTest {
     path = "first/second/third/firstfourth/";
     result = RequestUtil.cleanPathElement("first", path);
     context.assertEquals("second/third/firstfourth/", result);
-  }
-
-  @Test
-  public void testCustomer(TestContext context) {
-    netRelay.getDatastore().createQuery(TestCustomer.class);
   }
 
 }

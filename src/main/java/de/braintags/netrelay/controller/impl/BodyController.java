@@ -15,7 +15,6 @@ package de.braintags.netrelay.controller.impl;
 import java.net.URI;
 import java.util.Properties;
 
-import de.braintags.netrelay.controller.impl.persistence.PersistenceController;
 import de.braintags.netrelay.routing.RouterDefinition;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.BodyHandler;

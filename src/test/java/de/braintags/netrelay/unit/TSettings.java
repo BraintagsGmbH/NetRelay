@@ -10,7 +10,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.netrelay;
+package de.braintags.netrelay.unit;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;

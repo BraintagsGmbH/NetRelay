@@ -21,17 +21,10 @@ import de.braintags.io.vertx.pojomapper.mongo.init.MongoDataStoreInit;
 import de.braintags.io.vertx.util.exception.InitException;
 import de.braintags.netrelay.controller.impl.BodyController;
 import de.braintags.netrelay.controller.impl.CookieController;
-import de.braintags.netrelay.controller.impl.CurrentMemberController;
 import de.braintags.netrelay.controller.impl.FailureController;
 import de.braintags.netrelay.controller.impl.SessionController;
 import de.braintags.netrelay.controller.impl.StaticController;
-import de.braintags.netrelay.controller.impl.ThymeleafTemplateController;
 import de.braintags.netrelay.controller.impl.TimeoutController;
-import de.braintags.netrelay.controller.impl.api.MailController;
-import de.braintags.netrelay.controller.impl.authentication.AuthenticationController;
-import de.braintags.netrelay.controller.impl.authentication.PasswordLostController;
-import de.braintags.netrelay.controller.impl.authentication.RegisterController;
-import de.braintags.netrelay.controller.impl.persistence.PersistenceController;
 import de.braintags.netrelay.init.MailClientSettings;
 import de.braintags.netrelay.init.Settings;
 import de.braintags.netrelay.mapping.NetRelayMapperFactory;
@@ -263,18 +256,7 @@ public class NetRelay extends AbstractVerticle {
     settings.getRouterDefinitions().add(SessionController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(TimeoutController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(BodyController.createDefaultRouterDefinition());
-
-    settings.getRouterDefinitions().add(MailController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(StaticController.createDefaultRouterDefinition());
-    settings.getRouterDefinitions().add(AuthenticationController.createDefaultRouterDefinition());
-    settings.getRouterDefinitions().add(RegisterController.createDefaultRouterDefinition());
-    settings.getRouterDefinitions().add(PasswordLostController.createDefaultRouterDefinition());
-    settings.getRouterDefinitions().add(CurrentMemberController.createDefaultRouterDefinition());
-
-    settings.getRouterDefinitions().addAfter(BodyController.class.getSimpleName(),
-        PersistenceController.createDefaultRouterDefinition());
-
-    settings.getRouterDefinitions().add(ThymeleafTemplateController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(FailureController.createDefaultRouterDefinition());
   }
 

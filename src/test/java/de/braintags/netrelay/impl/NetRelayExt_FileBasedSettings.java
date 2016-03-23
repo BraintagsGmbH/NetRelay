@@ -15,7 +15,6 @@ package de.braintags.netrelay.impl;
 import de.braintags.netrelay.NetRelay;
 import de.braintags.netrelay.init.Settings;
 import de.braintags.netrelay.mapper.SimpleNetRelayMapper;
-import de.braintags.netrelay.model.Member;
 
 /**
  * An extension of NetRelay which is loading the Settings from a file
@@ -47,7 +46,6 @@ public class NetRelayExt_FileBasedSettings extends NetRelay {
     Settings settings = super.createDefaultSettings();
     settings.getDatastoreSettings().setDatabaseName("NetRelayExtended_DB");
     settings.getMappingDefinitions().addMapperDefinition(SIMPLEMAPPER_NAME, SimpleNetRelayMapper.class);
-    settings.getMappingDefinitions().addMapperDefinition(Member.class.getSimpleName(), Member.class);
     return settings;
   }
 

@@ -10,7 +10,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.netrelay;
+package de.braintags.netrelay.unit;
 
 import de.braintags.netrelay.init.Settings;
 import io.vertx.ext.unit.TestContext;
@@ -30,7 +30,7 @@ public abstract class AbstractPersistenceControllerTest extends AbstractCaptureP
    * de.braintags.netrelay.init.Settings)
    */
   @Override
-  protected void modifySettings(TestContext context, Settings settings) {
+  public void modifySettings(TestContext context, Settings settings) {
     super.modifySettings(context, settings);
     settings.getDatastoreSettings().setDatabaseName("TPersistenceController");
   }

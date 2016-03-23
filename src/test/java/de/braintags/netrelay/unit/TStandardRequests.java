@@ -10,7 +10,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.netrelay;
+package de.braintags.netrelay.unit;
 
 import java.io.File;
 import java.util.Set;
@@ -18,7 +18,6 @@ import java.util.Set;
 import org.junit.Test;
 
 import de.braintags.netrelay.controller.StandarRequestController;
-import de.braintags.netrelay.controller.impl.ThymeleafTemplateController;
 import de.braintags.netrelay.init.Settings;
 import de.braintags.netrelay.util.MultipartUtil;
 import io.vertx.core.buffer.Buffer;
@@ -45,22 +44,22 @@ public class TStandardRequests extends NetRelayBaseTest {
       Buffer cookie = Buffer.buffer();
       String url = "/";
       testRequest(context, HttpMethod.GET, url, req -> {
-      } , resp -> {
+      }, resp -> {
         LOGGER.info("RESPONSE: " + resp.content);
         LOGGER.info("HEADERS: " + resp.headers);
         String setCookie = resp.headers.get("Set-Cookie");
         context.assertNotNull(setCookie, "Cookie not found");
         cookie.appendString(setCookie);
-      } , 200, "OK", null);
+      }, 200, "OK", null);
 
       testRequest(context, HttpMethod.POST, url, httpConn -> {
         httpConn.headers().set("Cookie", cookie.toString());
-      } , resp -> {
+      }, resp -> {
         LOGGER.info("RESPONSE: " + resp.content);
         LOGGER.info("HEADERS: " + resp.headers);
         String setCookie = resp.headers.get("Set-Cookie");
         context.assertNull(setCookie, "Cookie should not be sent here");
-      } , 200, "OK", null);
+      }, 200, "OK", null);
 
     } catch (Exception e) {
       context.fail(e);
@@ -73,10 +72,10 @@ public class TStandardRequests extends NetRelayBaseTest {
       resetRoutes();
       String url = "/";
       testRequest(context, HttpMethod.GET, url, req -> {
-      } , resp -> {
+      }, resp -> {
         LOGGER.info("RESPONSE: " + resp.content);
         LOGGER.info("HEADERS: " + resp.headers);
-      } , 200, "OK", null);
+      }, 200, "OK", null);
     } catch (Exception e) {
       context.fail(e);
     }
@@ -92,12 +91,12 @@ public class TStandardRequests extends NetRelayBaseTest {
         testRequest(context, HttpMethod.GET, "/test.html", iresp -> {
           LOGGER.info("second request ran");
 
-        } , 200, "OK", null);
+        }, 200, "OK", null);
       } catch (Exception e) {
         context.fail(e);
       }
 
-    } , 200, "OK", null);
+    }, 200, "OK", null);
 
   }
 
@@ -109,7 +108,7 @@ public class TStandardRequests extends NetRelayBaseTest {
 
     testRequest(context, HttpMethod.POST, "/test.html", req -> {
       mu.finish(req);
-    } , 200, "OK", null);
+    }, 200, "OK", null);
     context.assertTrue(StandarRequestController.controllerProcessed, "handler wasn't executed");
     checkFields(context);
   }
@@ -127,7 +126,7 @@ public class TStandardRequests extends NetRelayBaseTest {
     addFields(mu);
     testRequest(context, HttpMethod.POST, "/test.html?p1=foo", req -> {
       mu.finish(req);
-    } , 200, "OK", null);
+    }, 200, "OK", null);
     context.assertTrue(StandarRequestController.controllerProcessed, "handler wasn't executed");
     checkFileUpload(context, 1, fileName, fieldName, contentType, uploadsDir, fileData);
     checkFields(context);
@@ -155,7 +154,7 @@ public class TStandardRequests extends NetRelayBaseTest {
       MultipartUtil mu = new MultipartUtil();
       mu.addFilePart(fieldName, fileName, contentType, fileData);
       mu.finish(req);
-    } , 200, "OK", null);
+    }, 200, "OK", null);
     context.assertTrue(StandarRequestController.controllerProcessed, "handler wasn't executed");
     checkFileUpload(context, 1, fileName, fieldName, contentType, uploadsDir, fileData);
     // The body should be set too
@@ -212,8 +211,7 @@ public class TStandardRequests extends NetRelayBaseTest {
     StandarRequestController.bodyBuffer = null;
     StandarRequestController.fileUploads = null;
 
-    netRelay.getSettings().getRouterDefinitions().addBefore(ThymeleafTemplateController.class.getSimpleName(),
-        StandarRequestController.createRouterDefinition());
+    netRelay.getSettings().getRouterDefinitions().add(StandarRequestController.createRouterDefinition());
     netRelay.resetRoutes();
   }
 
@@ -233,7 +231,7 @@ public class TStandardRequests extends NetRelayBaseTest {
    * @see de.braintags.netrelay.NetRelayBaseTest#modifySettings(de.braintags.netrelay.init.Settings)
    */
   @Override
-  protected void modifySettings(TestContext context, Settings settings) {
+  public void modifySettings(TestContext context, Settings settings) {
     super.modifySettings(context, settings);
   }
 

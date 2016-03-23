@@ -10,7 +10,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.netrelay;
+package de.braintags.netrelay.unit;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -25,19 +25,15 @@ import org.junit.runner.RunWith;
 import de.braintags.io.vertx.keygenerator.KeyGeneratorSettings;
 import de.braintags.io.vertx.keygenerator.KeyGeneratorVerticle;
 import de.braintags.io.vertx.keygenerator.impl.DebugGenerator;
-import de.braintags.io.vertx.pojomapper.IDataStore;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
 import de.braintags.io.vertx.pojomapper.testdatastore.DatastoreBaseTest;
-import de.braintags.io.vertx.pojomapper.testdatastore.ResultContainer;
 import de.braintags.io.vertx.pojomapper.testdatastore.TestHelper;
 import de.braintags.io.vertx.util.ErrorObject;
 import de.braintags.io.vertx.util.ResultObject;
 import de.braintags.io.vertx.util.exception.InitException;
-import de.braintags.netrelay.controller.impl.ThymeleafTemplateController;
+import de.braintags.netrelay.NetRelay;
 import de.braintags.netrelay.impl.NetRelayExt_InternalSettings;
 import de.braintags.netrelay.init.MailClientSettings;
 import de.braintags.netrelay.init.Settings;
-import de.braintags.netrelay.model.Member;
 import de.braintags.netrelay.routing.RouterDefinition;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
@@ -150,63 +146,18 @@ public class NetRelayBaseTest {
   public void initNetRelay(TestContext context) {
     if (netRelay == null) {
       LOGGER.info("init NetRelay");
-      Async async = context.async();
-      netRelay = createNetRelay(context);
-      vertx.deployVerticle(netRelay, result -> {
-        if (result.failed()) {
-          context.fail(result.cause());
-          async.complete();
-        } else {
-          async.complete();
-        }
-      });
-      async.awaitSuccess();
+      netRelay = NetRelayExt_InternalSettings.getInstance(vertx, context, this);
     }
-  }
-
-  public NetRelay createNetRelay(TestContext context) {
-    NetRelayExt_InternalSettings netrelay = new NetRelayExt_InternalSettings();
-    modifySettings(context, netrelay.getSettings());
-    return netrelay;
-  }
-
-  /**
-   * Searches in the database, wether a member with the given username / password exists.
-   * If not, it is created. After the found or created member is returned
-   * 
-   * @param context
-   * @param datastore
-   * @param member
-   * @return
-   */
-  public static final Member createOrFindMember(TestContext context, IDataStore datastore, Member member) {
-    IQuery<Member> query = datastore.createQuery(Member.class);
-    query.field("userName").is(member.getUserName()).field("password").is(member.getPassword());
-    Member returnMember = (Member) DatastoreBaseTest.findFirst(context, query);
-    if (returnMember == null) {
-      ResultContainer cont = DatastoreBaseTest.saveRecord(context, member);
-      if (cont.assertionError != null) {
-        throw cont.assertionError;
-      } else {
-        returnMember = member;
-      }
-    }
-    return returnMember;
   }
 
   /**
    * This method is modifying the {@link Settings} which are used to init NetRelay. Here it defines the
-   * template directory as "testTemplates"
+   * name of the database
    * 
    * @param settings
    */
-  protected void modifySettings(TestContext context, Settings settings) {
+  public void modifySettings(TestContext context, Settings settings) {
     settings.getDatastoreSettings().setDatabaseName(getClass().getSimpleName());
-    RouterDefinition def = settings.getRouterDefinitions()
-        .getNamedDefinition(ThymeleafTemplateController.class.getSimpleName());
-    if (def != null) {
-      def.getHandlerProperties().setProperty(ThymeleafTemplateController.TEMPLATE_DIRECTORY_PROPERTY, "testTemplates");
-    }
   }
 
   protected final void testRequest(TestContext context, HttpMethod method, String path, int statusCode,
@@ -242,7 +193,7 @@ public class NetRelayBaseTest {
 
   protected final void testRequest(TestContext context, HttpMethod method, String path,
       Consumer<HttpClientRequest> requestAction, int statusCode, String statusMessage, String responseBody)
-          throws Exception {
+      throws Exception {
     testRequest(context, method, path, requestAction, null, statusCode, statusMessage, responseBody);
   }
 

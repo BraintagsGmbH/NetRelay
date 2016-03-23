@@ -15,6 +15,11 @@ package de.braintags.netrelay.impl;
 import de.braintags.netrelay.NetRelay;
 import de.braintags.netrelay.init.Settings;
 import de.braintags.netrelay.mapper.SimpleNetRelayMapper;
+import de.braintags.netrelay.unit.NetRelayBaseTest;
+import io.vertx.core.Future;
+import io.vertx.core.Vertx;
+import io.vertx.ext.unit.Async;
+import io.vertx.ext.unit.TestContext;
 
 /**
  * An extension of NetRelay which is getting the {@link Settings} from external
@@ -23,16 +28,51 @@ import de.braintags.netrelay.mapper.SimpleNetRelayMapper;
  * 
  */
 public class NetRelayExt_InternalSettings extends NetRelay {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(NetRelayExt_InternalSettings.class);
+
   public static final String SIMPLEMAPPER_NAME = "SimpleNetRelayMapper";
   private Settings settings;
+  private static NetRelayExt_InternalSettings netRelay;
 
   /**
    * 
    */
-  public NetRelayExt_InternalSettings() {
+  private NetRelayExt_InternalSettings() {
     settings = createDefaultSettings();
     settings.getDatastoreSettings().setDatabaseName("NetRelayExtended_DB");
     settings.getMappingDefinitions().addMapperDefinition(SIMPLEMAPPER_NAME, SimpleNetRelayMapper.class);
+  }
+
+  public static NetRelayExt_InternalSettings getInstance(Vertx vertx, TestContext context, NetRelayBaseTest baseTest) {
+    if (netRelay == null) {
+      netRelay = new NetRelayExt_InternalSettings();
+      LOGGER.info("init NetRelay");
+      Async async = context.async();
+      baseTest.modifySettings(context, netRelay.settings);
+      vertx.deployVerticle(netRelay, result -> {
+        if (result.failed()) {
+          context.fail(result.cause());
+          async.complete();
+        } else {
+          async.complete();
+        }
+      });
+      async.awaitSuccess();
+
+    }
+    return netRelay;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.netrelay.NetRelay#stop(io.vertx.core.Future)
+   */
+  @Override
+  public void stop(Future<Void> stopFuture) throws Exception {
+    netRelay = null;
+    super.stop(stopFuture);
   }
 
   /*
@@ -54,4 +94,5 @@ public class NetRelayExt_InternalSettings extends NetRelay {
   public Settings getSettings() {
     return settings;
   }
+
 }

@@ -12,8 +12,6 @@
  */
 package de.braintags.netrelay.routing;
 
-import de.braintags.netrelay.controller.impl.persistence.PersistenceController;
-
 /**
  * A CaptureCollection defines all captures for one action, which are belonging together.
  * For a router definition like "/catalogue/products/:entity/:productid/:action/" one would
@@ -23,8 +21,8 @@ import de.braintags.netrelay.controller.impl.persistence.PersistenceController;
  * productid / identifyer
  * action / action
  * 
- * The controller, which would be in that case the {@link PersistenceController} would extract the values
- * and would execute the correct action, because he "knows" what to do with the definitions.
+ * A controller would extract the values and would execute the correct action, because he "knows" what to do with the
+ * definitions.
  * 
  * If a concrete URL would be then for example: /catalogue/products/article/12/search he would search the
  * mapper article with the id 12 and store it inside the context of the request

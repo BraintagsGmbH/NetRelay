@@ -14,8 +14,8 @@ package de.braintags.netrelay.processor;
 
 import org.junit.Test;
 
-import de.braintags.netrelay.NetRelayBaseTest;
 import de.braintags.netrelay.init.Settings;
+import de.braintags.netrelay.unit.NetRelayBaseTest;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 
@@ -64,7 +64,7 @@ public class TProcessorDefs extends NetRelayBaseTest {
    * @see de.braintags.netrelay.NetRelayBaseTest#modifySettings(de.braintags.netrelay.init.Settings)
    */
   @Override
-  protected void modifySettings(TestContext context, Settings settings) {
+  public void modifySettings(TestContext context, Settings settings) {
     super.modifySettings(context, settings);
     ProcessorDefinition pd = new ProcessorDefinition();
     pd.setActive(true);

@@ -23,7 +23,7 @@ import org.junit.runners.Suite.SuiteClasses;
  * 
  */
 @RunWith(Suite.class)
-@SuiteClasses({ TProcessorDefs.class, TMailProcessor.class })
+@SuiteClasses({ TProcessorDefs.class })
 public class TProcessorSuite {
 
 }

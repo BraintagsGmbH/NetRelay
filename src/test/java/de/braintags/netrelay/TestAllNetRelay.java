@@ -17,6 +17,9 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import de.braintags.netrelay.processor.TProcessorSuite;
+import de.braintags.netrelay.unit.TRequestUtil;
+import de.braintags.netrelay.unit.TSettings;
+import de.braintags.netrelay.unit.TStandardRequests;
 import de.braintags.netrelay.util.MockHttpServerRequestTest;
 
 /**
@@ -26,9 +29,7 @@ import de.braintags.netrelay.util.MockHttpServerRequestTest;
  * 
  */
 @RunWith(Suite.class)
-@SuiteClasses({ TRequestUtil.class, TStandardRequests.class, TTemplateController.class, TCaptureParameters.class,
-    TPersistenceSuite.class, TAuthentication.class, TRegistration.class, TPasswordLost.class, TFailureController.class,
-    TDataTablesController.class, TMailController.class, TProcessorSuite.class, MockHttpServerRequestTest.class,
+@SuiteClasses({ TRequestUtil.class, TStandardRequests.class, TProcessorSuite.class, MockHttpServerRequestTest.class,
     TSettings.class })
 
 public class TestAllNetRelay {
