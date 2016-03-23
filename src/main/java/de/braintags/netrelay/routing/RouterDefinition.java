@@ -30,7 +30,7 @@ import io.vertx.ext.web.Router;
  * 
  */
 public class RouterDefinition {
-  private String name;
+  private String name = null;
   private Class<? extends IController> controller;
   private boolean active = true;
   private HttpMethod httpMethod;
@@ -40,23 +40,26 @@ public class RouterDefinition {
   private Properties handlerProperties = new Properties();
   private CaptureCollection[] captureCollection;
 
-  public RouterDefinition() {
-
-  }
-
   /**
    * Create an instance of the defined IController and init it with the defined properties
    * 
-   * @return the intialized IController
+   * @param vertx
+   *          the instance of vertx
+   * @param netRelay
+   *          the instance of NetRelay
+   * @return the initialized {@link IController}
+   * @throws Exception
    */
   public IController instantiateController(Vertx vertx, NetRelay netRelay) throws Exception {
-    IController controller = getController().newInstance();
-    controller.init(vertx, netRelay, getHandlerProperties(), captureCollection, name);
-    return controller;
+    IController ctrl = getController().newInstance();
+    ctrl.init(vertx, netRelay, getHandlerProperties(), captureCollection, name);
+    return ctrl;
   }
 
   /**
-   * Defines properties, by which an {@link IController} is initialized
+   * Defines properties, by which an {@link IController} is initialized. The properties, which are possible to be
+   * defined
+   * here, are described inside the appropriate implementation of IController
    * 
    * @return the handlerProperties
    */
@@ -65,8 +68,9 @@ public class RouterDefinition {
   }
 
   /**
-   * Defines properties, by which an {@link IController} is initialized. Which properties are possible to be defined
-   * here, is described inside the appropriate implementation of IController
+   * Defines properties, by which an {@link IController} is initialized. The properties, which are possible to be
+   * defined
+   * here, are described inside the appropriate implementation of IController
    * 
    * @param handlerProperties
    *          the handlerProperties to set.
@@ -76,8 +80,7 @@ public class RouterDefinition {
   }
 
   /**
-   * Defines properties, by which an {@link IController} is initialized. Which properties are possible to be defined
-   * here, is described inside the appropriate implementation of IController
+   * The name of the definition is used for display and lookup
    * 
    * @return the defined name
    */
@@ -86,7 +89,7 @@ public class RouterDefinition {
   }
 
   /**
-   * The name of the definition is used for display
+   * The name of the definition is used for display and lookup
    * 
    * @param name
    *          the name to set
@@ -166,6 +169,9 @@ public class RouterDefinition {
    */
   public final void setController(Class<? extends IController> controller) {
     this.controller = controller;
+    if (name == null) {
+      name = controller.getSimpleName();
+    }
   }
 
   /**

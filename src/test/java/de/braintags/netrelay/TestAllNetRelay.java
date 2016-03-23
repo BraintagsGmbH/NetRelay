@@ -17,6 +17,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 import de.braintags.netrelay.processor.TProcessorSuite;
+import de.braintags.netrelay.unit.TFailureController;
 import de.braintags.netrelay.unit.TRequestUtil;
 import de.braintags.netrelay.unit.TSettings;
 import de.braintags.netrelay.unit.TStandardRequests;
@@ -29,8 +30,8 @@ import de.braintags.netrelay.util.MockHttpServerRequestTest;
  * 
  */
 @RunWith(Suite.class)
-@SuiteClasses({ TRequestUtil.class, TStandardRequests.class, TProcessorSuite.class, MockHttpServerRequestTest.class,
-    TSettings.class })
+@SuiteClasses({ TRequestUtil.class, TStandardRequests.class, TFailureController.class, TProcessorSuite.class,
+    MockHttpServerRequestTest.class, TSettings.class })
 
 public class TestAllNetRelay {
   // -DBlockedThreadCheckInterval=10000000 -DWarningExceptionTime=10000000 -DtestTimeout=5
