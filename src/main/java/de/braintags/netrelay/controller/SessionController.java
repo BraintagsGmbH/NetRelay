@@ -10,12 +10,11 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.netrelay.controller.impl;
+package de.braintags.netrelay.controller;
 
 import java.util.Objects;
 import java.util.Properties;
 
-import de.braintags.netrelay.controller.SessionStore;
 import de.braintags.netrelay.routing.RouterDefinition;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.SessionHandler;

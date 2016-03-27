@@ -10,7 +10,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.netrelay.controller.impl;
+package de.braintags.netrelay.controller;
 
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -26,10 +26,12 @@ import de.braintags.netrelay.routing.RouterDefinition;
 import io.vertx.ext.web.RoutingContext;
 
 /**
- * A Controller for failing calls, which is sending an error code. When this controller is added to a RouterDefinition,
- * the {@link RouterDefinition#setFailureDefinition(boolean)} should be set to true.
- * The Controller can be configured to produce output depending on an error code or an exception. For each of them can
- * be a redirect address defined. If no definition was found, then an internal default output is generated.
+ * A Controller for failing calls. The Controller can be configured to produce output depending on an error code or an
+ * exception. For each of them can be defined a redirect address. If no definition was found, then an internal default
+ * output is generated. If no definition was found, then an internal default output is generated.
+ * 
+ * When this controller is added to a RouterDefinition, the {@link RouterDefinition#setFailureDefinition(boolean)}
+ * should be set to true.
  * 
  * <br>
  * <br>

@@ -142,16 +142,15 @@
  * * handlerProperties +
  * a sub object, where controller specific properties are defined ( see the examples below ). The controller specific
  * properties should be contained inside the documentation of the controller
- * * captureCollection *
- * possibility to define captures like known from vertx web. Will be described more exact in the section of the
- * PersistenceController
+ * * captureCollection +
+ * possibility to define captures like known from vertx web. Will be described more exact below.
  * 
  * [source, json]
  * ----
  * 
  * {
  *   "name" : "ThymeleafTemplateController",
- *   "controller" : "de.braintags.netrelay.controller.impl.ThymeleafTemplateController",
+ *   "controller" : "de.braintags.netrelay.controller.ThymeleafTemplateController",
  *   "active" : true,
  *   "routes" : [ "/*" ],
  *   "httpMethod" : null,
@@ -179,7 +178,7 @@
  * 
  * {
  *   "name" : "FailureController",
- *   "controller" : "de.braintags.netrelay.controller.impl.FailureController",
+ *   "controller" : "de.braintags.netrelay.controller.FailureController",
  *   "routes" : null,
  *   "httpMethod" : null,
  *   "blocking" : false,
@@ -194,9 +193,148 @@
  * 
  * ----
  * The example above displays the specification of a failure controller by using the class
- * {@link de.braintags.netrelay.controller.impl.FailureController}, where resulting errorpages can be defined in
+ * {@link de.braintags.netrelay.controller.FailureController}, where resulting errorpages can be defined in
  * dependency to an exception or an error code
  * 
+ * ===== Capture Collection
+ * Capture collections define functional parts of a request. The functional parts of the request are understood and used
+ * by the Controller, which is assigned for the request url. For example, a URL like: +
+ * 
+ * [source, HTML]
+ * ----
+ * http://localhost:8080/products/detail/article/display/12
+ * ----
+ * 
+ * shall display a page, where the article with the id number 12 is published. +
+ * 
+ * One possibility to solve that would be to create a Controller, which would be assigned to the URL
+ * "/products/detail/article/display/*". This controller could then extract the last element of the URL as id, fetch the
+ * fitting article from the datastore, add it into the context and process the suitable template to generate the content
+ * of the reply. And for a URL like +
+ * [source, HTML]
+ * ----
+ * http://localhost:8080/products/detail/article/delete/12
+ * ----
+ * we would create another Controller, whos job would be to delete an article with the specified ID. +
+ * Of course this would lead into lots of Controllers. To avoid that, we are using CaptureCollections ( and behind them
+ * the Captures from vertx-web ) to allow a more generalized way, where we are specifying, which parts of a URL are
+ * defining a functional element.
+ * 
+ * In the examples above we can extract 3 functional parts:
+ * * article - the mapper to be displayed
+ * * display / delete - the action to be executed
+ * * 12 - the ID of the record to be handled
+ * 
+ * So we have to find a generalized way to define the functional elements so, that any controller will "know" what to
+ * with it. The PersistenceController ( you will find it inside the project
+ * link:https://github.com/BraintagsGmbH/NetRelay-Controller[ NetRelay-Controller] ) is the controller which is
+ * responsible to display, insert, update etc. data from or into a datastore by interpreting URLs and form contents and
+ * it is using the CaptureCollections. With this one we would add the following definition to the settings ( we are
+ * reducing the content here ):
+ * 
+ * [source, json]
+ * ----
+ * {
+ *   "name" : "PersistenceController",
+ *   "controller" : "de.braintags.netrelay.controller.persistence.PersistenceController",
+ *   "routes" : [ "/products/:entity/:action/:ID/detail.html" ],
+ *   "handlerProperties" : {
+ *     "uploadRelativePath" : "images/",
+ *     "uploadDirectory" : "webroot/images/",
+ *     "reroute" : "true",
+ *     "cleanPath" : "true"
+ *   },
+ *   "captureCollection" : [ {
+ *     "captureDefinitions" : [ {
+ *       "captureName" : "entity",
+ *       "controllerKey" : "mapper",
+ *       "required" : true
+ *     }, {
+ *       "captureName" : "ID",
+ *       "controllerKey" : "ID",
+ *       "required" : false
+ *     }, {
+ *       "captureName" : "action",
+ *       "controllerKey" : "action",
+ *       "required" : false
+ *     } ]
+ *   } ]
+ * }
+ * ----
+ * 
+ * Inside the PersistenceController are defined several functional elements, like ID, mapper, action, orderBy and
+ * several more. In the example above we defined the structure of the URL to be
+ * 
+ * [source]
+ * ----
+ * /products/:entity/:action/:ID/detail.html
+ * ----
+ * Now we have to explain to the Controller, how he should use those expressions, so that he is doing the right things.
+ * Therefor the CaptureCollections are existing. +
+ * All the elements starting with ":" are functional elements. Inside the definition of the CaptureCollection we are
+ * mapping the items from the defined route to those keys, which the Controller "knows". There we are defining for
+ * example, that the element ":entity" in the route shall be mapped to the idiom "mapper", which will be used by the
+ * PersistenceController to specify the table or collection of the datastore, where to search in. +
+ * Additionally for each CaptureDefinition can be defined, wether an entry is required or not.
+ * 
+ * So why do we need this cumbersome mapping? Why don't we set the functional elements directly so, that they are
+ * pointing to the variables, which are defined by the Controller?
+ * 
+ * Cause we can do other things with the CaptureCollection!
+ * 
+ * In the example configuration above, we defined the use of a URL that way, that all informations are contained inside
+ * the path as a clean URL. An example request for this configuration would be:
+ * 
+ * [source]
+ * ----
+ * http://localhost:8080/products/article/display/12/detail.html
+ * ----
+ * which is a nice clean URL, where all informations are contained inside the URL.
+ * But if we would change the configuration a little bit and would modify the route like that:
+ * 
+ * [source]
+ * ----
+ *   "routes" : [ "/products/detail.html" ],
+ * ----
+ * and would let the rest of the configuration untouched, then we would be able to perform the following request:
+ * 
+ * [source]
+ * ----
+ * http://localhost:8080/products/detail.html?entity=article&action=DISPLAY&ID=12
+ * ----
+ * with the same result!
+ * 
+ * Additionally we are able to define multiple structures. If, for example, inside a page we want to display an article
+ * and a customer, then we have to specify two objects by the URL. This we can do by defining a second CaptureCollection
+ * like that:
+ * 
+ * [source, json]
+ * ----
+ * {
+ *   "name" : "PersistenceController",
+ *   "controller" : "de.braintags.netrelay.controller.persistence.PersistenceController",
+ *   "routes" : [ "/products/:entity/:action/:ID/:entity2/:action2/:ID2/detail.html" ],
+ * ...
+ *   "captureCollection" : [ {
+ *     "captureDefinitions" : [ {
+ *       "captureName" : "entity",
+ *       "controllerKey" : "mapper",
+ *       "required" : true
+ *     }, {
+ *       ...
+ *     } ],
+ *         [ {
+ *       "captureName" : "entity2",
+ *       "controllerKey" : "mapper",
+ *       "required" : true
+ *     }, {
+ *       ...
+ *     } ]
+ *   } ]
+ * }
+ * ----
+ * 
+ * The above shows a route, where two different instances, like an arti
  * 
  * 
  * ==== Processor definitions

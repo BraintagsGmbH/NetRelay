@@ -10,7 +10,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.netrelay.controller.impl;
+package de.braintags.netrelay.controller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,7 +20,6 @@ import java.util.Properties;
 
 import de.braintags.io.vertx.util.exception.ParameterRequiredException;
 import de.braintags.netrelay.RequestUtil;
-import de.braintags.netrelay.controller.IController;
 import de.braintags.netrelay.routing.CaptureCollection;
 import de.braintags.netrelay.routing.CaptureDefinition;
 import io.vertx.core.AsyncResult;
@@ -212,7 +211,7 @@ public abstract class AbstractCaptureController extends AbstractController {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.netrelay.controller.impl.AbstractController#initProperties(java.util.Properties)
+   * @see de.braintags.netrelay.controller.AbstractController#initProperties(java.util.Properties)
    */
   @Override
   public final void initProperties(Properties properties) {

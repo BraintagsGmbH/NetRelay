@@ -1,6 +1,6 @@
 /*
  * #%L
- * netrelay
+ * vertx-pojongo
  * %%
  * Copyright (C) 2015 Braintags GmbH
  * %%
@@ -10,20 +10,23 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.netrelay.controller.impl;
+package de.braintags.netrelay.controller;
 
 import java.util.Properties;
 
 import de.braintags.netrelay.routing.RouterDefinition;
 import io.vertx.ext.web.RoutingContext;
-import io.vertx.ext.web.handler.CookieHandler;
+import io.vertx.ext.web.handler.TimeoutHandler;
 
 /**
- * The Cookie-Controller uses internally the {@link CookieHandler}
- * 
+ * This controller defines for the specified routes, after how long time the request processing is stopped. It uses
+ * internally a {@link TimeoutHandler}
  * <br>
  * <br>
  * Config-Parameter:<br/>
+ * <UL>
+ * <LI>{@value #TIMEOUT_PROP}<br/>
+ * </UL>
  * <br>
  * Request-Parameter:<br/>
  * <br/>
@@ -32,13 +35,14 @@ import io.vertx.ext.web.handler.CookieHandler;
  * 
  * @author Michael Remme
  */
-public class CookieController extends AbstractController {
-  private CookieHandler cookieHandler;
+public class TimeoutController extends AbstractController {
+  private TimeoutHandler timeoutHandler;
 
-  @Override
-  public void initProperties(Properties properties) {
-    cookieHandler = CookieHandler.create();
-  }
+  /**
+   * The property, by which the timeout in milliseconds is defined
+   */
+  public static final String TIMEOUT_PROP = "timeout";
+  public static final long DEFAULT_TIMEOUT = 30000;
 
   /*
    * (non-Javadoc)
@@ -47,7 +51,18 @@ public class CookieController extends AbstractController {
    */
   @Override
   public void handle(RoutingContext event) {
-    cookieHandler.handle(event);
+    timeoutHandler.handle(event);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.netrelay.controller.AbstractController#initProperties(java.util.Properties)
+   */
+  @Override
+  public void initProperties(Properties properties) {
+    long timeout = Long.parseLong((String) properties.getOrDefault(TIMEOUT_PROP, String.valueOf(DEFAULT_TIMEOUT)));
+    timeoutHandler = TimeoutHandler.create(timeout);
   }
 
   /**
@@ -57,9 +72,9 @@ public class CookieController extends AbstractController {
    */
   public static RouterDefinition createDefaultRouterDefinition() {
     RouterDefinition def = new RouterDefinition();
-    def.setName(CookieController.class.getSimpleName());
+    def.setName(TimeoutController.class.getSimpleName());
     def.setBlocking(false);
-    def.setController(CookieController.class);
+    def.setController(TimeoutController.class);
     def.setHandlerProperties(getDefaultProperties());
     return def;
   }
@@ -71,6 +86,7 @@ public class CookieController extends AbstractController {
    */
   public static Properties getDefaultProperties() {
     Properties json = new Properties();
+    json.put(TIMEOUT_PROP, String.valueOf(DEFAULT_TIMEOUT));
     return json;
   }
 

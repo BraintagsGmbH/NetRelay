@@ -3,8 +3,7 @@
  * :toc: left
  * :toclevels: 3
  * 
- * = NetRelay^(R)^
- * 
+ * = NetRelay^(R)^ +
  * web application framework with MVC based on vert.x-web
  * 
  * NetRelay is a web application framework based on vert.x and vert.x-web. It is styled to allow a configurable,
@@ -51,20 +50,29 @@
  * 
  * {@link de.braintags.netrelay.processor}
  * 
- * 
  * == Adding a KeyGenerator Verticle
+ * 
+ * To be able to use a clean key generator for your mappers, you should launch the
+ * {@link de.braintags.io.vertx.keygenerator.KeyGeneratorVerticle} from the project
+ * link:https://github.com/BraintagsGmbH/vertx-key-generator[ vertx-key-generator ].
  * 
  * [source, java]
  * ----
- *  vertx.deployVerticle(NetRelay.class.getName(), options, result -> {
+ * private void initKeyGeneratorVerticle(Vertx vertx, Future<Void> startFuture) {
+ *   DeploymentOptions options = new DeploymentOptions();
+ *   File dir = new File(SETTINGS_LOCATION).getParentFile();
+ *   String settingsLocation = new File(dir, "KeyGeneratorSettings.json").getPath();
+ *   LOGGER.info("Settings for KeyGenerator: " + settingsLocation);
+ *   options.setConfig(new JsonObject().put(KeyGeneratorSettings.SETTINGS_LOCATION_PROPERTY, settingsLocation));
+ *   vertx.deployVerticle(KeyGeneratorVerticle.class.getName(), options, result -> {
  *     if (result.failed()) {
- *       LOGGER.error("", result.cause());
  *       startFuture.fail(result.cause());
  *     } else {
- *       LOGGER.info(NetRelay.class.getSimpleName() + " successfully launched: " + result.result());
- *       initKeyGeneratorVerticle(vertx, settingsPath, startFuture);
+ *       LOGGER.info(KeyGeneratorVerticle.class.getSimpleName() + " successfully launched: " + result.result());
+ *       startFuture.complete();
  *     }
  *   });
+ * }
  * 
  * ----
  * 

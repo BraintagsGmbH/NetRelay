@@ -14,7 +14,6 @@ package de.braintags.netrelay.controller;
 
 import java.util.Properties;
 
-import de.braintags.netrelay.controller.impl.AbstractController;
 import io.vertx.ext.web.RoutingContext;
 
 /**
@@ -55,7 +54,7 @@ public class CreateErrorController extends AbstractController {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.netrelay.controller.impl.AbstractController#initProperties(java.util.Properties)
+   * @see de.braintags.netrelay.controller.AbstractController#initProperties(java.util.Properties)
    */
   @Override
   public void initProperties(Properties properties) {

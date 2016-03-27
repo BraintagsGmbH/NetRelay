@@ -2,7 +2,7 @@ package examples;
 
 import java.util.Properties;
 
-import de.braintags.netrelay.controller.impl.AbstractController;
+import de.braintags.netrelay.controller.AbstractController;
 import io.vertx.docgen.Source;
 import io.vertx.ext.web.RoutingContext;
 

@@ -10,7 +10,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.netrelay.controller.impl;
+package de.braintags.netrelay.controller;
 
 import java.util.Properties;
 
@@ -19,10 +19,7 @@ import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.StaticHandler;
 
 /**
- * Used to serve static contents. Internally a {@link StaticHandler} is used
- * 
- * 
- * <br>
+ * A controller to define serving of static contents. Internally a {@link StaticHandler} is used
  * <br>
  * Config-Parameter:<br/>
  * <UL>

@@ -15,7 +15,6 @@ package de.braintags.netrelay.controller;
 import java.util.Properties;
 import java.util.Set;
 
-import de.braintags.netrelay.controller.impl.AbstractController;
 import de.braintags.netrelay.routing.RouterDefinition;
 import io.vertx.core.MultiMap;
 import io.vertx.core.buffer.Buffer;
@@ -68,7 +67,7 @@ public class StandarRequestController extends AbstractController {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.netrelay.controller.impl.AbstractController#initProperties(java.util.Properties)
+   * @see de.braintags.netrelay.controller.AbstractController#initProperties(java.util.Properties)
    */
   @Override
   public void initProperties(Properties properties) {

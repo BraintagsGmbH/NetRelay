@@ -15,7 +15,6 @@ package de.braintags.netrelay.controller;
 import java.util.List;
 import java.util.Properties;
 
-import de.braintags.netrelay.controller.impl.AbstractCaptureController;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -32,7 +31,7 @@ public class CaptureTestController extends AbstractCaptureController {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.netrelay.controller.impl.AbstractCaptureController#handle(io.vertx.ext.web.RoutingContext,
+   * @see de.braintags.netrelay.controller.AbstractCaptureController#handle(io.vertx.ext.web.RoutingContext,
    * java.util.List)
    */
   @Override
@@ -46,7 +45,7 @@ public class CaptureTestController extends AbstractCaptureController {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.netrelay.controller.impl.AbstractCaptureController#internalInitProperties(java.util.Properties)
+   * @see de.braintags.netrelay.controller.AbstractCaptureController#internalInitProperties(java.util.Properties)
    */
   @Override
   protected void internalInitProperties(Properties properties) {
@@ -55,7 +54,7 @@ public class CaptureTestController extends AbstractCaptureController {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.netrelay.controller.impl.AbstractCaptureController#cleanPath(io.vertx.ext.web.RoutingContext,
+   * @see de.braintags.netrelay.controller.AbstractCaptureController#cleanPath(io.vertx.ext.web.RoutingContext,
    * java.util.List)
    */
   @Override

@@ -10,7 +10,7 @@
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-package de.braintags.netrelay.controller.impl;
+package de.braintags.netrelay.controller;
 
 import java.net.URI;
 import java.util.Properties;
@@ -21,7 +21,8 @@ import io.vertx.ext.web.handler.BodyHandler;
 
 /**
  * A Controller, which creates and uses a {@link BodyHandler}.
- * The BodyHandler creates som variables and stores them inside the context either:<br/>
+ * The BodyController creates some variables and stores them inside the context, so that they can be used from out of a
+ * template, for instance.<br/>
  * 
  * <UL>
  * <LI>REQUEST_HOST<br/>
@@ -30,7 +31,6 @@ import io.vertx.ext.web.handler.BodyHandler;
  * the port of the host of the current request
  * <LI>REQUEST_SCHEME<br/>
  * the scheme of the host of the current request
- * 
  * </UL>
  * 
  * <br/>
@@ -86,7 +86,7 @@ public class BodyController extends AbstractController {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.netrelay.controller.impl.AbstractController#initProperties(java.util.Properties)
+   * @see de.braintags.netrelay.controller.AbstractController#initProperties(java.util.Properties)
    */
   @Override
   public void initProperties(Properties properties) {
