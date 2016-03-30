@@ -604,20 +604,29 @@ This controller defines for the specified routes, after how long time the reques
 
 === Existing Processors
 
-
 == Adding a KeyGenerator Verticle
+
+To be able to use a clean key generator for your mappers, you should launch the
+`link:unavailable[KeyGeneratorVerticle]` from the project
+link:https://github.com/BraintagsGmbH/vertx-key-generator[ vertx-key-generator ].
 
 [source, java]
 ----
- vertx.deployVerticle(NetRelay.class.getName(), options, result -> {
+private void initKeyGeneratorVerticle(Vertx vertx, Future<Void> startFuture) {
+  DeploymentOptions options = new DeploymentOptions();
+  File dir = new File(SETTINGS_LOCATION).getParentFile();
+  String settingsLocation = new File(dir, "KeyGeneratorSettings.json").getPath();
+  LOGGER.info("Settings for KeyGenerator: " + settingsLocation);
+  options.setConfig(new JsonObject().put(KeyGeneratorSettings.SETTINGS_LOCATION_PROPERTY, settingsLocation));
+  vertx.deployVerticle(KeyGeneratorVerticle.class.getName(), options, result -> {
     if (result.failed()) {
-      LOGGER.error("", result.cause());
       startFuture.fail(result.cause());
     } else {
-      LOGGER.info(NetRelay.class.getSimpleName() + " successfully launched: " + result.result());
-      initKeyGeneratorVerticle(vertx, settingsPath, startFuture);
+      LOGGER.info(KeyGeneratorVerticle.class.getSimpleName() + " successfully launched: " + result.result());
+      startFuture.complete();
     }
   });
+}
 
 ----
 

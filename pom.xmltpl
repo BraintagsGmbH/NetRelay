@@ -23,6 +23,7 @@
 		<doc.skip>false</doc.skip>
 		<source.skip>false</source.skip>
 		<testjar.skip>false</testjar.skip>
+	    <jacoco.haltOnFailure>false</jacoco.haltOnFailure>
 	</properties>
 
 	<dependencies>
