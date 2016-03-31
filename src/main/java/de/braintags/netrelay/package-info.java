@@ -79,6 +79,15 @@
  * 
  * == Further links
  *
+ * * link:https://github.com/BraintagsGmbH/NetRelay-Controller[NetRelay-Controller] contains several ready to use
+ * controllers +
+ * 
+ * * link:https://github.com/BraintagsGmbH/NetRelay-PdfController[NetRelay-PdfController]: Controllers and processors
+ * for NetRelay, which are dealing with pdf. +
+ * 
+ * * link:https://github.com/BraintagsGmbH/NetRelay-Demoproject[NetRelay-Demoproject]: a demo project using NetRelay +
+ * 
+ *
  *
  */
 @Document(fileName = "index.adoc")
