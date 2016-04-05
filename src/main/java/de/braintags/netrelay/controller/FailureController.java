@@ -23,6 +23,7 @@ import de.braintags.io.vertx.util.ExceptionUtil;
 import de.braintags.io.vertx.util.exception.InitException;
 import de.braintags.netrelay.RequestUtil;
 import de.braintags.netrelay.routing.RouterDefinition;
+import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.ext.web.RoutingContext;
 
 /**
@@ -127,7 +128,10 @@ public class FailureController extends AbstractController {
    */
   @Override
   public void handle(RoutingContext context) {
-    String reply = String.format("Statuscode %d for request %s", context.statusCode(), context.request().path());
+    HttpResponseStatus status = context.statusCode() > 0 ? HttpResponseStatus.valueOf(context.statusCode()) : null;
+
+    String reply = String.format("Statuscode %d %s for request %s", context.statusCode(),
+        status == null ? "" : "( " + status.reasonPhrase() + " )", context.request().path());
     LOGGER.info(reply);
     if (context.failure() != null) {
       reactByException(context);
