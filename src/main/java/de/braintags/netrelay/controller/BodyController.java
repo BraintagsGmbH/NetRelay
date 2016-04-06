@@ -78,7 +78,7 @@ public class BodyController extends AbstractController {
       event.put("REQUEST_PORT", uri.getPort());
       event.put("REQUEST_SCHEME", uri.getScheme());
     } catch (Exception e) {
-      LOGGER.warn(e.toString());
+      LOGGER.warn(e);
     }
     bodyHandler.handle(event);
   }

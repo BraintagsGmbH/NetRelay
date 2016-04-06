@@ -22,6 +22,7 @@ import de.braintags.io.vertx.util.exception.InitException;
 import de.braintags.netrelay.controller.BodyController;
 import de.braintags.netrelay.controller.CookieController;
 import de.braintags.netrelay.controller.FailureController;
+import de.braintags.netrelay.controller.FavIconController;
 import de.braintags.netrelay.controller.SessionController;
 import de.braintags.netrelay.controller.StaticController;
 import de.braintags.netrelay.controller.TimeoutController;
@@ -61,12 +62,6 @@ public class NetRelay extends AbstractVerticle {
    */
   private IMapperFactory mapperFactory;
 
-  /**
-   * 
-   */
-  public NetRelay() {
-  }
-
   /*
    * (non-Javadoc)
    * 
@@ -94,7 +89,7 @@ public class NetRelay extends AbstractVerticle {
       mapperFactory = new NetRelayMapperFactory(this);
       initMailClient();
       initController(router);
-      initProcessors(router);
+      initProcessors();
       initHttpServer(router, result -> {
         if (result.failed()) {
           startFuture.fail(result.cause());
@@ -141,7 +136,7 @@ public class NetRelay extends AbstractVerticle {
    * 
    * @throws Exception
    */
-  protected void initProcessors(Router router) throws Exception {
+  protected void initProcessors() {
     List<ProcessorDefinition> rd = settings.getProcessorDefinitons().getProcessorDefinitions();
     for (ProcessorDefinition def : rd) {
       def.initProcessorDefinition(vertx, this);
@@ -167,12 +162,12 @@ public class NetRelay extends AbstractVerticle {
    */
   protected Settings initSettings() {
     try {
-      Settings settings = Settings.loadSettings(this, vertx, context);
-      if (!settings.isEdited()) {
+      Settings st = Settings.loadSettings(this, vertx, context);
+      if (!st.isEdited()) {
         throw new InitException(
             "The settings are not yet edited. Change the value of property 'edited' to true inside the appropriate file");
       }
-      return settings;
+      return st;
     } catch (Exception e) {
       LOGGER.error("", e);
       throw e;
@@ -234,12 +229,11 @@ public class NetRelay extends AbstractVerticle {
    * @return
    */
   public Settings createDefaultSettings() {
-    Settings settings = new Settings();
-    addDefaultRouterDefinitions(settings);
-    addDefaultProcessorDefinitions(settings);
-    settings.setDatastoreSettings(MongoDataStoreInit.createDefaultSettings());
-    // settings.getMappingDefinitions().addMapperDefinition("SimpleNetRelayMapper", SimpleNetRelayMapper.class);
-    return settings;
+    Settings st = new Settings();
+    addDefaultRouterDefinitions(st);
+    addDefaultProcessorDefinitions(st);
+    st.setDatastoreSettings(MongoDataStoreInit.createDefaultSettings());
+    return st;
   }
 
   protected void addDefaultProcessorDefinitions(Settings settings) {
@@ -252,6 +246,7 @@ public class NetRelay extends AbstractVerticle {
   }
 
   protected void addDefaultRouterDefinitions(Settings settings) {
+    settings.getRouterDefinitions().add(FavIconController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(CookieController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(SessionController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(TimeoutController.createDefaultRouterDefinition());

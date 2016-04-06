@@ -84,7 +84,7 @@ public class StaticController extends AbstractController {
     def.setBlocking(false);
     def.setController(StaticController.class);
     def.setHandlerProperties(getDefaultProperties());
-    def.setRoutes(new String[] { "/static/*", "/favicon.ico" });
+    def.setRoutes(new String[] { "/static/*" });
     return def;
   }
 

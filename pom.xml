@@ -85,8 +85,6 @@
 			<artifactId>vertx-mail-client</artifactId>
 			<version>3.3.0-SNAPSHOT</version>
 		</dependency>
-
-
 	</dependencies>
 
 	<build>
