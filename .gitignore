@@ -18,6 +18,7 @@ gradle-app.setting
 /.project
 /.yardoc
 /tmp
+/pombak
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
