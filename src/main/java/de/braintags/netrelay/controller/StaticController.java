@@ -35,6 +35,9 @@ import io.vertx.ext.web.handler.StaticHandler;
  * @author Michael Remme
  */
 public class StaticController extends AbstractController {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(StaticController.class);
+
   /**
    * The property, by which one can switch on / off the caching of static contents
    */
@@ -45,12 +48,6 @@ public class StaticController extends AbstractController {
    */
   public static final String CACHE_TIMEOUT_PROPERTY = "cacheTimeout";
   private StaticHandler staticHandler;
-
-  /**
-   * 
-   */
-  public StaticController() {
-  }
 
   @Override
   public void initProperties(Properties properties) {
@@ -70,6 +67,7 @@ public class StaticController extends AbstractController {
    */
   @Override
   public void handle(RoutingContext event) {
+    LOGGER.info("handling " + getClass().getName() + " for " + event.request().path());
     staticHandler.handle(event);
   }
 

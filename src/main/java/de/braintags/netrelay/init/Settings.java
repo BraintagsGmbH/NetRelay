@@ -57,7 +57,7 @@ public class Settings {
   private int serverPort = 8080;
   private String hostName = "localhost";
   private boolean edited = false;
-  private String defaultLoginPage = "/backend/login.html";
+  private String defaultLoginPage = "/login.html";
   private DataStoreSettings datastoreSettings;
   private RouterDefinitions routerDefinitions = new RouterDefinitions();
   private ProcessorDefinitions processorDefinitons = new ProcessorDefinitions();
