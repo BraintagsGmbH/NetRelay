@@ -39,7 +39,6 @@ import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.ext.mail.MailClient;
-import io.vertx.ext.mail.MailConfig;
 import io.vertx.ext.web.Router;
 
 /**
@@ -104,13 +103,35 @@ public class NetRelay extends AbstractVerticle {
 
   private void initMailClient() {
     MailClientSettings ms = settings.getMailClientSettings();
+    initMailClientSettings(ms);
     if (ms.isActive()) {
-      MailConfig config = new MailConfig();
       mailClient = MailClient.createShared(vertx, ms, ms.getName());
       LOGGER.info("MailClient startet with configuration " + ms.toJson());
     } else {
       LOGGER.info("MailClient NOT started, cause not activated in configuration");
     }
+  }
+
+  // "-DmailClientUserName=dev-test@braintags.net -DmailClientPassword=thoo4ati "
+  private void initMailClientSettings(MailClientSettings ms) {
+    String mailUserName = System.getProperty(MailClientSettings.USERNAME_SYS_PROPERTY);
+    if (mailUserName != null && mailUserName.hashCode() != 0) {
+      ms.setUsername(mailUserName);
+    }
+    String mailClientPassword = System.getProperty(MailClientSettings.PASSWORD_SYS_PROPERTY);
+    if (mailClientPassword != null && mailClientPassword.hashCode() != 0) {
+      ms.setPassword(mailClientPassword);
+    }
+    String mailClientHost = System.getProperty(MailClientSettings.HOST_SYS_PROPERTY);
+    if (mailClientHost != null && mailClientHost.hashCode() != 0) {
+      ms.setHostname(mailClientHost);
+    }
+
+    String mailClientPort = System.getProperty(MailClientSettings.PORT_SYS_PROPERTY);
+    if (mailClientPort != null && mailClientPort.hashCode() != 0) {
+      ms.setPort(Integer.parseInt(mailClientPort));
+    }
+
   }
 
   /**

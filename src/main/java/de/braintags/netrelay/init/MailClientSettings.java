@@ -22,6 +22,24 @@ import io.vertx.ext.mail.MailConfig;
  * 
  */
 public class MailClientSettings extends MailConfig {
+  /**
+   * name of a system property which can be set to init the mail clients username
+   */
+  public static final String USERNAME_SYS_PROPERTY = "mailClientUserName";
+  /**
+   * name of a system property which can be set to init the mail clients password
+   */
+  public static final String PASSWORD_SYS_PROPERTY = "mailClientPassword";
+  /**
+   * name of a system property which can be set to init the mail clients host
+   */
+  public static final String HOST_SYS_PROPERTY = "mailClientHost";
+
+  /**
+   * name of a system property which can be set to init the mail clients port
+   */
+  public static final String PORT_SYS_PROPERTY = "mailClientPort";
+
   private boolean active = false;
   private String name = "NetRelay MailClient";
 
