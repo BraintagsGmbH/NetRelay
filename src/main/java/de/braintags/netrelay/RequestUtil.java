@@ -15,6 +15,7 @@ package de.braintags.netrelay;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
+import de.braintags.io.vertx.util.ExceptionUtil;
 import de.braintags.io.vertx.util.exception.ParameterRequiredException;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpHeaders;
@@ -34,6 +35,9 @@ import io.vertx.ext.web.templ.ThymeleafTemplateEngine;
  */
 public class RequestUtil {
   private static final Logger LOGGER = LoggerFactory.getLogger(RequestUtil.class);
+
+  private RequestUtil() {
+  }
 
   /**
    * Encodes the text into a suitable format for UTF-8 for http requests for instance
@@ -59,7 +63,7 @@ public class RequestUtil {
     try {
       return URLEncoder.encode(text, encoding);
     } catch (UnsupportedEncodingException e) {
-      throw new RuntimeException(e);
+      throw ExceptionUtil.createRuntimeException(e);
     }
   }
 
@@ -117,7 +121,6 @@ public class RequestUtil {
    */
   public static void renderSpecificTemplate(RoutingContext context, String path, String contentType,
       String templateDirectory, ThymeleafTemplateEngine thEngine) {
-    // templateHandler.handle(context);
     String file = templateDirectory + path;
     thEngine.render(context, file, res -> {
       if (res.succeeded()) {
@@ -139,17 +142,42 @@ public class RequestUtil {
   }
 
   /**
-   * Sending a redirect to another page by adding query parameters of a current request
+   * The same than {@link #sendRedirect(HttpServerResponse, HttpServerRequest, String, true)}
    * 
    * @param response
    * @param request
    * @param path
    */
   public static void sendRedirect(HttpServerResponse response, HttpServerRequest request, String path) {
+    sendRedirect(response, request, path, true);
+  }
+
+  /**
+   * Sending a redirect to another page by adding query parameters of a current request
+   * 
+   * @param response
+   * @param request
+   * @param path
+   * @param reuseArguments
+   *          if true, the query parameters of the current request are reused
+   */
+  public static void sendRedirect(HttpServerResponse response, HttpServerRequest request, String path,
+      boolean resuseArguments) {
     LOGGER.info("sending redirect to " + path);
-    response.putHeader("location", createRedirectUrl(request, path));
+    response.putHeader("location", createRedirectUrl(request, path, resuseArguments));
     response.setStatusCode(302);
     response.end();
+  }
+
+  /**
+   * The same than {@link #createRedirectUrl(HttpServerRequest, String, true)}
+   * 
+   * @param request
+   * @param path
+   * @return
+   */
+  public static String createRedirectUrl(HttpServerRequest request, String path) {
+    return createRedirectUrl(request, path, true);
   }
 
   /**
@@ -158,16 +186,19 @@ public class RequestUtil {
    * 
    * @param request
    * @param path
+   * @param reuseArguments
+   *          if true, the query parameters of the current request are reused
    * @return
    */
-  public static String createRedirectUrl(HttpServerRequest request, String path) {
-    if (request != null) {
+  public static String createRedirectUrl(HttpServerRequest request, String path, boolean reuseArguments) {
+    String tmpPath = path;
+    if (request != null && reuseArguments) {
       String qp = request.query();
       if (qp != null && qp.hashCode() != 0) {
-        path += (path.indexOf('?') < 0 ? "?" : "&") + qp;
+        tmpPath += (path.indexOf('?') < 0 ? "?" : "&") + qp;
       }
     }
-    return path;
+    return tmpPath;
   }
 
   /**
@@ -181,7 +212,6 @@ public class RequestUtil {
    */
   public static String loadProperty(RoutingContext context, String propName, boolean required, JsonObject errorObject) {
     String value = context.request().getParam(propName);
-    // value = context.request().getFormAttribute(propName);
     if (required && (value == null || value.trim().isEmpty()))
       errorObject.put(propName + "Error", "parameter '" + propName + " is required");
     return value;
