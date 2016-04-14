@@ -19,6 +19,7 @@ gradle-app.setting
 /.yardoc
 /tmp
 /pombak
+/.sonar_lock
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/

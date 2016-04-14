@@ -14,6 +14,7 @@ package de.braintags.netrelay.typehandler;
 
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.StringTypeHandlerFactory;
 import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.BooleanTypeHandler;
+import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.GeoPointTypeHandler;
 
 /**
  * A TypeHandlerFactory, which reacts with information coming across http requests
@@ -33,5 +34,6 @@ public class HttpTypehandlerFactory extends StringTypeHandlerFactory {
     super.init();
     remove(BooleanTypeHandler.class);
     getDefinedTypeHandlers().add(0, new HttpBooleanTypeHandler(this));
+    replace(GeoPointTypeHandler.class, new HttpGeoPointTypeHandler(this));
   }
 }

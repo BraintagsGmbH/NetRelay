@@ -13,6 +13,7 @@
 package de.braintags.netrelay.mapper;
 
 import de.braintags.io.vertx.pojomapper.annotation.Entity;
+import de.braintags.io.vertx.pojomapper.datatypes.geojson.GeoPoint;
 import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRecord;
 
 /**
@@ -27,5 +28,6 @@ public class SimpleNetRelayMapper extends BaseRecord {
   public int age;
   public boolean child;
   public String fileName;
+  public GeoPoint geoPoint;
 
 }
