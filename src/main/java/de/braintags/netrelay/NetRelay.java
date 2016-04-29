@@ -93,12 +93,21 @@ public class NetRelay extends AbstractVerticle {
         if (result.failed()) {
           startFuture.fail(result.cause());
         } else {
-          startFuture.complete();
+          initComplete(startFuture);
         }
       });
     } catch (Exception e) {
       startFuture.fail(e);
     }
+  }
+
+  /**
+   * Set the future to be completed
+   * 
+   * @param startFuture
+   */
+  protected void initComplete(Future<Void> startFuture) {
+    startFuture.complete();
   }
 
   private void initMailClient() {
