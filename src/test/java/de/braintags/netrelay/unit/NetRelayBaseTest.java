@@ -68,13 +68,16 @@ public class NetRelayBaseTest {
   protected static NetRelay netRelay;
   protected KeyGeneratorVerticle keyGenVerticle;
 
+  public static String HOSTNAME = "localhost";
+  public static int PORT = 8080;
+
   @Rule
   public Timeout rule = Timeout.seconds(Integer.parseInt(System.getProperty("testTimeout", "20")));
   @Rule
   public TestName name = new TestName();
 
   @Before
-  public final void initBeforeTest(TestContext context) {
+  public void initBeforeTest(TestContext context) {
     LOGGER.info("Starting test: " + this.getClass().getSimpleName() + "#" + name.getMethodName());
     initNetRelay(context);
     DatastoreBaseTest.EXTERNAL_DATASTORE = netRelay.getDatastore();
@@ -209,7 +212,7 @@ public class NetRelayBaseTest {
   protected final void testRequestBuffer(TestContext context, HttpMethod method, String path,
       Consumer<HttpClientRequest> requestAction, Consumer<ResponseCopy> responseAction, int statusCode,
       String statusMessage, Buffer responseBodyBuffer) throws Exception {
-    testRequestBuffer(context, client, method, 8080, path, requestAction, responseAction, statusCode, statusMessage,
+    testRequestBuffer(context, client, method, PORT, path, requestAction, responseAction, statusCode, statusMessage,
         responseBodyBuffer);
   }
 
@@ -228,7 +231,7 @@ public class NetRelayBaseTest {
       }
     };
 
-    HttpClientRequest req = client.request(method, port, "localhost", path, resp -> {
+    HttpClientRequest req = client.request(method, port, HOSTNAME, path, resp -> {
       resp.exceptionHandler(exceptionHandler);
 
       ResponseCopy rc = new ResponseCopy();

@@ -118,8 +118,7 @@ public class BodyController extends AbstractController {
    * @return
    */
   public static Properties getDefaultProperties() {
-    Properties json = new Properties();
-    return json;
+    return new Properties();
   }
 
 }
