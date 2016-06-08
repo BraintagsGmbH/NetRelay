@@ -11,7 +11,7 @@
 	<parent>
 		<groupId>de.braintags</groupId>
 		<artifactId>btVertxBasePOM</artifactId>
-		<version>15-SNAPSHOT</version>
+		<version>16-SNAPSHOT</version>
 	</parent>
 
 
@@ -85,6 +85,8 @@
 			<artifactId>vertx-mail-client</artifactId>
 			<version>3.3.0-SNAPSHOT</version>
 		</dependency>
+
+
 	</dependencies>
 
 	<build>
