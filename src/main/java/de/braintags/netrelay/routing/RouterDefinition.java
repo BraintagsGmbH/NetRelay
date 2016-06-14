@@ -247,4 +247,9 @@ public class RouterDefinition {
     this.active = active;
   }
 
+  @Override
+  public String toString() {
+    return getName();
+  }
+
 }

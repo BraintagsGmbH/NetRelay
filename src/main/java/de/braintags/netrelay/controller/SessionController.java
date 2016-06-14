@@ -111,8 +111,8 @@ public class SessionController extends AbstractController {
    * @see io.vertx.core.Handler#handle(java.lang.Object)
    */
   @Override
-  public void handle(RoutingContext event) {
-    sessionHandler.handle(event);
+  public void handle(RoutingContext context) {
+    sessionHandler.handle(context);
   }
 
   /**
