@@ -34,6 +34,7 @@ import de.braintags.netrelay.impl.NetRelayExt_InternalSettings;
 import de.braintags.netrelay.init.MailClientSettings;
 import de.braintags.netrelay.init.Settings;
 import de.braintags.netrelay.routing.RouterDefinition;
+import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
@@ -100,6 +101,31 @@ public class NetRelayBaseTest {
 
   public void initTest(TestContext context) {
 
+  }
+
+  @Before
+  public final void afterTest(TestContext context) {
+    stopTest(context);
+  }
+
+  protected void stopTest(TestContext context) {
+  }
+
+  protected void undeployVerticle(TestContext context, AbstractVerticle verticle) {
+    LOGGER.debug("undeploying verticle " + verticle.deploymentID());
+    Async async = context.async();
+    vertx.undeploy(verticle.deploymentID(), result -> {
+      if (result.failed()) {
+        LOGGER.error(result.cause());
+        context.fail(result.cause());
+        async.complete();
+      } else {
+        LOGGER.debug("succeeded undeploying verticle " + verticle.deploymentID());
+        async.complete();
+      }
+    });
+    async.awaitSuccess();
+    LOGGER.debug("finished undeploying verticle " + verticle.deploymentID());
   }
 
   @BeforeClass
