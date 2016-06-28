@@ -23,23 +23,48 @@ public enum Action {
   /**
    * request for an action to insert a record
    */
-  INSERT(),
+  INSERT(
+      "INSERT", 'C'),
   /**
    * request for an action to update a record
    */
-  UPDATE(),
+  UPDATE(
+      "UPDATE", 'U'),
   /**
    * request for an action to display a record or a list of records
    */
-  DISPLAY(),
+  DISPLAY(
+      "DISPLAY", 'R'),
   /**
    * request for an action to delete a record
    */
-  DELETE(),
+  DELETE(
+      "DELETE", 'D'),
   /**
    * request for an action to perform no action. This action could be used, if one template shall be used for inserting
    * a new record and displaying the inserted result
    */
-  NONE();
+  NONE(
+      "NONE", ' ');
 
+  private String value;
+  private char CRUD;
+
+  Action(String value, char CRUD) {
+    this.value = value;
+  }
+
+  /**
+   * Get the char, which is describing the action as CRUD
+   * 
+   * @return
+   */
+  public char getCRUD() {
+    return CRUD;
+  }
+
+  @Override
+  public String toString() {
+    return value;
+  }
 }
