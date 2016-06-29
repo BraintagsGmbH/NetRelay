@@ -48,10 +48,11 @@ public enum Action {
       "NONE", ' ');
 
   private String value;
-  private char CRUD;
+  private char crud;
 
-  Action(String value, char CRUD) {
+  Action(String value, char crud) {
     this.value = value;
+    this.crud = crud;
   }
 
   /**
@@ -60,7 +61,7 @@ public enum Action {
    * @return
    */
   public char getCRUD() {
-    return CRUD;
+    return crud;
   }
 
   @Override
