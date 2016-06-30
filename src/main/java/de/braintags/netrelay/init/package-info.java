@@ -58,7 +58,7 @@
  *   "properties" : {
  *     "startMongoLocal" : "false",
  *     "handleReferencedRecursive" : "true",
- *     "localPort" : "27018",
+ *     "localPort" : "27017",
  *     "connection_string" : "mongodb://localhost:27017",
  *     "shared" : "false"
  *   },
