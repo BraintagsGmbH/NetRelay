@@ -135,7 +135,9 @@ public class NetRelayBaseTest {
     vertx = Vertx.vertx(getVertxOptions());
     client = vertx.createHttpClient(new HttpClientOptions().setDefaultPort(8080));
     boolean startMongoLocal = Boolean.getBoolean("startMongoLocal");
+    LOGGER.info("starting mongo local: " + startMongoLocal);
     if (startMongoLocal && MongoDataStoreInit.getMongodExecutable() == null) {
+      LOGGER.info("NOW starting mongo local");
       MongoDataStoreInit.startMongoExe(startMongoLocal, 27017);
     }
   }

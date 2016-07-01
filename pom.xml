@@ -101,6 +101,7 @@
 							<io.netty.leakDetectionLevel>PARANOID</io.netty.leakDetectionLevel>
 							<mailClientUserName>${mailClientUserName}</mailClientUserName>
                 			<mailClientPassword>${mailClientPassword}</mailClientPassword>
+                			<startMongoLocal>true</startMongoLocal>
 						</systemPropertyVariables>
 						<argLine>-server -Xmx1200M</argLine>
 						<forkCount>1</forkCount>
