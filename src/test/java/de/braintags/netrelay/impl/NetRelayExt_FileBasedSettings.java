@@ -12,6 +12,7 @@
  */
 package de.braintags.netrelay.impl;
 
+import de.braintags.io.vertx.pojomapper.mongo.init.MongoDataStoreInit;
 import de.braintags.netrelay.NetRelay;
 import de.braintags.netrelay.init.Settings;
 import de.braintags.netrelay.mapper.SimpleNetRelayMapper;
@@ -65,7 +66,24 @@ public class NetRelayExt_FileBasedSettings extends NetRelay {
     if (settingsEdited) {
       settings.setEdited(true);
     }
+    applySystemProperties(settings);
     return settings;
+  }
+
+  public static void applySystemProperties(Settings settings) {
+    String connectionString = System.getProperty(MongoDataStoreInit.CONNECTION_STRING_PROPERTY, null);
+    if (connectionString != null) {
+      settings.getDatastoreSettings().getProperties().put(MongoDataStoreInit.CONNECTION_STRING_PROPERTY,
+          connectionString);
+    }
+    String sl = System.getProperty(MongoDataStoreInit.START_MONGO_LOCAL_PROP, null);
+    if (sl != null) {
+      settings.getDatastoreSettings().getProperties().put(MongoDataStoreInit.START_MONGO_LOCAL_PROP, sl);
+    }
+    String localPort = System.getProperty(MongoDataStoreInit.LOCAL_PORT_PROP, null);
+    if (localPort != null) {
+      settings.getDatastoreSettings().getProperties().put(MongoDataStoreInit.LOCAL_PORT_PROP, localPort);
+    }
   }
 
   protected Settings initSettingsWithoutEditCheck() {

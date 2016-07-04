@@ -82,6 +82,7 @@ public class NetRelayExt_InternalSettings extends NetRelay {
    */
   @Override
   protected Settings initSettings() {
+    NetRelayExt_FileBasedSettings.applySystemProperties(settings);
     return settings;
   }
 

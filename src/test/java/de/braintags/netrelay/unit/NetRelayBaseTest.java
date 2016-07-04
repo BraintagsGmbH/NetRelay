@@ -195,20 +195,7 @@ public class NetRelayBaseTest {
    */
   public void modifySettings(TestContext context, Settings settings) {
     LOGGER.info("modifySettings");
-    String connectionString = System.getProperty(MongoDataStoreInit.CONNECTION_STRING_PROPERTY, null);
-    if (connectionString != null) {
-      settings.getDatastoreSettings().getProperties().put(MongoDataStoreInit.CONNECTION_STRING_PROPERTY,
-          connectionString);
-    }
     settings.getDatastoreSettings().setDatabaseName(getClass().getSimpleName());
-    String sl = System.getProperty(MongoDataStoreInit.START_MONGO_LOCAL_PROP, null);
-    if (sl != null) {
-      settings.getDatastoreSettings().getProperties().put(MongoDataStoreInit.START_MONGO_LOCAL_PROP, sl);
-    }
-    String localPort = System.getProperty(MongoDataStoreInit.LOCAL_PORT_PROP, null);
-    if (localPort != null) {
-      settings.getDatastoreSettings().getProperties().put(MongoDataStoreInit.LOCAL_PORT_PROP, localPort);
-    }
   }
 
   protected final void testRequest(TestContext context, HttpMethod method, String path, int statusCode,
