@@ -62,6 +62,12 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
 public class NetRelayBaseTest {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(NetRelayBaseTest.class);
+
+  /**
+   * The name of the property, by which the port of NetRelay can be specified
+   */
+  public static final String SERVER_PORT_PROPERTY = "NetRelayPort";
+
   public static final String TESTS_MAIL_RECIPIENT = "mremme@braintags.de";
   public static final String TESTS_MAIL_FROM = "netrelayTesting@braintags.de";
 
@@ -137,12 +143,6 @@ public class NetRelayBaseTest {
     boolean startMongoLocal = Boolean.getBoolean("startMongoLocal");
     String portString = System.getProperty(MongoDataStoreInit.LOCAL_PORT_PROP, "27017");
     int port = Integer.parseInt(portString);
-
-    // LOGGER.info("starting mongo local: " + startMongoLocal);
-    // if (startMongoLocal && MongoDataStoreInit.getMongodExecutable() == null) {
-    // LOGGER.info("NOW starting mongo local");
-    // MongoDataStoreInit.startMongoExe(startMongoLocal, port);
-    // }
   }
 
   @AfterClass
@@ -198,6 +198,11 @@ public class NetRelayBaseTest {
    */
   public void modifySettings(TestContext context, Settings settings) {
     LOGGER.info("modifySettings");
+
+    String portString = System.getProperty(SERVER_PORT_PROPERTY, null);
+    if (portString != null) {
+      PORT = Integer.parseInt(portString);
+    }
     settings.setServerPort(PORT);
     settings.getDatastoreSettings().setDatabaseName(getClass().getSimpleName());
   }
