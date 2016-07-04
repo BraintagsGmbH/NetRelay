@@ -73,6 +73,7 @@ public class TStandardRequests extends NetRelayBaseTest {
       String url = "/";
       testRequest(context, HttpMethod.GET, url, req -> {
       }, resp -> {
+        context.assertNotNull(resp, "response is null");
         LOGGER.info("RESPONSE: " + resp.content);
         LOGGER.info("HEADERS: " + resp.headers);
       }, 200, "OK", null);

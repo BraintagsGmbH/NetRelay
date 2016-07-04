@@ -71,7 +71,7 @@ public class NetRelayBaseTest {
   protected KeyGeneratorVerticle keyGenVerticle;
 
   public static String HOSTNAME = "localhost";
-  public static int PORT = 8080;
+  public static int PORT = 8085;
 
   @Rule
   public Timeout rule = Timeout.seconds(Integer.parseInt(System.getProperty("testTimeout", "20")));
@@ -198,6 +198,7 @@ public class NetRelayBaseTest {
    */
   public void modifySettings(TestContext context, Settings settings) {
     LOGGER.info("modifySettings");
+    settings.setServerPort(PORT);
     settings.getDatastoreSettings().setDatabaseName(getClass().getSimpleName());
   }
 
@@ -293,6 +294,7 @@ public class NetRelayBaseTest {
     if (responseAction != null) {
       responseAction.accept(rc);
     }
+    context.assertNotNull(rc, "Responsecopy is null");
     context.assertEquals(statusCode, rc.code);
     context.assertEquals(statusMessage, rc.statusMessage);
     if (responseBodyBuffer == null) {
