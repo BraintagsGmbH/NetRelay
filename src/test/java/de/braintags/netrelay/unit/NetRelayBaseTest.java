@@ -195,6 +195,11 @@ public class NetRelayBaseTest {
    */
   public void modifySettings(TestContext context, Settings settings) {
     LOGGER.info("modifySettings");
+    String connectionString = System.getProperty(MongoDataStoreInit.CONNECTION_STRING_PROPERTY, null);
+    if (connectionString != null) {
+      settings.getDatastoreSettings().getProperties().put(MongoDataStoreInit.CONNECTION_STRING_PROPERTY,
+          connectionString);
+    }
     settings.getDatastoreSettings().setDatabaseName(getClass().getSimpleName());
   }
 
