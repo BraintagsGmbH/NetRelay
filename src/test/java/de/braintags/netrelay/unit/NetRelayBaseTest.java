@@ -137,11 +137,12 @@ public class NetRelayBaseTest {
     boolean startMongoLocal = Boolean.getBoolean("startMongoLocal");
     String portString = System.getProperty(MongoDataStoreInit.LOCAL_PORT_PROP, "27017");
     int port = Integer.parseInt(portString);
-    LOGGER.info("starting mongo local: " + startMongoLocal);
-    if (startMongoLocal && MongoDataStoreInit.getMongodExecutable() == null) {
-      LOGGER.info("NOW starting mongo local");
-      MongoDataStoreInit.startMongoExe(startMongoLocal, port);
-    }
+
+    // LOGGER.info("starting mongo local: " + startMongoLocal);
+    // if (startMongoLocal && MongoDataStoreInit.getMongodExecutable() == null) {
+    // LOGGER.info("NOW starting mongo local");
+    // MongoDataStoreInit.startMongoExe(startMongoLocal, port);
+    // }
   }
 
   @AfterClass
