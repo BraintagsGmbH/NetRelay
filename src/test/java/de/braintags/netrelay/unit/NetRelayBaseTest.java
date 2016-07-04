@@ -77,7 +77,14 @@ public class NetRelayBaseTest {
   protected KeyGeneratorVerticle keyGenVerticle;
 
   public static String HOSTNAME = "localhost";
-  public static int PORT = 8085;
+  public static int PORT = -1;
+
+  static {
+    String portString = System.getProperty(SERVER_PORT_PROPERTY, null);
+    if (portString != null) {
+      PORT = Integer.parseInt(portString);
+    }
+  }
 
   @Rule
   public Timeout rule = Timeout.seconds(Integer.parseInt(System.getProperty("testTimeout", "20")));
@@ -197,12 +204,7 @@ public class NetRelayBaseTest {
    * @param settings
    */
   public void modifySettings(TestContext context, Settings settings) {
-    LOGGER.info("modifySettings");
-
-    String portString = System.getProperty(SERVER_PORT_PROPERTY, null);
-    if (portString != null) {
-      PORT = Integer.parseInt(portString);
-    }
+    LOGGER.info("modifySettings, setting port to " + PORT);
     settings.setServerPort(PORT);
     settings.getDatastoreSettings().setDatabaseName(getClass().getSimpleName());
   }

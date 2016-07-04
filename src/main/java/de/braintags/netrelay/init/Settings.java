@@ -80,6 +80,9 @@ public class Settings {
    *          the serverPort to set
    */
   public final void setServerPort(int serverPort) {
+    if (serverPort <= 0) {
+      throw new IllegalArgumentException("Port must be > 0");
+    }
     this.serverPort = serverPort;
   }
 
