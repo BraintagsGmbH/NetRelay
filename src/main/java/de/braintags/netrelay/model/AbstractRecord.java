@@ -42,4 +42,15 @@ public abstract class AbstractRecord {
     return o instanceof AbstractRecord && ObjectUtil.isEqual(((AbstractRecord) o).id, id);
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see java.lang.Object#hashCode()
+   */
+  @Override
+  public int hashCode() {
+    String str = getClass().getName() + String.valueOf(id);
+    return str.hashCode();
+  }
+
 }
