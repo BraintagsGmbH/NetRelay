@@ -208,6 +208,7 @@ public class NetRelay extends AbstractVerticle {
    * Create an instance of {@link IDataStore} which will be used by the current instance of NetRelay.
    * The init is performed by using the {@link Settings#getDatastoreSettings()}
    * 
+   * @handler the handler to be informed
    * @return the {@link IDataStore} to be used
    * @throws IllegalAccessException
    * @throws InstantiationException
