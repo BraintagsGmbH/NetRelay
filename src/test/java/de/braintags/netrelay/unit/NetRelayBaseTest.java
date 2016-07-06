@@ -25,7 +25,6 @@ import org.junit.runner.RunWith;
 import de.braintags.io.vertx.keygenerator.KeyGeneratorSettings;
 import de.braintags.io.vertx.keygenerator.KeyGeneratorVerticle;
 import de.braintags.io.vertx.keygenerator.impl.DebugGenerator;
-import de.braintags.io.vertx.pojomapper.mongo.init.MongoDataStoreInit;
 import de.braintags.io.vertx.pojomapper.testdatastore.DatastoreBaseTest;
 import de.braintags.io.vertx.pojomapper.testdatastore.TestHelper;
 import de.braintags.io.vertx.util.ResultObject;
@@ -147,9 +146,9 @@ public class NetRelayBaseTest {
     LOGGER.debug("starting class");
     vertx = Vertx.vertx(getVertxOptions());
     client = vertx.createHttpClient(new HttpClientOptions().setDefaultPort(8080));
-    boolean startMongoLocal = Boolean.getBoolean("startMongoLocal");
-    String portString = System.getProperty(MongoDataStoreInit.LOCAL_PORT_PROP, "27017");
-    int port = Integer.parseInt(portString);
+    // boolean startMongoLocal = Boolean.getBoolean("startMongoLocal");
+    // String portString = System.getProperty(MongoDataStoreInit.LOCAL_PORT_PROP, "27017");
+    // int port = Integer.parseInt(portString);
   }
 
   @AfterClass
