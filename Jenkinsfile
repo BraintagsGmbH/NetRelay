@@ -18,7 +18,7 @@ node {
 
     wrap([$class: 'ConfigFileBuildWrapper', managedFiles: [[fileId: 'MAVEN_SETTINGS_GLOBAL_OSSHR', 
     	replaceTokens: false, targetLocation: 'settings.xml' ]]]) {
-         sh "mvn -s settings.xml -Dsign.skip=true -DNetRelayPort=9898 -DstartMongoLocal=false -DlocalPort=27018  -Dconnection_string=mongodb://192.168.42.180:27017 clean deploy"
+         sh "mvn -s settings.xml -Dsign.skip=true -DNetRelayPort=9898 -DstartMongoLocal=false -Dconnection_string=mongodb://192.168.42.180:27017 clean deploy"
     	step([$class: 'ArtifactArchiver', artifacts: '**/build/*.jar', fingerprint: true])
     	step([$class: 'JUnitResultArchiver', testResults: '**/build/surefire-reports/TEST-*.xml'])
     }
