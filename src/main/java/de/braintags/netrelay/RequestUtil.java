@@ -153,7 +153,7 @@ public class RequestUtil {
   }
 
   /**
-   * Sending a redirect to another page by adding query parameters of a current request
+   * Sending a redirect as 302 to another page by adding query parameters of a current request
    * 
    * @param response
    * @param request
@@ -163,9 +163,24 @@ public class RequestUtil {
    */
   public static void sendRedirect(HttpServerResponse response, HttpServerRequest request, String path,
       boolean resuseArguments) {
+    sendRedirect(response, request, path, resuseArguments, 302);
+  }
+
+  /**
+   * Sending a redirect to another page by adding query parameters of a current request
+   * 
+   * @param response
+   * @param request
+   * @param path
+   * @param reuseArguments
+   *          if true, the query parameters of the current request are reused
+   *          param code - the http code to be used
+   */
+  public static void sendRedirect(HttpServerResponse response, HttpServerRequest request, String path,
+      boolean resuseArguments, int code) {
     LOGGER.info("sending redirect to " + path);
     response.putHeader("location", createRedirectUrl(request, path, resuseArguments));
-    response.setStatusCode(302);
+    response.setStatusCode(code);
     response.end();
   }
 
