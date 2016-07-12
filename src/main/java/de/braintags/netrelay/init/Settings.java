@@ -63,6 +63,10 @@ public class Settings {
   private ProcessorDefinitions processorDefinitons = new ProcessorDefinitions();
   private MailClientSettings mailClientSettings = new MailClientSettings();
   private MappingDefinitions mappingDefinitions = new MappingDefinitions();
+  private int sslPort = -1;
+  private boolean certificateSelfSigned = false;
+  private String certificatePath;
+  private String certificatePassword;
 
   /**
    * The port, where the server shall run on
@@ -286,6 +290,82 @@ public class Settings {
    */
   public final void setHostName(String hostName) {
     this.hostName = hostName;
+  }
+
+  /**
+   * The ssl port, where the server shall listen to. If the port is <= 0, no ssl server is started
+   * 
+   * @return the sslPort
+   */
+  public int getSslPort() {
+    return sslPort;
+  }
+
+  /**
+   * The ssl port, where the server shall listen to. If the port is <= 0, no ssl server is started
+   * 
+   * @param sslPort
+   *          the sslPort to set
+   */
+  public void setSslPort(int sslPort) {
+    this.sslPort = sslPort;
+  }
+
+  /**
+   * Shall the system generate a certificate?
+   * 
+   * @return the certificateSelfSigned
+   */
+  public boolean isCertificateSelfSigned() {
+    return certificateSelfSigned;
+  }
+
+  /**
+   * Shall the system generate a certificate?
+   * 
+   * @param certificateSelfSigned
+   *          the certificateSelfSigned to set
+   */
+  public void setCertificateSelfSigned(boolean certificateSelfSigned) {
+    this.certificateSelfSigned = certificateSelfSigned;
+  }
+
+  /**
+   * The path to the certificate file
+   * 
+   * @return the certificatePath
+   */
+  public String getCertificatePath() {
+    return certificatePath;
+  }
+
+  /**
+   * The path to the certificate file
+   * 
+   * @param certificatePath
+   *          the certificatePath to set
+   */
+  public void setCertificatePath(String certificatePath) {
+    this.certificatePath = certificatePath;
+  }
+
+  /**
+   * The password which shall be used for a certificate
+   * 
+   * @return the certificatePassword
+   */
+  public String getCertificatePassword() {
+    return certificatePassword;
+  }
+
+  /**
+   * The password which shall be used for a certificate
+   * 
+   * @param certificatePassword
+   *          the certificatePassword to set
+   */
+  public void setCertificatePassword(String certificatePassword) {
+    this.certificatePassword = certificatePassword;
   }
 
 }

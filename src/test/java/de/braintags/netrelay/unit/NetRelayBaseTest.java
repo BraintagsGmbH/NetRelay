@@ -76,7 +76,7 @@ public class NetRelayBaseTest {
   protected KeyGeneratorVerticle keyGenVerticle;
 
   public static String HOSTNAME = "localhost";
-  public static int PORT = -1;
+  public static int PORT = 8080;
 
   static {
     String portString = System.getProperty(SERVER_PORT_PROPERTY, null);

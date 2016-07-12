@@ -12,6 +12,8 @@
  */
 package de.braintags.netrelay;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.List;
 
 import de.braintags.io.vertx.pojomapper.IDataStore;
@@ -19,6 +21,7 @@ import de.braintags.io.vertx.pojomapper.init.IDataStoreInit;
 import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
 import de.braintags.io.vertx.pojomapper.mongo.init.MongoDataStoreInit;
 import de.braintags.io.vertx.util.exception.InitException;
+import de.braintags.io.vertx.util.security.CertificateHelper;
 import de.braintags.netrelay.controller.BodyController;
 import de.braintags.netrelay.controller.CookieController;
 import de.braintags.netrelay.controller.FailureController;
@@ -89,11 +92,17 @@ public class NetRelay extends AbstractVerticle {
       initMailClient();
       initController(router);
       initProcessors();
-      initHttpServer(router, result -> {
-        if (result.failed()) {
-          startFuture.fail(result.cause());
+      initHttpServer(router, res -> {
+        if (res.failed()) {
+          startFuture.fail(res.cause());
         } else {
-          initComplete(startFuture);
+          initHttpsServer(router, httpsResult -> {
+            if (httpsResult.failed()) {
+              startFuture.fail(httpsResult.cause());
+            } else {
+              initComplete(startFuture);
+            }
+          });
         }
       });
     } catch (Exception e) {
@@ -236,6 +245,54 @@ public class NetRelay extends AbstractVerticle {
         handler.handle(Future.succeededFuture());
       }
     });
+  }
+
+  private void initHttpsServer(Router router, Handler<AsyncResult<Void>> handler) {
+    if (settings.getSslPort() > 0) {
+      LOGGER.info("launching ssl server listening on port " + settings.getSslPort());
+      HttpServerOptions options = new HttpServerOptions().setPort(settings.getSslPort());
+      options.setSsl(true);
+      try {
+        handleSslCertificate(options, handler);
+        HttpServer server = vertx.createHttpServer(options);
+        server.requestHandler(router::accept).listen(result -> {
+          if (result.failed()) {
+            handler.handle(Future.failedFuture(result.cause()));
+          } else {
+            handler.handle(Future.succeededFuture());
+          }
+        });
+      } catch (Exception e) {
+        handler.handle(Future.failedFuture(e));
+      }
+    } else {
+      LOGGER.info("no ssl server is launched, cause ssl port is not set: " + settings.getSslPort());
+      handler.handle(Future.succeededFuture());
+    }
+  }
+
+  private void handleSslCertificate(HttpServerOptions options, Handler<AsyncResult<Void>> handler)
+      throws GeneralSecurityException, IOException {
+    validateSslPassword();
+    if (settings.isCertificateSelfSigned()) {
+      CertificateHelper.createSelfCertificate(options, settings.getHostName(), settings.getCertificatePassword());
+    } else if (settings.getCertificatePath() != null && settings.getCertificatePath().hashCode() != 0) {
+      importCertificate(options);
+    } else {
+      handler.handle(Future.failedFuture(new UnsupportedOperationException(
+          "ssl port is set, but no certificate path set and option certificateSelfSigned is not activated")));
+    }
+  }
+
+  private void validateSslPassword() {
+    if (settings.getCertificatePassword() == null || settings.getCertificatePassword().hashCode() == 0) {
+      throw new IllegalArgumentException("The property 'certificatePassword' must be set in the settings of NetRelay");
+    }
+  }
+
+  private void importCertificate(HttpServerOptions options) {
+    String certPath = settings.getCertificatePath();
+
   }
 
   /*
