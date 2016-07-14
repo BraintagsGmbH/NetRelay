@@ -17,6 +17,12 @@ import javax.net.ssl.X509TrustManager;
 import org.junit.Test;
 
 import de.braintags.netrelay.init.Settings;
+import io.vertx.core.Handler;
+import io.vertx.core.http.HttpClient;
+import io.vertx.core.http.HttpClientOptions;
+import io.vertx.core.http.HttpClientRequest;
+import io.vertx.core.http.HttpMethod;
+import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 
 /**
@@ -56,6 +62,56 @@ public class TSSL_SelfSigned extends NetRelayBaseTest {
       LOGGER.warn("", e);
     }
 
+  }
+
+  /**
+   * Test can be deactivated, if needed.
+   * Strange behaviour: when using the default HttpClient from the super class, it is crashing, cause certificate can't
+   * be read.
+   * With this it works fine
+   * 
+   * @param context
+   */
+  @Test
+  public void testC(TestContext context) {
+    Async async = context.async();
+    HttpClientOptions options = new HttpClientOptions();
+    options.setSsl(true);
+    options.setDefaultPort(SSL_PORT);
+    options.setTrustAll(true);
+    options.setVerifyHost(false);
+    options.setKeepAlive(true);
+    options.setTcpKeepAlive(true);
+
+    Handler<Throwable> exceptionHandler = new Handler<Throwable>() {
+
+      @Override
+      public void handle(Throwable ex) {
+        LOGGER.error("", ex);
+        async.complete();
+      }
+    };
+
+    HttpClient client = vertx.createHttpClient(options);
+
+    HttpClientRequest req = client.request(HttpMethod.GET, SSL_PORT, HOSTNAME, "/", resp -> {
+      resp.exceptionHandler(exceptionHandler);
+
+      resp.bodyHandler(buff -> {
+        LOGGER.info(buff.toString());
+        LOGGER.info(resp.statusCode());
+        LOGGER.info(resp.statusMessage());
+        LOGGER.info(resp.headers());
+        LOGGER.info(resp.cookies());
+        async.complete();
+      });
+
+    });
+    req.exceptionHandler(exceptionHandler);
+    req.end();
+
+    async.await();
+    LOGGER.info("finished");
   }
 
   @Test
