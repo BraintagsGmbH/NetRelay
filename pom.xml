@@ -78,7 +78,6 @@
 			<artifactId>vertx-mail-client</artifactId>
 		</dependency>
 
-
 	</dependencies>
 
 	<build>

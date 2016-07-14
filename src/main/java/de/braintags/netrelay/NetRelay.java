@@ -41,6 +41,7 @@ import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
+import io.vertx.core.net.PemKeyCertOptions;
 import io.vertx.ext.mail.MailClient;
 import io.vertx.ext.web.Router;
 
@@ -273,9 +274,9 @@ public class NetRelay extends AbstractVerticle {
 
   private void handleSslCertificate(HttpServerOptions options, Handler<AsyncResult<Void>> handler)
       throws GeneralSecurityException, IOException {
-    validateSslPassword();
     if (settings.isCertificateSelfSigned()) {
-      CertificateHelper.createSelfCertificate(options, settings.getHostName(), settings.getCertificatePassword());
+      String password = validateSslPassword();
+      CertificateHelper.createSelfCertificate(options, settings.getHostName(), password);
     } else if (settings.getCertificatePath() != null && settings.getCertificatePath().hashCode() != 0) {
       importCertificate(options);
     } else {
@@ -284,14 +285,28 @@ public class NetRelay extends AbstractVerticle {
     }
   }
 
-  private void validateSslPassword() {
+  private String validateSslPassword() {
     if (settings.getCertificatePassword() == null || settings.getCertificatePassword().hashCode() == 0) {
       throw new IllegalArgumentException("The property 'certificatePassword' must be set in the settings of NetRelay");
     }
+    return settings.getCertificatePassword();
   }
 
-  private void importCertificate(HttpServerOptions options) {
+  private void importCertificate(HttpServerOptions httpOpts) {
     String certPath = settings.getCertificatePath();
+    String password = settings.getCertificatePassword();
+
+    if (certPath.matches("^.*\\.(pem|PEM)$")) {
+      // Use a PEM key/cert pair
+      if (settings.getCertificateKeyPath() == null) {
+        throw new IllegalArgumentException("The certificateKeyPath is not set for pem certificate");
+      }
+      httpOpts.setPemKeyCertOptions(
+          new PemKeyCertOptions().setCertPath(certPath).setKeyPath(settings.getCertificateKeyPath()));
+      httpOpts.setSsl(true);
+    } else {
+      throw new IllegalArgumentException("Please specify the certificate as PEM file in the format pkcs8");
+    }
 
   }
 

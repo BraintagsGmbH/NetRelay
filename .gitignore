@@ -20,6 +20,7 @@ gradle-app.setting
 /tmp
 /pombak
 /.sonar_lock
+/.keystore
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/

@@ -66,6 +66,7 @@ public class Settings {
   private int sslPort = -1;
   private boolean certificateSelfSigned = false;
   private String certificatePath;
+  private String certificateKeyPath;
   private String certificatePassword;
 
   /**
@@ -366,6 +367,21 @@ public class Settings {
    */
   public void setCertificatePassword(String certificatePassword) {
     this.certificatePassword = certificatePassword;
+  }
+
+  /**
+   * @return the certificateKeyPath
+   */
+  public String getCertificateKeyPath() {
+    return certificateKeyPath;
+  }
+
+  /**
+   * @param certificateKeyPath
+   *          the certificateKeyPath to set
+   */
+  public void setCertificateKeyPath(String certificateKeyPath) {
+    this.certificateKeyPath = certificateKeyPath;
   }
 
 }

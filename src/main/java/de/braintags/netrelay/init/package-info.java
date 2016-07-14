@@ -116,6 +116,12 @@
  * * the processor definitions contain the configuration of regular processed jobs
  * * the mapping definitions contain the specification of the pojo-mappers, which are used by the current application
  * 
+ * ==== Application settings
+ * TODO - further documentation of application properties and SSL
+ * Based on the given
+ * configuration, the web server may be configured for SSL using a self-generated SSL cert or a provided SSL certificate
+ * file. The application accepts P12, PEM, and JKS files.
+ * 
  * ==== Controller / Router definitions
  * 
  * The Controller / Router definitions of the settings are determining, which logic is executed by which route.
