@@ -50,6 +50,27 @@ import io.vertx.ext.web.RoutingContext;
  * </UL>
  * <br/>
  * 
+ * Example configuration:<br/>
+ * 
+ * <pre>
+ * {
+      "name" : "ExampleController",
+      "routes" : null,
+      "blocking" : false,
+      "failureDefinition" : false,
+      "controller" : "de.braintags.netrelay.controller.ExampleController",
+      "httpMethod" : null,
+      "handlerProperties" : {
+        "prop1" : "127.0.0.1",
+        "prop2" : "http://localhost",
+        "prop3" : "true"
+       },
+      "captureCollection" : null
+    }
+ * </pre>
+ * 
+ * 
+ * 
  * @author Michael Remme
  * 
  */
