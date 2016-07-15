@@ -117,10 +117,38 @@
  * * the mapping definitions contain the specification of the pojo-mappers, which are used by the current application
  * 
  * ==== Application settings
- * TODO - further documentation of application properties and SSL
- * Based on the given
- * configuration, the web server may be configured for SSL using a self-generated SSL cert or a provided SSL certificate
- * file. The application accepts P12, PEM, and JKS files.
+ * This section defines the general behaviour of the application.
+ * 
+ * * hostName +
+ * the host name can be used by controllers, when thy are setting links for instance
+ * 
+ * * serverPort +
+ * the port ( http ), where the server is running on
+ * 
+ * * defaultLoginPage +
+ * the definition of the default page, which is used for a login redirect, when no other information can be retrived
+ * 
+ * * sslPort +
+ * the ssl port, where the server shall listen to. If the port is <= 0, no ssl server is started
+ * 
+ * * certificateSelfSigned +
+ * if sslPort is defined and this property is set to true, then the server will generate a certificate by itself on
+ * startup and use it. This option is useful for the development phase of a server
+ * 
+ * * certificatePassword +
+ * this password will be used, if certificateSelfSigned is true
+ * 
+ * * certificatePath +
+ * the path to the file of a PEM certificate
+ * 
+ * * certificateKeyPath +
+ * the path to the key file of a PEM certificate
+ * 
+ * NOTE: The certificate needs to be in the format PKCS#. If your certificate is in the traditional format, then you
+ * should convert it by using
+ * ----
+ * openssl pkcs8 -topk8 -inform pem -in keyfileIn.pem -outform pem -nocrypt -out keyfileOut.pem
+ * ----
  * 
  * ==== Controller / Router definitions
  * 

@@ -65,9 +65,9 @@ public class Settings {
   private MappingDefinitions mappingDefinitions = new MappingDefinitions();
   private int sslPort = -1;
   private boolean certificateSelfSigned = false;
+  private String certificatePassword;
   private String certificatePath;
   private String certificateKeyPath;
-  private String certificatePassword;
 
   /**
    * The port, where the server shall run on
@@ -332,25 +332,6 @@ public class Settings {
   }
 
   /**
-   * The path to the certificate file
-   * 
-   * @return the certificatePath
-   */
-  public String getCertificatePath() {
-    return certificatePath;
-  }
-
-  /**
-   * The path to the certificate file
-   * 
-   * @param certificatePath
-   *          the certificatePath to set
-   */
-  public void setCertificatePath(String certificatePath) {
-    this.certificatePath = certificatePath;
-  }
-
-  /**
    * The password which shall be used for a certificate
    * 
    * @return the certificatePassword
@@ -370,6 +351,27 @@ public class Settings {
   }
 
   /**
+   * The path to the certificate file as PEM file
+   * 
+   * @return the certificatePath
+   */
+  public String getCertificatePath() {
+    return certificatePath;
+  }
+
+  /**
+   * The path to the certificate file as PEM file
+   * 
+   * @param certificatePath
+   *          the certificatePath to set
+   */
+  public void setCertificatePath(String certificatePath) {
+    this.certificatePath = certificatePath;
+  }
+
+  /**
+   * The path to the key file of a certificate
+   * 
    * @return the certificateKeyPath
    */
   public String getCertificateKeyPath() {
@@ -377,6 +379,8 @@ public class Settings {
   }
 
   /**
+   * The path to the key file of a certificate
+   * 
    * @param certificateKeyPath
    *          the certificateKeyPath to set
    */
