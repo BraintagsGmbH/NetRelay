@@ -135,11 +135,6 @@ public class TStandardRequests extends NetRelayBaseTest {
     // is the file also in the mapped attributes?
     context.assertNull(StandarRequestController.attrs.get(fieldName),
         "uploaded file infos should not be inside attributes");
-
-    // The body should be set too
-    Buffer rawBody = StandarRequestController.bodyBuffer;
-    context.assertNotNull(rawBody);
-    context.assertTrue(rawBody.length() > fileData.length());
   }
 
   @Test
@@ -158,10 +153,6 @@ public class TStandardRequests extends NetRelayBaseTest {
     }, 200, "OK", null);
     context.assertTrue(StandarRequestController.controllerProcessed, "handler wasn't executed");
     checkFileUpload(context, 1, fileName, fieldName, contentType, uploadsDir, fileData);
-    // The body should be set too
-    Buffer rawBody = StandarRequestController.bodyBuffer;
-    context.assertNotNull(rawBody);
-    context.assertTrue(rawBody.length() > fileData.length());
   }
 
   /**

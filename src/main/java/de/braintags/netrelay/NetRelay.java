@@ -78,28 +78,9 @@ public class NetRelay extends AbstractVerticle {
         if (dsInitResult.failed()) {
           startFuture.fail(dsInitResult.cause());
         } else {
-          init(startFuture);
-        }
-      });
-    } catch (Exception e) {
-      startFuture.fail(e);
-    }
-  }
-
-  private void init(Future<Void> startFuture) {
-    try {
-      router = Router.router(vertx);
-      mapperFactory = new NetRelayMapperFactory(this);
-      initMailClient();
-      initController(router);
-      initProcessors();
-      initHttpServer(router, res -> {
-        if (res.failed()) {
-          startFuture.fail(res.cause());
-        } else {
-          initHttpsServer(router, httpsResult -> {
-            if (httpsResult.failed()) {
-              startFuture.fail(httpsResult.cause());
+          init(initResult -> {
+            if (initResult.failed()) {
+              startFuture.fail(initResult.cause());
             } else {
               initComplete(startFuture);
             }
@@ -108,6 +89,31 @@ public class NetRelay extends AbstractVerticle {
       });
     } catch (Exception e) {
       startFuture.fail(e);
+    }
+  }
+
+  private void init(Handler<AsyncResult<Void>> handler) {
+    try {
+      router = Router.router(vertx);
+      mapperFactory = new NetRelayMapperFactory(this);
+      initMailClient();
+      initController(router);
+      initProcessors();
+      initHttpServer(router, res -> {
+        if (res.failed()) {
+          handler.handle(Future.failedFuture(res.cause()));
+        } else {
+          initHttpsServer(router, httpsResult -> {
+            if (httpsResult.failed()) {
+              handler.handle(Future.failedFuture(httpsResult.cause()));
+            } else {
+              handler.handle(Future.succeededFuture());
+            }
+          });
+        }
+      });
+    } catch (Exception e) {
+      handler.handle(Future.failedFuture(e));
     }
   }
 

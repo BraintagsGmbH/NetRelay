@@ -21,6 +21,8 @@ import io.vertx.codegen.annotations.Nullable;
 import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.HttpConnection;
+import io.vertx.core.http.HttpFrame;
 import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServerFileUpload;
 import io.vertx.core.http.HttpServerRequest;
@@ -331,6 +333,56 @@ public class MockHttpServerRequest implements HttpServerRequest {
   @Override
   public boolean isSSL() {
     return false;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see io.vertx.core.http.HttpServerRequest#rawMethod()
+   */
+  @Override
+  public String rawMethod() {
+    return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see io.vertx.core.http.HttpServerRequest#scheme()
+   */
+  @Override
+  public @Nullable String scheme() {
+    return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see io.vertx.core.http.HttpServerRequest#host()
+   */
+  @Override
+  public @Nullable String host() {
+    return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see io.vertx.core.http.HttpServerRequest#customFrameHandler(io.vertx.core.Handler)
+   */
+  @Override
+  public HttpServerRequest customFrameHandler(Handler<HttpFrame> handler) {
+    return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see io.vertx.core.http.HttpServerRequest#connection()
+   */
+  @Override
+  public HttpConnection connection() {
+    return null;
   }
 
 }

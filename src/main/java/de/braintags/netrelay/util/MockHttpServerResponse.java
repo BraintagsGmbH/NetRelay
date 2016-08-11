@@ -17,6 +17,7 @@ import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.buffer.Buffer;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.core.http.HttpServerResponse;
 
 /**
@@ -33,7 +34,9 @@ public class MockHttpServerResponse implements HttpServerResponse {
   public MockHttpServerResponse() {
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.streams.WriteStream#writeQueueFull()
    */
   @Override
@@ -41,7 +44,9 @@ public class MockHttpServerResponse implements HttpServerResponse {
     return false;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#exceptionHandler(io.vertx.core.Handler)
    */
   @Override
@@ -49,7 +54,9 @@ public class MockHttpServerResponse implements HttpServerResponse {
     return null;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#write(io.vertx.core.buffer.Buffer)
    */
   @Override
@@ -57,7 +64,9 @@ public class MockHttpServerResponse implements HttpServerResponse {
     return null;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#setWriteQueueMaxSize(int)
    */
   @Override
@@ -65,7 +74,9 @@ public class MockHttpServerResponse implements HttpServerResponse {
     return null;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#drainHandler(io.vertx.core.Handler)
    */
   @Override
@@ -73,7 +84,9 @@ public class MockHttpServerResponse implements HttpServerResponse {
     return null;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#getStatusCode()
    */
   @Override
@@ -81,7 +94,9 @@ public class MockHttpServerResponse implements HttpServerResponse {
     return 0;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#setStatusCode(int)
    */
   @Override
@@ -89,7 +104,9 @@ public class MockHttpServerResponse implements HttpServerResponse {
     return null;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#getStatusMessage()
    */
   @Override
@@ -97,7 +114,9 @@ public class MockHttpServerResponse implements HttpServerResponse {
     return null;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#setStatusMessage(java.lang.String)
    */
   @Override
@@ -105,7 +124,9 @@ public class MockHttpServerResponse implements HttpServerResponse {
     return null;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#setChunked(boolean)
    */
   @Override
@@ -113,7 +134,9 @@ public class MockHttpServerResponse implements HttpServerResponse {
     return null;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#isChunked()
    */
   @Override
@@ -121,7 +144,9 @@ public class MockHttpServerResponse implements HttpServerResponse {
     return false;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#headers()
    */
   @Override
@@ -129,7 +154,9 @@ public class MockHttpServerResponse implements HttpServerResponse {
     return null;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#putHeader(java.lang.String, java.lang.String)
    */
   @Override
@@ -137,7 +164,9 @@ public class MockHttpServerResponse implements HttpServerResponse {
     return null;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#putHeader(java.lang.CharSequence, java.lang.CharSequence)
    */
   @Override
@@ -145,7 +174,9 @@ public class MockHttpServerResponse implements HttpServerResponse {
     return null;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#putHeader(java.lang.String, java.lang.Iterable)
    */
   @Override
@@ -153,7 +184,9 @@ public class MockHttpServerResponse implements HttpServerResponse {
     return null;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#putHeader(java.lang.CharSequence, java.lang.Iterable)
    */
   @Override
@@ -161,7 +194,9 @@ public class MockHttpServerResponse implements HttpServerResponse {
     return null;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#trailers()
    */
   @Override
@@ -169,7 +204,9 @@ public class MockHttpServerResponse implements HttpServerResponse {
     return null;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#putTrailer(java.lang.String, java.lang.String)
    */
   @Override
@@ -177,7 +214,9 @@ public class MockHttpServerResponse implements HttpServerResponse {
     return null;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#putTrailer(java.lang.CharSequence, java.lang.CharSequence)
    */
   @Override
@@ -185,7 +224,9 @@ public class MockHttpServerResponse implements HttpServerResponse {
     return null;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#putTrailer(java.lang.String, java.lang.Iterable)
    */
   @Override
@@ -193,7 +234,9 @@ public class MockHttpServerResponse implements HttpServerResponse {
     return null;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#putTrailer(java.lang.CharSequence, java.lang.Iterable)
    */
   @Override
@@ -201,7 +244,9 @@ public class MockHttpServerResponse implements HttpServerResponse {
     return null;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#closeHandler(io.vertx.core.Handler)
    */
   @Override
@@ -209,7 +254,9 @@ public class MockHttpServerResponse implements HttpServerResponse {
     return null;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#write(java.lang.String, java.lang.String)
    */
   @Override
@@ -217,7 +264,9 @@ public class MockHttpServerResponse implements HttpServerResponse {
     return null;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#write(java.lang.String)
    */
   @Override
@@ -225,7 +274,9 @@ public class MockHttpServerResponse implements HttpServerResponse {
     return null;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#writeContinue()
    */
   @Override
@@ -233,35 +284,45 @@ public class MockHttpServerResponse implements HttpServerResponse {
     return null;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#end(java.lang.String)
    */
   @Override
   public void end(String chunk) {
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#end(java.lang.String, java.lang.String)
    */
   @Override
   public void end(String chunk, String enc) {
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#end(io.vertx.core.buffer.Buffer)
    */
   @Override
   public void end(Buffer chunk) {
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#end()
    */
   @Override
   public void end() {
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#sendFile(java.lang.String, long, long)
    */
   @Override
@@ -269,7 +330,9 @@ public class MockHttpServerResponse implements HttpServerResponse {
     return null;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#sendFile(java.lang.String, long, long, io.vertx.core.Handler)
    */
   @Override
@@ -278,14 +341,18 @@ public class MockHttpServerResponse implements HttpServerResponse {
     return null;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#close()
    */
   @Override
   public void close() {
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#ended()
    */
   @Override
@@ -293,7 +360,9 @@ public class MockHttpServerResponse implements HttpServerResponse {
     return false;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#closed()
    */
   @Override
@@ -301,7 +370,9 @@ public class MockHttpServerResponse implements HttpServerResponse {
     return false;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#headWritten()
    */
   @Override
@@ -309,7 +380,9 @@ public class MockHttpServerResponse implements HttpServerResponse {
     return false;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#headersEndHandler(io.vertx.core.Handler)
    */
   @Override
@@ -317,7 +390,9 @@ public class MockHttpServerResponse implements HttpServerResponse {
     return null;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#bodyEndHandler(io.vertx.core.Handler)
    */
   @Override
@@ -325,12 +400,90 @@ public class MockHttpServerResponse implements HttpServerResponse {
     return null;
   }
 
-  /* (non-Javadoc)
+  /*
+   * (non-Javadoc)
+   * 
    * @see io.vertx.core.http.HttpServerResponse#bytesWritten()
    */
   @Override
   public long bytesWritten() {
     return 0;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see io.vertx.core.http.HttpServerResponse#streamId()
+   */
+  @Override
+  public int streamId() {
+    return 0;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see io.vertx.core.http.HttpServerResponse#push(io.vertx.core.http.HttpMethod, java.lang.String, java.lang.String,
+   * io.vertx.core.Handler)
+   */
+  @Override
+  public HttpServerResponse push(HttpMethod method, String host, String path,
+      Handler<AsyncResult<HttpServerResponse>> handler) {
+    return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see io.vertx.core.http.HttpServerResponse#push(io.vertx.core.http.HttpMethod, java.lang.String,
+   * io.vertx.core.MultiMap, io.vertx.core.Handler)
+   */
+  @Override
+  public HttpServerResponse push(HttpMethod method, String path, MultiMap headers,
+      Handler<AsyncResult<HttpServerResponse>> handler) {
+    return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see io.vertx.core.http.HttpServerResponse#push(io.vertx.core.http.HttpMethod, java.lang.String,
+   * io.vertx.core.Handler)
+   */
+  @Override
+  public HttpServerResponse push(HttpMethod method, String path, Handler<AsyncResult<HttpServerResponse>> handler) {
+    return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see io.vertx.core.http.HttpServerResponse#push(io.vertx.core.http.HttpMethod, java.lang.String, java.lang.String,
+   * io.vertx.core.MultiMap, io.vertx.core.Handler)
+   */
+  @Override
+  public HttpServerResponse push(HttpMethod method, String host, String path, MultiMap headers,
+      Handler<AsyncResult<HttpServerResponse>> handler) {
+    return null;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see io.vertx.core.http.HttpServerResponse#reset(long)
+   */
+  @Override
+  public void reset(long code) {
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see io.vertx.core.http.HttpServerResponse#writeCustomFrame(int, int, io.vertx.core.buffer.Buffer)
+   */
+  @Override
+  public HttpServerResponse writeCustomFrame(int type, int flags, Buffer payload) {
+    return null;
   }
 
 }
