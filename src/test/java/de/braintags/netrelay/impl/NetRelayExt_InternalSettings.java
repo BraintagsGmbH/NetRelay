@@ -12,6 +12,7 @@
  */
 package de.braintags.netrelay.impl;
 
+import de.braintags.io.vertx.util.ErrorObject;
 import de.braintags.netrelay.NetRelay;
 import de.braintags.netrelay.init.Settings;
 import de.braintags.netrelay.mapper.SimpleNetRelayMapper;
@@ -49,17 +50,20 @@ public class NetRelayExt_InternalSettings extends NetRelay {
       netRelay = new NetRelayExt_InternalSettings();
       LOGGER.info("init NetRelay");
       Async async = context.async();
+      ErrorObject err = new ErrorObject<>(null);
       baseTest.modifySettings(context, netRelay.settings);
       vertx.deployVerticle(netRelay, result -> {
         if (result.failed()) {
-          context.fail(result.cause());
+          err.setThrowable(result.cause());
           async.complete();
         } else {
           async.complete();
         }
       });
       async.awaitSuccess();
-
+      if (err.isError()) {
+        throw err.getRuntimeException();
+      }
     }
     return netRelay;
   }
