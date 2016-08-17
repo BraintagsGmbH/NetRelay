@@ -28,13 +28,6 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.apache.httpcomponents</groupId>
-			<artifactId>httpmime</artifactId>
-			<version>4.4-alpha2-SNAPSHOT</version>
-			<classifier>sources</classifier>
-		</dependency>
-
-		<dependency>
 			<groupId>de.braintags</groupId>
 			<artifactId>vertx-pojo-mapper-mysql</artifactId>
 			<exclusions>
