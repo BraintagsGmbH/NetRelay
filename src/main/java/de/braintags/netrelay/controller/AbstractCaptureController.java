@@ -64,11 +64,6 @@ public abstract class AbstractCaptureController extends AbstractController {
   public static final String AUTO_CLEAN_PATH_PROPERTY = "cleanPath";
 
   /**
-   * This property specifies, wether the corresponding form is sending multipart contents like file uploads
-   */
-  public static final String MULTIPART_FORM_PROP = "multipartForm";
-
-  /**
    * By this property you are able to set the destination for a rerouting manually
    */
   public static final String DESTINATION_PATH_PROPERTY = "destinationPath";
