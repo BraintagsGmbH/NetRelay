@@ -59,4 +59,32 @@ public class CaptureCollection {
     this.captureDefinitions = captureDefinitions;
   }
 
+  /**
+   * Get the {@link CaptureDefinition} where the controller key equals the given key
+   * 
+   * @param key
+   *          the key to search for
+   * @return a suitable instance of {@link CaptureDefinition} or null
+   */
+  public CaptureDefinition getCaptureDefinition(String controllerKey) {
+    for (CaptureDefinition def : captureDefinitions) {
+      if (def.getControllerKey().equals(controllerKey)) {
+        return def;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Get the keyname of the capture for the given controller key
+   * 
+   * @param controllerKey
+   *          the controller key to search for
+   * @return the suitable capture name or null
+   */
+  public String getCaptureName(String controllerKey) {
+    CaptureDefinition def = getCaptureDefinition(controllerKey);
+    return def == null ? null : def.getCaptureName();
+  }
+
 }
