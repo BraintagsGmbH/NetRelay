@@ -262,6 +262,7 @@ public class NetRelayBaseTest {
   protected final void testRequestBuffer(TestContext context, HttpClient client, HttpMethod method, int port,
       String path, Consumer<HttpClientRequest> requestAction, Consumer<ResponseCopy> responseAction, int statusCode,
       String statusMessage, Buffer responseBodyBuffer) throws Exception {
+    LOGGER.info("calling URL " + path);
     Async async = context.async();
     ResultObject<ResponseCopy> resultObject = new ResultObject<>(null);
 
