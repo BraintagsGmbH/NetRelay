@@ -49,7 +49,21 @@ public class NetRelayStoreObjectFactory extends AbstractStoreObjectFactory {
 
   @Override
   public void createStoreObject(Object storedObject, IMapper mapper, Handler<AsyncResult<IStoreObject<?>>> handler) {
-    NetRelayStoreObject storeObject = new NetRelayStoreObject((Map<String, String>) storedObject, mapper, netRelay);
+    createStoreObject(storedObject, null, mapper, handler);
+  }
+
+  /**
+   * This method is called in cases, where a subobject needs to be updated, which can't be loaded from the datastore
+   * 
+   * @param storedObject
+   * @param entity
+   * @param mapper
+   * @param handler
+   */
+  public void createStoreObject(Object storedObject, Object entity, IMapper mapper,
+      Handler<AsyncResult<IStoreObject<?>>> handler) {
+    NetRelayStoreObject storeObject = new NetRelayStoreObject((Map<String, String>) storedObject, entity, mapper,
+        netRelay);
     storeObject.initToEntity(result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));

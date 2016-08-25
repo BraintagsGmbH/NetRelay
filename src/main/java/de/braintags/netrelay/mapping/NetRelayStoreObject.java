@@ -71,12 +71,13 @@ public class NetRelayStoreObject implements IStoreObject<Map<String, String>> {
    * @param mapper
    *          the mapper to be used
    */
-  public NetRelayStoreObject(Map<String, String> requestMap, IMapper mapper, NetRelay netRelay) {
+  public NetRelayStoreObject(Map<String, String> requestMap, Object entity, IMapper mapper, NetRelay netRelay) {
     Objects.requireNonNull(mapper, "Mapper must not be null");
     Objects.requireNonNull(requestMap, "requestMap must not be null");
     this.mapper = mapper;
     this.requestMap = requestMap;
     this.netRelay = netRelay;
+    this.entity = entity;
   }
 
   /*
@@ -166,7 +167,9 @@ public class NetRelayStoreObject implements IStoreObject<Map<String, String>> {
 
   @SuppressWarnings({ "rawtypes" })
   private void createEntity(Handler<AsyncResult<Object>> handler) {
-    if (hasProperty(getMapper().getIdField())) {
+    if (entity != null) {
+      handler.handle(Future.succeededFuture(entity));
+    } else if (hasProperty(getMapper().getIdField())) {
       Object id = get(getMapper().getIdField());
       IQuery<?> query = netRelay.getDatastore().createQuery(getMapper().getMapperClass());
       query.field(query.getMapper().getIdField().getName()).is(id);

@@ -18,7 +18,7 @@ gradle-app.setting
 /.project
 /.yardoc
 /tmp
-/pombak
+/pombak/
 /.sonar_lock
 /.keystore
 
