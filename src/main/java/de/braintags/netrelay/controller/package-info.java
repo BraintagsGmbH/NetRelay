@@ -14,7 +14,7 @@
  * === Creating a new Controller
  * Adding a new controller is simply done by implementing {@link de.braintags.netrelay.controller.IController} or by
  * extending {@link de.braintags.netrelay.controller.AbstractController}, for instance. +
- * In our example here we will create a new controller, which will add the test "Hello world" into the context, from
+ * In our example here we will create a new controller, which will add the text "Hello world" into the context, from
  * where it can be read from out of a template. The name of the variable in the context must set inside the
  * configuration in the settings. +
  * 

@@ -32,6 +32,9 @@ public abstract class AbstractRecord {
   public Timestamp createdOn = new Timestamp(System.currentTimeMillis());
   public Timestamp modifiedOn;
 
+  /**
+   * Method sets the property modifiedOn to the current date time
+   */
   @BeforeSave
   public void beforeSave() {
     modifiedOn = new Timestamp(System.currentTimeMillis());

@@ -12,7 +12,9 @@
  */
 package de.braintags.netrelay.impl;
 
+import de.braintags.io.vertx.pojomapper.init.DataStoreSettings;
 import de.braintags.io.vertx.pojomapper.mongo.init.MongoDataStoreInit;
+import de.braintags.io.vertx.pojomapper.mysql.init.MySqlDataStoreinit;
 import de.braintags.netrelay.NetRelay;
 import de.braintags.netrelay.init.Settings;
 import de.braintags.netrelay.mapper.SimpleNetRelayMapper;
@@ -72,20 +74,13 @@ public class NetRelayExt_FileBasedSettings extends NetRelay {
   }
 
   public static void applySystemProperties(Settings settings) {
-    String connectionString = System.getProperty(MongoDataStoreInit.CONNECTION_STRING_PROPERTY, null);
-    if (connectionString != null) {
-      settings.getDatastoreSettings().getProperties().put(MongoDataStoreInit.CONNECTION_STRING_PROPERTY,
-          connectionString);
+    String dbName = settings.getDatastoreSettings().getDatabaseName();
+    DataStoreSettings dsSettings = MySqlDataStoreinit.hasSystemProperties() ? MySqlDataStoreinit.createSettings()
+        : MongoDataStoreInit.createSettings();
+    if (dbName != null && dbName.hashCode() != 0) {
+      dsSettings.setDatabaseName(dbName);
     }
-    String sl = System.getProperty(MongoDataStoreInit.START_MONGO_LOCAL_PROP, null);
-    if (sl != null) {
-      settings.getDatastoreSettings().getProperties().put(MongoDataStoreInit.START_MONGO_LOCAL_PROP, sl);
-    }
-    String localPort = System.getProperty(MongoDataStoreInit.LOCAL_PORT_PROP, null);
-    if (localPort != null) {
-      settings.getDatastoreSettings().getProperties().put(MongoDataStoreInit.LOCAL_PORT_PROP, localPort);
-    }
-
+    settings.setDatastoreSettings(dsSettings);
     String portString = System.getProperty(NetRelayBaseTest.SERVER_PORT_PROPERTY, null);
     if (portString != null) {
       settings.setServerPort(Integer.parseInt(portString));
