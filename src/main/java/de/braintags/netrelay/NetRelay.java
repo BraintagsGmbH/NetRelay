@@ -137,7 +137,6 @@ public class NetRelay extends AbstractVerticle {
     }
   }
 
-  // "-DmailClientUserName=dev-test@braintags.net -DmailClientPassword=thoo4ati "
   private void initMailClientSettings(MailClientSettings ms) {
     String mailUserName = System.getProperty(MailClientSettings.USERNAME_SYS_PROPERTY);
     if (mailUserName != null && mailUserName.hashCode() != 0) {
