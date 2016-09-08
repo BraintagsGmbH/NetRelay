@@ -203,7 +203,7 @@ public class TStandardRequests extends NetRelayBaseTest {
     StandarRequestController.bodyBuffer = null;
     StandarRequestController.fileUploads = null;
 
-    netRelay.getSettings().getRouterDefinitions().add(StandarRequestController.createRouterDefinition());
+    netRelay.getSettings().getRouterDefinitions().addOrReplace(StandarRequestController.createRouterDefinition());
     netRelay.resetRoutes();
   }
 

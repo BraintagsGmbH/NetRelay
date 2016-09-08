@@ -14,6 +14,7 @@ package de.braintags.netrelay.routing;
 
 import java.util.ArrayList;
 
+import de.braintags.io.vertx.util.exception.InitException;
 import de.braintags.netrelay.init.Settings;
 
 /**
@@ -33,7 +34,25 @@ public class RouterDefinitions {
    *          teh {@link RouterDefinition} to be added
    */
   public void add(RouterDefinition definition) {
+    if (getNamedDefinition(definition.getName()) != null) {
+      throw new InitException("There exists already a definition with name '" + definition.getName() + "'");
+    }
     routerDefinitions.add(definition);
+  }
+
+  /**
+   * Add a new definition at the end of the definitions
+   * 
+   * @param definition
+   *          teh {@link RouterDefinition} to be added
+   */
+  public void addOrReplace(RouterDefinition definition) {
+    int position = getPosition(definition.getName());
+    if (position >= 0) {
+      add(position, definition);
+    } else {
+      routerDefinitions.add(definition);
+    }
   }
 
   /**
