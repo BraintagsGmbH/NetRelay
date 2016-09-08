@@ -150,6 +150,27 @@
  * openssl pkcs8 -topk8 -inform pem -in keyfileIn.pem -outform pem -nocrypt -out keyfileOut.pem
  * ----
  * 
+ * * encoders
+ * If you are using the annotation {@link de.braintags.io.vertx.pojomapper.annotation.field.Encoder} inside your
+ * mappers, you will have to define the name of the encoder to be used. The existing encoders are defined in the part
+ * encoders of the settings. Per default the standard encoder is created and initialized. Each encoder definition
+ * consists of the name, which is the name you are referencing in the mapper; the encoderClass, which is a class which
+ * implements {@link de.braintags.io.vertx.util.security.crypt.IEncoder} and some optional properties, which are used by
+ * the concrete implementation.
+ * 
+ * [source, json]
+ * ----
+ *   "encoders" : [ {
+ *     "name" : "StandardEncoder",
+ *     "encoderClass" : "de.braintags.io.vertx.util.security.crypt.impl.StandardEncoder",
+ *     "properties" : {
+ *       "salt" : "61DD62293E7CBE37D9D6B3C69282B964A4BEAC9EEEEA70D05C32AE1A8E50413B"
+ *   }
+ * } ]
+ * 
+ * ----
+ * 
+ * 
  * ==== Controller / Router definitions
  * 
  * The Controller / Router definitions of the settings are determining, which logic is executed by which route.
