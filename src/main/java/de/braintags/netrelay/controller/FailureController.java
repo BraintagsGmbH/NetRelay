@@ -151,7 +151,7 @@ public class FailureController extends AbstractController {
       reply += "\n" + error.toString();
       reply += "\n" + ExceptionUtil.getStackTrace(error);
       if (!context.response().ended()) {
-        context.response().end(reply);
+        handleDefaultStatus(context, reply);
       }
     }
   }
@@ -176,7 +176,7 @@ public class FailureController extends AbstractController {
     if (redirect != null && !context.request().path().equalsIgnoreCase(redirect)) {
       RequestUtil.sendRedirect(context.response(), redirect);
     } else {
-      handleDefaultStatus(context);
+      handleDefaultStatus(context, null);
     }
 
   }
@@ -191,10 +191,10 @@ public class FailureController extends AbstractController {
     return null;
   }
 
-  private void handleDefaultStatus(RoutingContext context) {
+  private void handleDefaultStatus(RoutingContext context, String message) {
     if (!context.response().ended()) {
       context.response().setStatusCode(context.statusCode());
-      context.response().end();
+      context.response().end(message == null ? "" : message);
     }
   }
 
