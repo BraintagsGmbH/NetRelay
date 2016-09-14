@@ -92,7 +92,12 @@ public class NetRelay extends AbstractVerticle {
     }
   }
 
-  private void init(Handler<AsyncResult<Void>> handler) {
+  /**
+   * Initialize all needed resources of NetRelay
+   * 
+   * @param handler
+   */
+  protected void init(Handler<AsyncResult<Void>> handler) {
     try {
       router = Router.router(vertx);
       mapperFactory = new NetRelayMapperFactory(this);
