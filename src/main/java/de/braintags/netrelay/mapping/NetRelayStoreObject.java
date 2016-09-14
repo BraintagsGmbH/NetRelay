@@ -206,23 +206,37 @@ public class NetRelayStoreObject implements IStoreObject<Map<String, String>> {
     }
   }
 
+  /**
+   * Iterate the fields if the mapper and - if a content exists in the current data -
+   * add the new value into the entity
+   * 
+   * @param tmpObject
+   * @param handler
+   */
   protected final void iterateFields(Object tmpObject, Handler<AsyncResult<Void>> handler) {
     LOGGER.debug("start iterateFields");
     Set<String> fieldNames = getMapper().getFieldNames();
     CounterObject<Void> co = new CounterObject<>(fieldNames.size(), handler);
     for (String fieldName : fieldNames) {
       IField field = getMapper().getField(fieldName);
-      LOGGER.debug("handling field " + field.getFullName());
-      field.getPropertyMapper().fromStoreObject(tmpObject, this, field, result -> {
-        if (result.failed()) {
-          co.setThrowable(result.cause());
-          return;
-        }
+      if (hasProperty(field)) {
+        LOGGER.debug("handling field " + field.getFullName());
+        field.getPropertyMapper().fromStoreObject(tmpObject, this, field, result -> {
+          if (result.failed()) {
+            co.setThrowable(result.cause());
+            return;
+          }
+          if (co.reduce()) {
+            LOGGER.debug("field counter finished");
+            handler.handle(Future.succeededFuture());
+          }
+        });
+      } else {
         if (co.reduce()) {
           LOGGER.debug("field counter finished");
           handler.handle(Future.succeededFuture());
         }
-      });
+      }
     }
   }
 

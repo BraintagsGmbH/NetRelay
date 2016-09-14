@@ -39,7 +39,7 @@ public class NetRelayExt_InternalSettings extends NetRelay {
   /**
    * 
    */
-  private NetRelayExt_InternalSettings() {
+  protected NetRelayExt_InternalSettings() {
     settings = createDefaultSettings();
     settings.getDatastoreSettings().setDatabaseName("NetRelayExtended_DB");
     settings.getMappingDefinitions().addMapperDefinition(SIMPLEMAPPER_NAME, SimpleNetRelayMapper.class);
