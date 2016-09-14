@@ -193,7 +193,8 @@ public class FailureController extends AbstractController {
 
   private void handleDefaultStatus(RoutingContext context, String message) {
     if (!context.response().ended()) {
-      context.response().setStatusCode(context.statusCode());
+      int code = context.statusCode() > 0 ? context.statusCode() : HttpResponseStatus.INTERNAL_SERVER_ERROR.code();
+      context.response().setStatusCode(code);
       context.response().end(message == null ? "" : message);
     }
   }
