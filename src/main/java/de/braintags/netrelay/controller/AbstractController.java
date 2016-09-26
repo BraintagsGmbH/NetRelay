@@ -307,6 +307,15 @@ public abstract class AbstractController implements IController {
   }
 
   /**
+   * Send a reply as Json
+   * 
+   * @param content
+   */
+  protected void sendJson(RoutingContext context, String content) {
+    context.response().putHeader("content-type", "application/json; charset=utf-8").end(content);
+  }
+
+  /**
    * Get the name of the definition
    * 
    * @return
