@@ -46,7 +46,7 @@ public class StandarRequestController extends AbstractController {
    * @see io.vertx.core.Handler#handle(java.lang.Object)
    */
   @Override
-  public void handle(RoutingContext event) {
+  public void handleController(RoutingContext event) {
     StandarRequestController.controllerProcessed = true;
     StandarRequestController.attrs = event.request().formAttributes();
     StandarRequestController.params = event.request().params();

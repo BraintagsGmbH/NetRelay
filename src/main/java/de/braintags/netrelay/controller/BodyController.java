@@ -71,7 +71,7 @@ public class BodyController extends AbstractController {
    * @see io.vertx.core.Handler#handle(java.lang.Object)
    */
   @Override
-  public void handle(RoutingContext event) {
+  public void handleController(RoutingContext event) {
     try {
       URI uri = URI.create(event.request().absoluteURI());
       event.put("REQUEST_HOST", uri.getHost());

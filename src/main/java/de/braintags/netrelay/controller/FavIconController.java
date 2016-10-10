@@ -44,12 +44,11 @@ public class FavIconController extends AbstractController {
    * @see io.vertx.core.Handler#handle(java.lang.Object)
    */
   @Override
-  public void handle(RoutingContext context) {
+  public void handleController(RoutingContext context) {
     LOGGER.info("calling " + getClass().getName());
     try {
       fh.handle(context);
     } catch (Exception e) {
-      LOGGER.warn(e);
       context.response().end();
     }
   }

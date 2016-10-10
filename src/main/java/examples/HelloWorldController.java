@@ -13,7 +13,7 @@ public class HelloWorldController extends AbstractController {
   private String propertyName;
 
   @Override
-  public void handle(RoutingContext context) {
+  public void handleController(RoutingContext context) {
     context.put(propertyName, "Hello world");
     context.next();
   }

@@ -82,7 +82,7 @@ public abstract class AbstractCaptureController extends AbstractController {
    * @see io.vertx.core.Handler#handle(java.lang.Object)
    */
   @Override
-  public final void handle(RoutingContext context) {
+  public final void handleController(RoutingContext context) {
     List<CaptureMap> resolvedCaptureCollections = resolveCaptureCollections(context);
     handle(context, resolvedCaptureCollections, result -> {
       if (result.failed()) {

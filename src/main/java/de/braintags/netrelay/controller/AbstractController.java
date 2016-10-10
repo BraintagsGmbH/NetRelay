@@ -75,6 +75,9 @@ import io.vertx.ext.web.RoutingContext;
  * 
  */
 public abstract class AbstractController implements IController {
+  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
+      .getLogger(AbstractController.class);
+
   private Vertx vertx;
   private CaptureCollection[] captureCollection;
   private NetRelay netRelay;
@@ -89,6 +92,24 @@ public abstract class AbstractController implements IController {
   public final Vertx getVertx() {
     return vertx;
   }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see io.vertx.core.Handler#handle(java.lang.Object)
+   */
+  @Override
+  public final void handle(RoutingContext context) {
+    LOGGER.debug("handling controller " + getClass().getName());
+    handleController(context);
+  }
+
+  /**
+   * internal method to handle the request
+   * 
+   * @param context
+   */
+  protected abstract void handleController(RoutingContext context);
 
   /*
    * (non-Javadoc)
@@ -328,4 +349,5 @@ public abstract class AbstractController implements IController {
   public String toString() {
     return name;
   }
+
 }

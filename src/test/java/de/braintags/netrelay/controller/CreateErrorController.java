@@ -38,7 +38,7 @@ public class CreateErrorController extends AbstractController {
    * @see io.vertx.core.Handler#handle(java.lang.Object)
    */
   @Override
-  public void handle(RoutingContext event) {
+  public void handleController(RoutingContext event) {
     if (exception != null) {
       try {
         event.fail(exception.newInstance());
