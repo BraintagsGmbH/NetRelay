@@ -303,7 +303,8 @@ public class NetRelayBaseTest {
     }
     context.assertNotNull(rc, "Responsecopy is null");
     context.assertEquals(statusCode, rc.code);
-    context.assertEquals(statusMessage, rc.statusMessage);
+    if (statusMessage != null)
+      context.assertEquals(statusMessage, rc.statusMessage);
     if (responseBodyBuffer == null) {
       // async.complete();
     } else {

@@ -55,6 +55,11 @@ public class NetRelay extends AbstractVerticle {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(NetRelay.class);
 
+  /**
+   * The name of the property which is used to store the instance of NetRelay
+   */
+  public static final String NETRELAY_PROPERTY = "NetRelay";
+
   // to be able to handle multiple datastores, an IDatastoreCollection will come from pojo-mapper later
   private IDataStore datastore;
   private Settings settings;
