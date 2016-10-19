@@ -101,7 +101,21 @@ public abstract class AbstractController implements IController {
   @Override
   public final void handle(RoutingContext context) {
     LOGGER.debug("handling controller " + getClass().getName());
-    handleController(context);
+    try {
+      handleController(context);
+    } catch (Exception e) {
+      handleError(context, e);
+    }
+  }
+
+  /**
+   * The default implementation lets the context fail with the error
+   * 
+   * @param context
+   * @param e
+   */
+  protected void handleError(RoutingContext context, Throwable e) {
+    context.fail(e);
   }
 
   /**
