@@ -14,10 +14,12 @@ package de.braintags.netrelay.controller;
 
 import java.util.Properties;
 
+import de.braintags.io.vertx.util.exception.InitException;
 import de.braintags.netrelay.NetRelay;
 import de.braintags.netrelay.init.Settings;
 import de.braintags.netrelay.routing.CaptureCollection;
 import de.braintags.netrelay.routing.CaptureDefinition;
+import de.braintags.netrelay.routing.RouterDefinition;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.JsonObject;
@@ -49,4 +51,12 @@ public interface IController extends Handler<RoutingContext> {
    */
   void init(Vertx vertx, NetRelay netRelay, Properties properties, CaptureCollection[] captureCollection, String name);
 
+  /**
+   * This method can check the {@link RouterDefinition}, by which the current instance is created and can throw an
+   * {@link InitException} if some required settings aren't found
+   * 
+   * @param currentDefinition
+   * @throws InitException
+   */
+  void validateRoutingDefinition(RouterDefinition currentDefinition);
 }

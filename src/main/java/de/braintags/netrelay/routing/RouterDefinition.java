@@ -53,6 +53,7 @@ public class RouterDefinition {
   public IController instantiateController(Vertx vertx, NetRelay netRelay) throws Exception {
     IController ctrl = getController().newInstance();
     ctrl.init(vertx, netRelay, getHandlerProperties(), captureCollection, name);
+    ctrl.validateRoutingDefinition(this);
     return ctrl;
   }
 

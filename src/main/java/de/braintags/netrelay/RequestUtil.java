@@ -35,6 +35,11 @@ import io.vertx.ext.web.templ.ThymeleafTemplateEngine;
  */
 public class RequestUtil {
   private static final Logger LOGGER = LoggerFactory.getLogger(RequestUtil.class);
+  /**
+   * If a property is defined inside the context with this name, it will be used in case of redirects to be added at the
+   * beginning of the path
+   */
+  public static final String PREPATH_PROPERTY = "netrelay.redirect.prepath";
 
   private RequestUtil() {
   }
@@ -132,54 +137,40 @@ public class RequestUtil {
   }
 
   /**
-   * Sending a redirect to another page
-   * 
-   * @param response
-   * @param path
-   */
-  public static void sendRedirect(HttpServerResponse response, String path) {
-    sendRedirect(response, null, path);
-  }
-
-  /**
    * The same than {@link #sendRedirect(HttpServerResponse, HttpServerRequest, String, true)}
    * 
-   * @param response
-   * @param request
+   * @param context
    * @param path
    */
-  public static void sendRedirect(HttpServerResponse response, HttpServerRequest request, String path) {
-    sendRedirect(response, request, path, true);
+  public static void sendRedirect(RoutingContext context, String path) {
+    sendRedirect(context, path, true);
   }
 
   /**
    * Sending a redirect as 302 to another page by adding query parameters of a current request
    * 
-   * @param response
-   * @param request
+   * @param context
    * @param path
    * @param reuseArguments
    *          if true, the query parameters of the current request are reused
    */
-  public static void sendRedirect(HttpServerResponse response, HttpServerRequest request, String path,
-      boolean resuseArguments) {
-    sendRedirect(response, request, path, resuseArguments, 302);
+  public static void sendRedirect(RoutingContext context, String path, boolean resuseArguments) {
+    sendRedirect(context, path, resuseArguments, 302);
   }
 
   /**
    * Sending a redirect to another page by adding query parameters of a current request
    * 
-   * @param response
-   * @param request
+   * @param context
    * @param path
    * @param reuseArguments
    *          if true, the query parameters of the current request are reused
    *          param code - the http code to be used
    */
-  public static void sendRedirect(HttpServerResponse response, HttpServerRequest request, String path,
-      boolean resuseArguments, int code) {
+  public static void sendRedirect(RoutingContext context, String path, boolean resuseArguments, int code) {
+    HttpServerResponse response = context.response();
     LOGGER.info("sending redirect to " + path);
-    response.putHeader("location", createRedirectUrl(request, path, resuseArguments));
+    response.putHeader("location", createRedirectUrl(context, path, resuseArguments));
     response.setStatusCode(code);
     response.end();
   }
@@ -187,31 +178,36 @@ public class RequestUtil {
   /**
    * The same than {@link #createRedirectUrl(HttpServerRequest, String, true)}
    * 
-   * @param request
+   * @param context
    * @param path
    * @return
    */
-  public static String createRedirectUrl(HttpServerRequest request, String path) {
-    return createRedirectUrl(request, path, true);
+  public static String createRedirectUrl(RoutingContext context, String path) {
+    return createRedirectUrl(context, path, true);
   }
 
   /**
    * Creates a url from the given information for a redirect. If request is not null, then current query parameters are
    * added to the path
    * 
-   * @param request
+   * @param context
    * @param path
    * @param reuseArguments
    *          if true, the query parameters of the current request are reused
    * @return
    */
-  public static String createRedirectUrl(HttpServerRequest request, String path, boolean reuseArguments) {
+  public static String createRedirectUrl(RoutingContext context, String path, boolean reuseArguments) {
     String tmpPath = path;
+    HttpServerRequest request = context.request();
     if (request != null && reuseArguments) {
       String qp = request.query();
       if (qp != null && qp.hashCode() != 0) {
         tmpPath += (path.indexOf('?') < 0 ? "?" : "&") + qp;
       }
+    }
+    String prePath = context.get(PREPATH_PROPERTY);
+    if (prePath != null) {
+      tmpPath = prePath + ((prePath.endsWith("/") || tmpPath.startsWith("/")) ? "" : "/") + tmpPath;
     }
     return tmpPath;
   }

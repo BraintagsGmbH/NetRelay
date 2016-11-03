@@ -103,7 +103,7 @@ public abstract class AbstractCaptureController extends AbstractController {
    *          the resolved data to clean the path
    */
   protected void handleReroute(RoutingContext context, List<CaptureMap> resolvedCaptureCollections) {
-    if (doReroute) {
+    if (isDoReroute()) {
       String path = context.normalisedPath();
       String cleanedPath = cleanPath(context, resolvedCaptureCollections);
       if (!path.equals(cleanedPath)) {
@@ -167,7 +167,10 @@ public abstract class AbstractCaptureController extends AbstractController {
     List<CaptureMap> resolvedCaptureCollections = new ArrayList<>();
     if (getCaptureCollections() != null) {
       for (CaptureCollection collection : getCaptureCollections()) {
-        resolvedCaptureCollections.add(resolveCollection(event, collection));
+        CaptureMap map = resolveCollection(event, collection);
+        if (map != null && !map.isEmpty()) {
+          resolvedCaptureCollections.add(map);
+        }
       }
     }
     return resolvedCaptureCollections;

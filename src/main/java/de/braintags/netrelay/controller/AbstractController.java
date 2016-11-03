@@ -364,4 +364,14 @@ public abstract class AbstractController implements IController {
     return name;
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.netrelay.controller.IController#validateRoutingDefinition(de.braintags.netrelay.routing.
+   * RouterDefinition)
+   */
+  @Override
+  public void validateRoutingDefinition(RouterDefinition currentDefinition) {
+  }
+
 }

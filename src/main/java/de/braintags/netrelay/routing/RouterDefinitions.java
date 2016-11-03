@@ -24,6 +24,7 @@ import de.braintags.netrelay.init.Settings;
  * 
  */
 public class RouterDefinitions {
+  private static final String ROUTER_EXIST_ERROR = "A required router definition with name %s does not exist. Add it to the router definitions";
 
   private ArrayList<RouterDefinition> routerDefinitions = new ArrayList<>();
 
@@ -164,6 +165,27 @@ public class RouterDefinitions {
       }
     }
     return -2;
+  }
+
+  /**
+   * Checks wether there exists a definition with the given name
+   * 
+   * @param name
+   * @return
+   */
+  public boolean hasDefinition(String name) {
+    return getPosition(name) >= 0;
+  }
+
+  /**
+   * This method checks, wether there exists a definition with the given name and throws an {@link InitException} if not
+   * 
+   * @param name
+   */
+  public void checkRequired(String name) {
+    if (!hasDefinition(name)) {
+      throw new InitException(String.format(ROUTER_EXIST_ERROR, name));
+    }
   }
 
 }

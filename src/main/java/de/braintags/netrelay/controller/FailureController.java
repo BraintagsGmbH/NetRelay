@@ -87,8 +87,8 @@ public class FailureController extends AbstractController {
    */
   public static final String DEFAULT_PROPERTY = "DEFAULT";
 
-  private Map<Class, String> exceptionDefinitions = new HashMap<Class, String>();
-  private Map<Integer, String> codeDefinitions = new HashMap<Integer, String>();
+  private Map<Class, String> exceptionDefinitions = new HashMap<>();
+  private Map<Integer, String> codeDefinitions = new HashMap<>();
   private String defaultRedirect;
 
   @Override
@@ -145,7 +145,7 @@ public class FailureController extends AbstractController {
     String redirect = getRedirectByException(error);
     LOGGER.error("", error);
     if (redirect != null && !context.request().path().equalsIgnoreCase(redirect)) {
-      RequestUtil.sendRedirect(context.response(), redirect);
+      RequestUtil.sendRedirect(context, redirect);
     } else {
       String reply = String.format("Statuscode %d for request %s", context.statusCode(), context.request().path());
       reply += "\n" + error.toString();
@@ -174,7 +174,7 @@ public class FailureController extends AbstractController {
   private void reactByStatusCode(RoutingContext context) {
     String redirect = getRedirectByStatusCode(context.statusCode());
     if (redirect != null && !context.request().path().equalsIgnoreCase(redirect)) {
-      RequestUtil.sendRedirect(context.response(), redirect);
+      RequestUtil.sendRedirect(context, redirect);
     } else {
       handleDefaultStatus(context, null);
     }
