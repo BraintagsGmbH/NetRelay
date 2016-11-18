@@ -72,7 +72,7 @@ public class FavIconController extends AbstractController {
     RouterDefinition def = new RouterDefinition();
     def.setName(FavIconController.class.getSimpleName());
     def.setBlocking(false);
-    def.setController(FavIconController.class);
+    def.setControllerClass(FavIconController.class);
     def.setHandlerProperties(getDefaultProperties());
     def.setRoutes(new String[] { "/favicon.ico" });
     return def;

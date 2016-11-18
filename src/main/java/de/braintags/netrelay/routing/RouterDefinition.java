@@ -14,6 +14,7 @@ package de.braintags.netrelay.routing;
 
 import java.util.Properties;
 
+import de.braintags.io.vertx.util.exception.InitException;
 import de.braintags.netrelay.NetRelay;
 import de.braintags.netrelay.controller.IController;
 import de.braintags.netrelay.init.Settings;
@@ -31,7 +32,7 @@ import io.vertx.ext.web.Router;
  */
 public class RouterDefinition {
   private String name = null;
-  private Class<? extends IController> controller;
+  private Class<? extends IController> controllerClass;
   private boolean active = true;
   private HttpMethod httpMethod;
   private String[] routes;
@@ -39,6 +40,7 @@ public class RouterDefinition {
   private boolean failureDefinition = false;
   private Properties handlerProperties = new Properties();
   private CaptureCollection[] captureCollection;
+  private IController controller;
 
   /**
    * Create an instance of the defined IController and init it with the defined properties
@@ -51,7 +53,10 @@ public class RouterDefinition {
    * @throws Exception
    */
   public IController instantiateController(Vertx vertx, NetRelay netRelay) throws Exception {
-    IController ctrl = getController().newInstance();
+    if (controller != null) {
+      throw new InitException("The controller was initialized already in router definition: " + getName());
+    }
+    IController ctrl = getControllerClass().newInstance();
     ctrl.init(vertx, netRelay, getHandlerProperties(), captureCollection, name);
     ctrl.validateRoutingDefinition(this);
     return ctrl;
@@ -158,8 +163,8 @@ public class RouterDefinition {
    * 
    * @return the controller
    */
-  public Class<? extends IController> getController() {
-    return controller;
+  public Class<? extends IController> getControllerClass() {
+    return controllerClass;
   }
 
   /**
@@ -168,8 +173,8 @@ public class RouterDefinition {
    * @param controller
    *          the controller to set
    */
-  public final void setController(Class<? extends IController> controller) {
-    this.controller = controller;
+  public final void setControllerClass(Class<? extends IController> controller) {
+    this.controllerClass = controller;
     if (name == null) {
       name = controller.getSimpleName();
     }
@@ -246,6 +251,15 @@ public class RouterDefinition {
    */
   public final void setActive(boolean active) {
     this.active = active;
+  }
+
+  /**
+   * Get the instantiated controller of the current definition
+   * 
+   * @return
+   */
+  public IController getController() {
+    return controller;
   }
 
   @Override

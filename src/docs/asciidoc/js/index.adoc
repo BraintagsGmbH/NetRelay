@@ -49,18 +49,6 @@ To create and launch an instance of NetRelay, we are creating a Main Verticle li
 
 [source, java]
 ----
-package examples;
-
-import de.braintags.netrelay.NetRelay;
-import de.braintags.netrelay.init.Settings;
-import io.vertx.core.AbstractVerticle;
-import io.vertx.core.DeploymentOptions;
-import io.vertx.core.Future;
-import io.vertx.core.json.JsonObject;
-import io.vertx.core.logging.Logger;
-import io.vertx.core.logging.LoggerFactory;
-import io.vertx.docgen.Source;
-
 @Source(translate = false)
 public class Main extends AbstractVerticle {
  private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
@@ -81,7 +69,6 @@ public class Main extends AbstractVerticle {
    });
  }
 }
-
 ----
 
 In this example we are defining first the settings path, which will be used to read or generate the settings, by
@@ -552,14 +539,6 @@ configuration in the settings. +
 
 [source, java]
 ----
-package examples;
-
-import java.util.Properties;
-
-import de.braintags.netrelay.controller.AbstractController;
-import io.vertx.docgen.Source;
-import io.vertx.ext.web.RoutingContext;
-
 @Source(translate = false)
 public class HelloWorldController extends AbstractController {
  public static final String HELLO_PROPNAME = "helloProperty";
@@ -578,7 +557,6 @@ public class HelloWorldController extends AbstractController {
  }
 
 }
-
 
 ----
 

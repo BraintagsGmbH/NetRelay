@@ -107,7 +107,7 @@ public class BodyController extends AbstractController {
     RouterDefinition def = new RouterDefinition();
     def.setName(BodyController.class.getSimpleName());
     def.setBlocking(false);
-    def.setController(BodyController.class);
+    def.setControllerClass(BodyController.class);
     def.setHandlerProperties(getDefaultProperties());
     return def;
   }

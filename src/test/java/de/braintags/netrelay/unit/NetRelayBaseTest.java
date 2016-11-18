@@ -208,58 +208,58 @@ public class NetRelayBaseTest {
     settings.getDatastoreSettings().setDatabaseName(getClass().getSimpleName());
   }
 
-  protected final void testRequest(TestContext context, HttpMethod method, String path, int statusCode,
+  protected static final void testRequest(TestContext context, HttpMethod method, String path, int statusCode,
       String statusMessage) throws Exception {
     testRequest(context, method, path, null, statusCode, statusMessage, null);
   }
 
-  protected final void testRequest(TestContext context, HttpMethod method, String path, int statusCode,
+  protected static final void testRequest(TestContext context, HttpMethod method, String path, int statusCode,
       String statusMessage, String responseBody) throws Exception {
     testRequest(context, method, path, null, statusCode, statusMessage, responseBody);
   }
 
-  protected final void testRequest(TestContext context, HttpMethod method, String path, int statusCode,
+  protected static final void testRequest(TestContext context, HttpMethod method, String path, int statusCode,
       String statusMessage, Buffer responseBody) throws Exception {
     testRequestBuffer(context, method, path, null, null, statusCode, statusMessage, responseBody);
   }
 
-  protected final void testRequestWithContentType(TestContext context, HttpMethod method, String path,
+  protected static final void testRequestWithContentType(TestContext context, HttpMethod method, String path,
       String contentType, int statusCode, String statusMessage) throws Exception {
     testRequest(context, method, path, req -> req.putHeader("content-type", contentType), statusCode, statusMessage,
         null);
   }
 
-  protected final void testRequestWithAccepts(TestContext context, HttpMethod method, String path, String accepts,
-      int statusCode, String statusMessage) throws Exception {
+  protected static final void testRequestWithAccepts(TestContext context, HttpMethod method, String path,
+      String accepts, int statusCode, String statusMessage) throws Exception {
     testRequest(context, method, path, req -> req.putHeader("accept", accepts), statusCode, statusMessage, null);
   }
 
-  protected final void testRequestWithCookies(TestContext context, HttpMethod method, String path, String cookieHeader,
-      int statusCode, String statusMessage) throws Exception {
+  protected static final void testRequestWithCookies(TestContext context, HttpMethod method, String path,
+      String cookieHeader, int statusCode, String statusMessage) throws Exception {
     testRequest(context, method, path, req -> req.putHeader("cookie", cookieHeader), statusCode, statusMessage, null);
   }
 
-  protected final void testRequest(TestContext context, HttpMethod method, String path,
+  protected static final void testRequest(TestContext context, HttpMethod method, String path,
       Consumer<HttpClientRequest> requestAction, int statusCode, String statusMessage, String responseBody)
       throws Exception {
     testRequest(context, method, path, requestAction, null, statusCode, statusMessage, responseBody);
   }
 
-  protected final void testRequest(TestContext context, HttpMethod method, String path,
+  protected static final void testRequest(TestContext context, HttpMethod method, String path,
       Consumer<HttpClientRequest> requestAction, Consumer<ResponseCopy> responseAction, int statusCode,
       String statusMessage, String responseBody) throws Exception {
     testRequestBuffer(context, method, path, requestAction, responseAction, statusCode, statusMessage,
         responseBody != null ? Buffer.buffer(responseBody) : null);
   }
 
-  protected final void testRequestBuffer(TestContext context, HttpMethod method, String path,
+  protected static final void testRequestBuffer(TestContext context, HttpMethod method, String path,
       Consumer<HttpClientRequest> requestAction, Consumer<ResponseCopy> responseAction, int statusCode,
       String statusMessage, Buffer responseBodyBuffer) throws Exception {
     testRequestBuffer(context, client, method, PORT, path, requestAction, responseAction, statusCode, statusMessage,
         responseBodyBuffer);
   }
 
-  protected final void testRequestBuffer(TestContext context, HttpClient client, HttpMethod method, int port,
+  protected static final void testRequestBuffer(TestContext context, HttpClient client, HttpMethod method, int port,
       String path, Consumer<HttpClientRequest> requestAction, Consumer<ResponseCopy> responseAction, int statusCode,
       String statusMessage, Buffer responseBodyBuffer) throws Exception {
     LOGGER.info("calling URL " + path);
@@ -315,12 +315,12 @@ public class NetRelayBaseTest {
   protected RouterDefinition defineRouterDefinition(Class controllerClass, String route) {
     RouterDefinition rd = new RouterDefinition();
     rd.setName(controllerClass.getSimpleName());
-    rd.setController(controllerClass);
+    rd.setControllerClass(controllerClass);
     rd.setRoutes(new String[] { route });
     return rd;
   }
 
-  public class ResponseCopy {
+  public static class ResponseCopy {
     public String content;
     public int code;
     public String statusMessage;
