@@ -80,7 +80,7 @@ public class StaticController extends AbstractController {
     RouterDefinition def = new RouterDefinition();
     def.setName(StaticController.class.getSimpleName());
     def.setBlocking(false);
-    def.setControllerClass(StaticController.class);
+    def.setController(StaticController.class);
     def.setHandlerProperties(getDefaultProperties());
     def.setRoutes(new String[] { "/static/*" });
     return def;

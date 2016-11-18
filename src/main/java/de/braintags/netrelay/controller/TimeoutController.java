@@ -74,7 +74,7 @@ public class TimeoutController extends AbstractController {
     RouterDefinition def = new RouterDefinition();
     def.setName(TimeoutController.class.getSimpleName());
     def.setBlocking(false);
-    def.setControllerClass(TimeoutController.class);
+    def.setController(TimeoutController.class);
     def.setHandlerProperties(getDefaultProperties());
     return def;
   }

@@ -209,7 +209,7 @@ public class FailureController extends AbstractController {
     def.setName(FailureController.class.getSimpleName());
     def.setBlocking(false);
     def.setFailureDefinition(true);
-    def.setControllerClass(FailureController.class);
+    def.setController(FailureController.class);
     return def;
   }
 

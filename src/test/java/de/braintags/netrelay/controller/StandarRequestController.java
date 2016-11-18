@@ -59,7 +59,7 @@ public class StandarRequestController extends AbstractController {
   public static RouterDefinition createRouterDefinition() {
     RouterDefinition def = new RouterDefinition();
     def.setName(StandarRequestController.class.getSimpleName());
-    def.setControllerClass(StandarRequestController.class);
+    def.setController(StandarRequestController.class);
     def.setHandlerProperties(new Properties());
     return def;
   }

@@ -60,7 +60,7 @@ public class CookieController extends AbstractController {
     RouterDefinition def = new RouterDefinition();
     def.setName(CookieController.class.getSimpleName());
     def.setBlocking(false);
-    def.setControllerClass(CookieController.class);
+    def.setController(CookieController.class);
     def.setHandlerProperties(getDefaultProperties());
     return def;
   }

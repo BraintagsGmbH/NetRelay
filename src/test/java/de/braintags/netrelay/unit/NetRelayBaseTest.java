@@ -315,7 +315,7 @@ public class NetRelayBaseTest {
   protected RouterDefinition defineRouterDefinition(Class controllerClass, String route) {
     RouterDefinition rd = new RouterDefinition();
     rd.setName(controllerClass.getSimpleName());
-    rd.setControllerClass(controllerClass);
+    rd.setController(controllerClass);
     rd.setRoutes(new String[] { route });
     return rd;
   }

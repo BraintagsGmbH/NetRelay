@@ -84,7 +84,7 @@ public class TFailureController extends NetRelayBaseTest {
     rdf.setRoutes(new String[] { "/*" });
 
     RouterDefinition def = new RouterDefinition();
-    def.setControllerClass(CreateErrorController.class);
+    def.setController(CreateErrorController.class);
     CreateErrorController.errorCode = errorCode;
     CreateErrorController.exception = exception;
     netRelay.getSettings().getRouterDefinitions().addBefore(FailureController.class.getSimpleName(), def);
