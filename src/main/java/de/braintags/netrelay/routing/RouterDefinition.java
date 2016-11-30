@@ -30,6 +30,11 @@ import io.vertx.ext.web.Router;
  * 
  */
 public class RouterDefinition {
+  /**
+   * If a route shall be executed based on regex, this is the suffix, which must be added into the route specification
+   */
+  public static final String REGEX_MARKER = "regex:";
+
   private String name = null;
   private Class<? extends IController> controller;
   private boolean active = true;

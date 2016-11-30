@@ -19,6 +19,8 @@ import org.junit.Test;
 
 import de.braintags.netrelay.controller.StandarRequestController;
 import de.braintags.netrelay.init.Settings;
+import de.braintags.netrelay.routing.RouterDefinition;
+import de.braintags.netrelay.routing.RouterDefinitions;
 import de.braintags.netrelay.util.MultipartUtil;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpMethod;
@@ -36,6 +38,23 @@ import io.vertx.test.core.TestUtils;
 public class TStandardRequests extends NetRelayBaseTest {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(TStandardRequests.class);
+
+  @Test
+  public void testRegexRoute(TestContext context) throws Exception {
+    try {
+      resetRoutes(RouterDefinition.REGEX_MARKER + ".*foo");
+      String url = "/test.foo";
+      testRequest(context, HttpMethod.GET, url, req -> {
+      }, resp -> {
+        context.assertNotNull(resp, "response is null");
+        LOGGER.info("RESPONSE: " + resp.content);
+        LOGGER.info("HEADERS: " + resp.headers);
+      }, 200, "OK", null);
+    } catch (Exception e) {
+      context.fail(e);
+    }
+
+  }
 
   @Test
   public void testReuseCookie(TestContext context) throws Exception {
@@ -193,17 +212,26 @@ public class TStandardRequests extends NetRelayBaseTest {
     context.assertEquals(fileData, uploaded);
   }
 
+  private void resetRoutes() throws Exception {
+    resetRoutes(null);
+  }
+
   /**
    * @throws Exception
    */
-  private void resetRoutes() throws Exception {
+  private void resetRoutes(String regex) throws Exception {
     StandarRequestController.controllerProcessed = false;
     StandarRequestController.attrs = null;
     StandarRequestController.params = null;
     StandarRequestController.bodyBuffer = null;
     StandarRequestController.fileUploads = null;
 
-    netRelay.getSettings().getRouterDefinitions().addOrReplace(StandarRequestController.createRouterDefinition());
+    RouterDefinition def = StandarRequestController.createRouterDefinition();
+    if (regex != null) {
+      def.setRoutes(new String[] { regex });
+    }
+    RouterDefinitions defs = netRelay.getSettings().getRouterDefinitions();
+    defs.addOrReplace(def);
     netRelay.resetRoutes();
   }
 

@@ -74,14 +74,44 @@ public class RoutingInit {
       returnList.add(router.route());
     } else if (def.getHttpMethod() == null) {
       for (String route : def.getRoutes()) {
-        returnList.add(router.route(route));
+        addRoute(router, returnList, route);
       }
     } else {
       HttpMethod method = def.getHttpMethod();
       for (String route : def.getRoutes()) {
-        returnList.add(router.route(method, route));
+        addRouteWithHttpMethod(router, returnList, method, route);
       }
     }
     return returnList;
   }
+
+  /**
+   * @param router
+   * @param returnList
+   * @param method
+   * @param route
+   */
+  private static void addRouteWithHttpMethod(Router router, List<Route> returnList, HttpMethod method, String route) {
+    if (route.startsWith(RouterDefinition.REGEX_MARKER)) {
+      String tmpRoute = route.substring(RouterDefinition.REGEX_MARKER.length());
+      returnList.add(router.routeWithRegex(method, tmpRoute));
+    } else {
+      returnList.add(router.route(method, route));
+    }
+  }
+
+  /**
+   * @param router
+   * @param returnList
+   * @param route
+   */
+  private static void addRoute(Router router, List<Route> returnList, String route) {
+    if (route.startsWith(RouterDefinition.REGEX_MARKER)) {
+      String tmpRoute = route.substring(RouterDefinition.REGEX_MARKER.length());
+      returnList.add(router.routeWithRegex(tmpRoute));
+    } else {
+      returnList.add(router.route(route));
+    }
+  }
+
 }

@@ -185,7 +185,8 @@
  * possibility to deactivate an entry
  * * routes +
  * a comma separated list of routes, where the controller shall be executed, following the syntax defined by
- * {@link io.vertx.ext.web}
+ * {@link io.vertx.ext.web}. If you want to add a route based on regex, you will have to define the route by using the
+ * suffix {@value de.braintags.netrelay.routing.RouterDefinition#REGEX_MARKER}
  * * httpMethod +
  * if the controller shall be executed under a certain http method ( POST / GET etc. ), then this is defined here.
  * Default is null.

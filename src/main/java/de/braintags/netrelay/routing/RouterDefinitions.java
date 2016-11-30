@@ -50,14 +50,26 @@ public class RouterDefinitions {
   public void addOrReplace(RouterDefinition definition) {
     int position = getPosition(definition.getName());
     if (position >= 0) {
-      add(position, definition);
+      set(position, definition);
     } else {
       routerDefinitions.add(definition);
     }
   }
 
   /**
-   * Add a new definition at the end of the definitions
+   * Overwrite the definition at given position
+   * 
+   * @param position
+   *          the position where to add the new element
+   * @param definition
+   *          teh {@link RouterDefinition} to be added
+   */
+  public void set(int position, RouterDefinition definition) {
+    routerDefinitions.set(position, definition);
+  }
+
+  /**
+   * Add a new definition at the given posistion
    * 
    * @param position
    *          the position where to add the new element
