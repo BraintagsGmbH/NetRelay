@@ -280,6 +280,7 @@ public class NetRelayBaseTest {
 
       ResponseCopy rc = new ResponseCopy();
       resp.bodyHandler(buff -> {
+        LOGGER.debug("Executing body handler");
         rc.content = buff.toString();
         rc.code = resp.statusCode();
         rc.statusMessage = resp.statusMessage();
@@ -297,6 +298,7 @@ public class NetRelayBaseTest {
     req.end();
     async.await();
 
+    LOGGER.debug("request executed");
     ResponseCopy rc = resultObject.getResult();
     if (responseAction != null) {
       responseAction.accept(rc);
