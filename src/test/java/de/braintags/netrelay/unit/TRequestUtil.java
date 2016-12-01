@@ -58,4 +58,24 @@ public class TRequestUtil extends NetRelayBaseTest {
     context.assertEquals("second/third/firstfourth/", result);
   }
 
+  @Test
+  public void testSplitPath(TestContext context) {
+    splitPath(context, "/test/at/index.html", "/test/at/", "index");
+    splitPath(context, "/test/at/", "/test/at/", "index");
+    splitPath(context, "/index.html", "/", "index");
+    splitPath(context, "/", "/", "index");
+    splitPath(context, "test/at/index.html", "test/at/", "index");
+    try {
+      splitPath(context, "", "/", "index");
+      context.fail("expected IllegalArgumentException");
+    } catch (IllegalArgumentException e) {
+      // this is expected
+    }
+  }
+
+  private void splitPath(TestContext context, String url, String expectedPath, String expectedFile) {
+    String[] result = RequestUtil.splitPathFile(url);
+    context.assertEquals(expectedPath, result[0]);
+    context.assertEquals(expectedFile, result[1]);
+  }
 }

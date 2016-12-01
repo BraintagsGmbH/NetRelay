@@ -45,6 +45,30 @@ public class RequestUtil {
   }
 
   /**
+   * Split the url into path and file without extension
+   * 
+   * @param requestUrl
+   *          the url to be used
+   * @return
+   */
+  public static String[] splitPathFile(String requestUrl) {
+    if (requestUrl == null || requestUrl.isEmpty()) {
+      throw new IllegalArgumentException("url must not be null or empty");
+    }
+    if (requestUrl.endsWith("/")) {
+      return new String[] { requestUrl, "index" };
+    }
+    String[] elements = new String[2];
+    elements[0] = requestUrl.substring(0, requestUrl.lastIndexOf("/") + 1);
+    String tmpName = requestUrl.substring(requestUrl.lastIndexOf("/") + 1);
+    if (tmpName.contains(".")) {
+      tmpName = tmpName.substring(0, tmpName.indexOf('.'));
+    }
+    elements[1] = tmpName;
+    return elements;
+  }
+
+  /**
    * Encodes the text into a suitable format for UTF-8 for http requests for instance
    * 
    * @param text
