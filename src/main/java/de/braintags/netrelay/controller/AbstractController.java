@@ -14,6 +14,7 @@ package de.braintags.netrelay.controller;
 
 import java.util.Properties;
 
+import de.braintags.io.vertx.util.HttpContentType;
 import de.braintags.io.vertx.util.exception.ParameterRequiredException;
 import de.braintags.netrelay.NetRelay;
 import de.braintags.netrelay.RequestUtil;
@@ -303,6 +304,16 @@ public abstract class AbstractController implements IController {
   }
 
   /**
+   * This mehtod adds the instance of NetRelay into the context, so that it is accessible by template specific
+   * processors for instance
+   * 
+   * @param context
+   */
+  protected void addNetRelayToContext(RoutingContext context) {
+    context.put(NetRelay.NETRELAY_PROPERTY, getNetRelay());
+  }
+
+  /**
    * Reads a value from the request
    * 
    * @param context
@@ -347,7 +358,7 @@ public abstract class AbstractController implements IController {
    * @param content
    */
   protected void sendJson(RoutingContext context, String content) {
-    context.response().putHeader("content-type", "application/json; charset=utf-8").end(content);
+    context.response().putHeader("content-type", HttpContentType.JSON_UTF8.toString()).end(content);
   }
 
   /**
