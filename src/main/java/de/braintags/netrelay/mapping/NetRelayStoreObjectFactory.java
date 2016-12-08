@@ -28,7 +28,7 @@ import io.vertx.core.Handler;
  * @author Michael Remme
  * 
  */
-public class NetRelayStoreObjectFactory extends AbstractStoreObjectFactory {
+public class NetRelayStoreObjectFactory extends AbstractStoreObjectFactory<Map<String, String>> {
   private NetRelay netRelay;
 
   public NetRelayStoreObjectFactory(NetRelay netRelay) {
@@ -36,8 +36,8 @@ public class NetRelayStoreObjectFactory extends AbstractStoreObjectFactory {
   }
 
   @Override
-  public void createStoreObject(IMapper mapper, Object entity, Handler<AsyncResult<IStoreObject<?>>> handler) {
-    NetRelayStoreObject storeObject = new NetRelayStoreObject(mapper, entity);
+  public <T> void createStoreObject(IMapper<T> mapper, T entity, Handler<AsyncResult<IStoreObject<T, ?>>> handler) {
+    NetRelayStoreObject<T> storeObject = new NetRelayStoreObject<>(mapper, entity);
     storeObject.initFromEntity(initResult -> {
       if (initResult.failed()) {
         handler.handle(Future.failedFuture(initResult.cause()));
@@ -48,7 +48,8 @@ public class NetRelayStoreObjectFactory extends AbstractStoreObjectFactory {
   }
 
   @Override
-  public void createStoreObject(Object storedObject, IMapper mapper, Handler<AsyncResult<IStoreObject<?>>> handler) {
+  public <T> void createStoreObject(Map<String, String> storedObject, IMapper<T> mapper,
+      Handler<AsyncResult<IStoreObject<T, ?>>> handler) {
     createStoreObject(storedObject, null, mapper, handler);
   }
 
@@ -60,10 +61,9 @@ public class NetRelayStoreObjectFactory extends AbstractStoreObjectFactory {
    * @param mapper
    * @param handler
    */
-  public void createStoreObject(Object storedObject, Object entity, IMapper mapper,
-      Handler<AsyncResult<IStoreObject<?>>> handler) {
-    NetRelayStoreObject storeObject = new NetRelayStoreObject((Map<String, String>) storedObject, entity, mapper,
-        netRelay);
+  public <T> void createStoreObject(Map<String, String> storedObject, T entity, IMapper<T> mapper,
+      Handler<AsyncResult<IStoreObject<T, ?>>> handler) {
+    NetRelayStoreObject<T> storeObject = new NetRelayStoreObject<>(storedObject, entity, mapper, netRelay);
     storeObject.initToEntity(result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));

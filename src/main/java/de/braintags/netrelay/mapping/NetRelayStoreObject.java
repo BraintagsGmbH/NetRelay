@@ -38,13 +38,13 @@ import io.vertx.core.Handler;
  * @author Michael Remme
  * 
  */
-public class NetRelayStoreObject implements IStoreObject<Map<String, String>> {
+public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, String>> {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(NetRelayStoreObject.class);
 
-  private IMapper mapper;
-  private Object entity = null;
-  private Collection<IObjectReference> objectReferences = new ArrayList<IObjectReference>();
+  private IMapper<T> mapper;
+  private T entity = null;
+  private Collection<IObjectReference> objectReferences = new ArrayList<>();
   private Map<String, String> requestMap = new HashMap<>();
   private NetRelay netRelay;
 
@@ -56,7 +56,7 @@ public class NetRelayStoreObject implements IStoreObject<Map<String, String>> {
    * @param entity
    *          the entity to be used
    */
-  public NetRelayStoreObject(IMapper mapper, Object entity) {
+  public NetRelayStoreObject(IMapper<T> mapper, T entity) {
     if (mapper == null)
       throw new NullPointerException("Mapper must not be null");
     this.mapper = mapper;
@@ -71,7 +71,7 @@ public class NetRelayStoreObject implements IStoreObject<Map<String, String>> {
    * @param mapper
    *          the mapper to be used
    */
-  public NetRelayStoreObject(Map<String, String> requestMap, Object entity, IMapper mapper, NetRelay netRelay) {
+  public NetRelayStoreObject(Map<String, String> requestMap, T entity, IMapper<T> mapper, NetRelay netRelay) {
     Objects.requireNonNull(mapper, "Mapper must not be null");
     Objects.requireNonNull(requestMap, "requestMap must not be null");
     this.mapper = mapper;
@@ -108,25 +108,25 @@ public class NetRelayStoreObject implements IStoreObject<Map<String, String>> {
    * java.lang.Object)
    */
   @Override
-  public IStoreObject<Map<String, String>> put(IField field, Object value) {
+  public IStoreObject<T, Map<String, String>> put(IField field, Object value) {
     requestMap.put(field.getName().toLowerCase(), String.valueOf(value));
     return this;
   }
 
   @Override
-  public Map getContainer() {
+  public Map<String, String> getContainer() {
     return requestMap;
   }
 
   /**
    * @return the mapper
    */
-  public IMapper getMapper() {
+  public IMapper<T> getMapper() {
     return mapper;
   }
 
   @Override
-  public Object getEntity() {
+  public T getEntity() {
     if (entity == null) {
       String message = String.format("Internal Entity is not initialized; call method %s.initToEntity first ",
           getClass().getName());
@@ -145,7 +145,7 @@ public class NetRelayStoreObject implements IStoreObject<Map<String, String>> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
       } else {
-        Object tmpObject = result.result();
+        T tmpObject = result.result();
         LOGGER.debug("start initToEntity");
         iterateFields(tmpObject, fieldResult -> {
           if (fieldResult.failed()) {
@@ -165,19 +165,18 @@ public class NetRelayStoreObject implements IStoreObject<Map<String, String>> {
     });
   }
 
-  @SuppressWarnings({ "rawtypes" })
-  private void createEntity(Handler<AsyncResult<Object>> handler) {
+  private void createEntity(Handler<AsyncResult<T>> handler) {
     if (entity != null) {
       handler.handle(Future.succeededFuture(entity));
     } else if (hasProperty(getMapper().getIdField())) {
       Object id = get(getMapper().getIdField());
-      IQuery<?> query = netRelay.getDatastore().createQuery(getMapper().getMapperClass());
+      IQuery<T> query = netRelay.getDatastore().createQuery(getMapper().getMapperClass());
       query.field(query.getMapper().getIdField().getName()).is(id);
       query.execute(qrr -> {
         if (qrr.failed()) {
           handler.handle(Future.failedFuture(qrr.cause()));
         } else {
-          IQueryResult<?> qr = qrr.result();
+          IQueryResult<T> qr = qrr.result();
           if (!qr.iterator().hasNext()) {
             handler.handle(Future.failedFuture(new NoSuchRecordException("Could not find record with ID " + id)));
           } else {
@@ -192,12 +191,12 @@ public class NetRelayStoreObject implements IStoreObject<Map<String, String>> {
         }
       });
     } else {
-      Object returnObject = getMapper().getObjectFactory().createInstance(getMapper().getMapperClass());
+      T returnObject = getMapper().getObjectFactory().createInstance(getMapper().getMapperClass());
       handler.handle(Future.succeededFuture(returnObject));
     }
   }
 
-  protected void finishToEntity(Object tmpObject, Handler<AsyncResult<Void>> handler) {
+  protected void finishToEntity(T tmpObject, Handler<AsyncResult<Void>> handler) {
     this.entity = tmpObject;
     try {
       handler.handle(Future.succeededFuture());
@@ -213,7 +212,7 @@ public class NetRelayStoreObject implements IStoreObject<Map<String, String>> {
    * @param tmpObject
    * @param handler
    */
-  protected final void iterateFields(Object tmpObject, Handler<AsyncResult<Void>> handler) {
+  protected final void iterateFields(T tmpObject, Handler<AsyncResult<Void>> handler) {
     LOGGER.debug("start iterateFields");
     Set<String> fieldNames = getMapper().getFieldNames();
     CounterObject<Void> co = new CounterObject<>(fieldNames.size(), handler);
