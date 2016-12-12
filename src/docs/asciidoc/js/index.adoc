@@ -51,23 +51,23 @@ To create and launch an instance of NetRelay, we are creating a Main Verticle li
 ----
 @Source(translate = false)
 public class Main extends AbstractVerticle {
- private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
- @Override
- public void start(Future<Void> startFuture) throws Exception {
-   String settingsPath = "src/main/resources/";
-   String settingsFile = settingsPath + "fairytale-settings.json";
-   DeploymentOptions options = new DeploymentOptions();
-   options.setConfig(new JsonObject().put(Settings.SETTINGS_LOCATION_PROPERTY, settingsFile));
-   vertx.deployVerticle(NetRelay.class.getName(), options, result -> {
-     if (result.failed()) {
-       LOGGER.error("", result.cause());
-       startFuture.fail(result.cause());
-     } else {
-       LOGGER.info(NetRelay.class.getSimpleName() + " successfully launched: " + result.result());
-     }
-   });
- }
+  @Override
+  public void start(Future<Void> startFuture) throws Exception {
+    String settingsPath = "src/main/resources/";
+    String settingsFile = settingsPath + "fairytale-settings.json";
+    DeploymentOptions options = new DeploymentOptions();
+    options.setConfig(new JsonObject().put(Settings.SETTINGS_LOCATION_PROPERTY, settingsFile));
+    vertx.deployVerticle(NetRelay.class.getName(), options, result -> {
+      if (result.failed()) {
+        LOGGER.error("", result.cause());
+        startFuture.fail(result.cause());
+      } else {
+        LOGGER.info(NetRelay.class.getSimpleName() + " successfully launched: " + result.result());
+      }
+    });
+  }
 }
 ----
 
@@ -542,20 +542,20 @@ configuration in the settings. +
 ----
 @Source(translate = false)
 public class HelloWorldController extends AbstractController {
- public static final String HELLO_PROPNAME = "helloProperty";
+  public static final String HELLO_PROPNAME = "helloProperty";
 
- private String propertyName;
+  private String propertyName;
 
- @Override
- public void handleController(RoutingContext context) {
-   context.put(propertyName, "Hello world");
-   context.next();
- }
+  @Override
+  public void handleController(RoutingContext context) {
+    context.put(propertyName, "Hello world");
+    context.next();
+  }
 
- @Override
- public void initProperties(Properties properties) {
-   propertyName = readProperty(HELLO_PROPNAME, null, true);
- }
+  @Override
+  public void initProperties(Properties properties) {
+    propertyName = readProperty(HELLO_PROPNAME, null, true);
+  }
 
 }
 

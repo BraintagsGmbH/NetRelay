@@ -51,23 +51,23 @@ To create and launch an instance of NetRelay, we are creating a Main Verticle li
 ----
 @Source(translate = false)
 public class Main extends AbstractVerticle {
- private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
- @Override
- public void start(Future<Void> startFuture) throws Exception {
-   String settingsPath = "src/main/resources/";
-   String settingsFile = settingsPath + "fairytale-settings.json";
-   DeploymentOptions options = new DeploymentOptions();
-   options.setConfig(new JsonObject().put(Settings.SETTINGS_LOCATION_PROPERTY, settingsFile));
-   vertx.deployVerticle(NetRelay.class.getName(), options, result -> {
-     if (result.failed()) {
-       LOGGER.error("", result.cause());
-       startFuture.fail(result.cause());
-     } else {
-       LOGGER.info(NetRelay.class.getSimpleName() + " successfully launched: " + result.result());
-     }
-   });
- }
+  @Override
+  public void start(Future<Void> startFuture) throws Exception {
+    String settingsPath = "src/main/resources/";
+    String settingsFile = settingsPath + "fairytale-settings.json";
+    DeploymentOptions options = new DeploymentOptions();
+    options.setConfig(new JsonObject().put(Settings.SETTINGS_LOCATION_PROPERTY, settingsFile));
+    vertx.deployVerticle(NetRelay.class.getName(), options, result -> {
+      if (result.failed()) {
+        LOGGER.error("", result.cause());
+        startFuture.fail(result.cause());
+      } else {
+        LOGGER.info(NetRelay.class.getSimpleName() + " successfully launched: " + result.result());
+      }
+    });
+  }
 }
 ----
 
@@ -168,12 +168,12 @@ shall be activated on nearly any route.
 The settings are consisting mainly of five parts:
 
 * some application specific adjustments like the port, where the server shall run, or the even the
-`MailClientSettings` to enable the system to send and receive emails by controllers
+`link:../../apidocs/de/braintags/netrelay/init/MailClientSettings.html[MailClientSettings]` to enable the system to send and receive emails by controllers
 or processors
-* the datastore settings to define, which `IDataStore` shall be used by
+* the datastore settings to define, which `link:../../apidocs/de/braintags/io/vertx/pojomapper/IDataStore.html[IDataStore]` shall be used by
 NetRelay. ( This will include the use of the coming MultiDataStores from the project
 link:https://github.com/BraintagsGmbH/vertx-pojo-mapper[ vertx-pojo-mapper ] )
-* the Router / Controller definitions to configure `IController`s and to
+* the Router / Controller definitions to configure `link:../../apidocs/de/braintags/netrelay/controller/IController.html[IController]`s and to
 define, which Controller shall be executed under which route
 * the processor definitions contain the configuration of regular processed jobs
 * the mapping definitions contain the specification of the pojo-mappers, which are used by the current application
@@ -213,11 +213,11 @@ openssl pkcs8 -topk8 -inform pem -in keyfileIn.pem -outform pem -nocrypt -out ke
 ----
 
 * encoders
-If you are using the annotation `@Encoder` inside your
+If you are using the annotation `link:../../apidocs/de/braintags/io/vertx/pojomapper/annotation/field/Encoder.html[@Encoder]` inside your
 mappers, you will have to define the name of the encoder to be used. The existing encoders are defined in the part
 encoders of the settings. Per default the standard encoder is created and initialized. Each encoder definition
 consists of the name, which is the name you are referencing in the mapper; the encoderClass, which is a class which
-implements `IEncoder` and some optional properties, which are used by
+implements `link:../../apidocs/de/braintags/io/vertx/util/security/crypt/IEncoder.html[IEncoder]` and some optional properties, which are used by
 the concrete implementation.
 
 [source, json]
@@ -242,7 +242,7 @@ In general such a definitions consists of:
 * name +
 the name specified here is used for display
 * controller +
-the Class as instance of `IController`, which shall be executed here
+the Class as instance of `link:../../apidocs/de/braintags/netrelay/controller/IController.html[IController]`, which shall be executed here
 * active +
 possibility to deactivate an entry
 * routes +
@@ -311,7 +311,7 @@ caching controle, for instance.
 
 ----
 The example above displays the specification of a failure controller by using the class
-`FailureController`, where resulting errorpages can be defined in
+`link:../../apidocs/de/braintags/netrelay/controller/FailureController.html[FailureController]`, where resulting errorpages can be defined in
 dependency to an exception or an error code
 
 ===== Capture Collection
@@ -462,7 +462,7 @@ Processors are classes, which are executed regular inside a defined time frame. 
 * name +
 the name specified here is used for display
 * processorClass +
-a class as an extension of `IProcessor`, which is executed
+a class as an extension of `link:../../apidocs/de/braintags/netrelay/processor/IProcessor.html[IProcessor]`, which is executed
 * active +
 possibility to deactivate a processor
 * timeDef +
@@ -532,8 +532,8 @@ use controllers, which can be simply added and configured inside the settings. T
 parameters and properties can be found in the javadoc of the appropriate classes.
 
 === Creating a new Controller
-Adding a new controller is simply done by implementing `IController` or by
-extending `AbstractController`, for instance. +
+Adding a new controller is simply done by implementing `link:../../apidocs/de/braintags/netrelay/controller/IController.html[IController]` or by
+extending `link:../../apidocs/de/braintags/netrelay/controller/AbstractController.html[AbstractController]`, for instance. +
 In our example here we will create a new controller, which will add the text "Hello world" into the context, from
 where it can be read from out of a template. The name of the variable in the context must set inside the
 configuration in the settings. +
@@ -542,20 +542,20 @@ configuration in the settings. +
 ----
 @Source(translate = false)
 public class HelloWorldController extends AbstractController {
- public static final String HELLO_PROPNAME = "helloProperty";
+  public static final String HELLO_PROPNAME = "helloProperty";
 
- private String propertyName;
+  private String propertyName;
 
- @Override
- public void handleController(RoutingContext context) {
-   context.put(propertyName, "Hello world");
-   context.next();
- }
+  @Override
+  public void handleController(RoutingContext context) {
+    context.put(propertyName, "Hello world");
+    context.next();
+  }
 
- @Override
- public void initProperties(Properties properties) {
-   propertyName = readProperty(HELLO_PROPNAME, null, true);
- }
+  @Override
+  public void initProperties(Properties properties) {
+    propertyName = readProperty(HELLO_PROPNAME, null, true);
+  }
 
 }
 
@@ -608,28 +608,28 @@ Inside the core project of NetRelay are existing only a few, fundamental control
 controllers can be found in the project link:https://github.com/BraintagsGmbH/NetRelay-Controller[
 NetRelay-Controller]. The configuration options of each Controller are described inside the javadoc.
 
-* `BodyController` +
+* `link:../../apidocs/de/braintags/netrelay/controller/BodyController.html[BodyController]` +
 A Controller, which creates and uses the Bodyhandler, to read the request body and uploads.
 The BodyController creates some variables and stores them inside the context, so that they can be used from out of a
 template, for instance.<br/>
 
-* `CookieController` +
+* `link:../../apidocs/de/braintags/netrelay/controller/CookieController.html[CookieController]` +
 The Cookie-Controller uses teh CookieHandler to decode cookies from the request, makes them
 available in the RoutingContext and writes them back in the response.
 
-* `SessionController` +
+* `link:../../apidocs/de/braintags/netrelay/controller/SessionController.html[SessionController]` +
 SessionController uses a SessionHandler internally to implement session handling for
 all browser sessions.
 
-* `FailureController` +
+* `link:../../apidocs/de/braintags/netrelay/controller/FailureController.html[FailureController]` +
 A Controller for failing calls. The Controller can be configured to produce output depending on an error code or an
 exception. For each of them can be defined a redirect address. If no definition is found, then an internal default
 output is generated.
 
-* `StaticController` +
+* `link:../../apidocs/de/braintags/netrelay/controller/StaticController.html[StaticController]` +
 A controller to define serving of static contents.
 
-* `TimeoutController` +
+* `link:../../apidocs/de/braintags/netrelay/controller/TimeoutController.html[TimeoutController]` +
 This controller defines for the specified routes, after how long time the request processing is stopped.
 
 == Processors
@@ -641,7 +641,7 @@ This controller defines for the specified routes, after how long time the reques
 == Adding a KeyGenerator Verticle
 
 To be able to use a clean key generator for your mappers, you should launch the
-`KeyGeneratorVerticle` from the project
+`link:../../apidocs/de/braintags/io/vertx/keygenerator/KeyGeneratorVerticle.html[KeyGeneratorVerticle]` from the project
 link:https://github.com/BraintagsGmbH/vertx-key-generator[ vertx-key-generator ].
 
 [source, java]
