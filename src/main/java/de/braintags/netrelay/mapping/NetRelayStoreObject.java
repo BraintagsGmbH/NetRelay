@@ -15,6 +15,7 @@ package de.braintags.netrelay.mapping;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -26,9 +27,9 @@ import de.braintags.io.vertx.pojomapper.mapping.IField;
 import de.braintags.io.vertx.pojomapper.mapping.IMapper;
 import de.braintags.io.vertx.pojomapper.mapping.IObjectReference;
 import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
-import de.braintags.io.vertx.util.CounterObject;
 import de.braintags.netrelay.NetRelay;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
 
@@ -37,6 +38,8 @@ import io.vertx.core.Handler;
  * 
  * @author Michael Remme
  * 
+ * @param <T>
+ *          the class of the mapper used
  */
 public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, String>> {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
@@ -68,8 +71,12 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
    * 
    * @param requestMap
    *          a {@link Map} with key value pairs, which are describing the object properties
+   * @param entity
+   *          the entity to be used
    * @param mapper
    *          the mapper to be used
+   * @param netRelay
+   *          the instance of NetRelay
    */
   public NetRelayStoreObject(Map<String, String> requestMap, T entity, IMapper<T> mapper, NetRelay netRelay) {
     Objects.requireNonNull(mapper, "Mapper must not be null");
@@ -147,21 +154,29 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
       } else {
         T tmpObject = result.result();
         LOGGER.debug("start initToEntity");
-        iterateFields(tmpObject, fieldResult -> {
-          if (fieldResult.failed()) {
-            handler.handle(fieldResult);
-            return;
-          }
-          iterateObjectReferences(tmpObject, orResult -> {
-            if (orResult.failed()) {
-              handler.handle(orResult);
-              return;
-            }
-            finishToEntity(tmpObject, handler);
-            LOGGER.debug("finished initToEntity");
-          });
-        });
+        initToEntity(tmpObject, handler);
       }
+    });
+  }
+
+  /**
+   * @param tmpObject
+   * @param handler
+   */
+  private void initToEntity(T tmpObject, Handler<AsyncResult<Void>> handler) {
+    iterateFields(tmpObject, fieldResult -> {
+      if (fieldResult.failed()) {
+        handler.handle(fieldResult);
+        return;
+      }
+      iterateObjectReferences(tmpObject, orResult -> {
+        if (orResult.failed()) {
+          handler.handle(orResult);
+          return;
+        }
+        finishToEntity(tmpObject, handler);
+        LOGGER.debug("finished initToEntity");
+      });
     });
   }
 
@@ -169,6 +184,7 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
     if (entity != null) {
       handler.handle(Future.succeededFuture(entity));
     } else if (hasProperty(getMapper().getIdField())) {
+<<<<<<< 378beb40fd3de1b6713ff2e2addcf387f4ea652f
       Object id = get(getMapper().getIdField());
       IQuery<T> query = netRelay.getDatastore().createQuery(getMapper().getMapperClass());
       query.setSearchCondition(query.isEqual(query.getMapper().getIdField().getName(), id));
@@ -190,10 +206,42 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
           }
         }
       });
+=======
+      queryEntity(handler);
+>>>>>>> replacing CounterObject by CompositeFuture
     } else {
       T returnObject = getMapper().getObjectFactory().createInstance(getMapper().getMapperClass());
       handler.handle(Future.succeededFuture(returnObject));
     }
+  }
+
+  /**
+   * Fetch the entity from datastore by executing a query
+   * 
+   * @param handler
+   */
+  private void queryEntity(Handler<AsyncResult<T>> handler) {
+    Object id = get(getMapper().getIdField());
+    IQuery<T> query = netRelay.getDatastore().createQuery(getMapper().getMapperClass());
+    query.field(query.getMapper().getIdField().getName()).is(id);
+    query.execute(qrr -> {
+      if (qrr.failed()) {
+        handler.handle(Future.failedFuture(qrr.cause()));
+      } else {
+        IQueryResult<T> qr = qrr.result();
+        if (!qr.iterator().hasNext()) {
+          handler.handle(Future.failedFuture(new NoSuchRecordException("Could not find record with ID " + id)));
+        } else {
+          qr.iterator().next(ir -> {
+            if (ir.failed()) {
+              handler.handle(Future.failedFuture(ir.cause()));
+            } else {
+              handler.handle(Future.succeededFuture(ir.result()));
+            }
+          });
+        }
+      }
+    });
   }
 
   protected void finishToEntity(T tmpObject, Handler<AsyncResult<Void>> handler) {
@@ -212,33 +260,33 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
    * @param tmpObject
    * @param handler
    */
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   protected final void iterateFields(T tmpObject, Handler<AsyncResult<Void>> handler) {
     LOGGER.debug("start iterateFields");
     Set<String> fieldNames = getMapper().getFieldNames();
-    CounterObject<Void> co = new CounterObject<>(fieldNames.size(), handler);
+    List<Future> fl = new ArrayList<>();
     for (String fieldName : fieldNames) {
+      Future f = Future.future();
+      fl.add(f);
       IField field = getMapper().getField(fieldName);
       if (hasProperty(field)) {
         LOGGER.debug("handling field " + field.getFullName());
-        field.getPropertyMapper().fromStoreObject(tmpObject, this, field, result -> {
-          if (result.failed()) {
-            co.setThrowable(result.cause());
-            return;
-          }
-          if (co.reduce()) {
-            LOGGER.debug("field counter finished");
-            handler.handle(Future.succeededFuture());
-          }
-        });
+        field.getPropertyMapper().fromStoreObject(tmpObject, this, field, f.completer());
       } else {
-        if (co.reduce()) {
-          LOGGER.debug("field counter finished");
-          handler.handle(Future.succeededFuture());
-        }
+        f.complete();
       }
     }
+    CompositeFuture cf = CompositeFuture.all(fl);
+    cf.setHandler(cfr -> {
+      if (cfr.failed()) {
+        handler.handle(Future.failedFuture(cfr.cause()));
+      } else {
+        handler.handle(Future.succeededFuture());
+      }
+    });
   }
 
+  @SuppressWarnings({ "unchecked", "rawtypes" })
   protected void iterateObjectReferences(Object tmpObject, Handler<AsyncResult<Void>> handler) {
     LOGGER.debug("start iterateObjectReferences");
     if (getObjectReferences().isEmpty()) {
@@ -247,21 +295,22 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
       return;
     }
     Collection<IObjectReference> refs = getObjectReferences();
-    CounterObject<Void> co = new CounterObject<>(refs.size(), handler);
+    List<Future> fl = new ArrayList<>(refs.size());
+
     for (IObjectReference ref : refs) {
       LOGGER.debug("handling object reference " + ref.getField().getFullName());
-      ref.getField().getPropertyMapper().fromObjectReference(tmpObject, ref, result -> {
-        if (result.failed()) {
-          co.setThrowable(result.cause());
-          return;
-        }
-        if (co.reduce()) {
-          LOGGER.debug("object references finished");
-          handler.handle(Future.succeededFuture());
-        }
-      });
-
+      Future f = Future.future();
+      fl.add(f);
+      ref.getField().getPropertyMapper().fromObjectReference(tmpObject, ref, f.completer());
     }
+    CompositeFuture cf = CompositeFuture.all(fl);
+    cf.setHandler(cfr -> {
+      if (cfr.failed()) {
+        handler.handle(Future.failedFuture(cfr.cause()));
+      } else {
+        handler.handle(Future.succeededFuture());
+      }
+    });
   }
 
   /**
@@ -269,22 +318,23 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
    * 
    * @param handler
    */
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   public void initFromEntity(Handler<AsyncResult<Void>> handler) {
-    CounterObject<Void> co = new CounterObject<>(mapper.getFieldNames().size(), handler);
+    List<Future> fl = new ArrayList<>(mapper.getFieldNames().size());
     for (String fieldName : mapper.getFieldNames()) {
       IField field = mapper.getField(fieldName);
-      field.getPropertyMapper().intoStoreObject(entity, this, field, result -> {
-        if (result.failed()) {
-          co.setThrowable(result.cause());
-        } else {
-          if (co.reduce())
-            handler.handle(Future.succeededFuture());
-        }
-      });
-      if (co.isError()) {
-        return;
-      }
+      Future f = Future.future();
+      fl.add(f);
+      field.getPropertyMapper().intoStoreObject(entity, this, field, f.completer());
     }
+    CompositeFuture cf = CompositeFuture.all(fl);
+    cf.setHandler(cfr -> {
+      if (cfr.failed()) {
+        handler.handle(Future.failedFuture(cfr.cause()));
+      } else {
+        handler.handle(Future.succeededFuture());
+      }
+    });
   }
 
   /*
@@ -304,7 +354,7 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
    */
   @Override
   public String toString() {
-    return mapper.getTableInfo().getName() + ": " + String.valueOf(requestMap);
+    return mapper.getTableInfo().getName() + ": " + requestMap;
   }
 
   /*
