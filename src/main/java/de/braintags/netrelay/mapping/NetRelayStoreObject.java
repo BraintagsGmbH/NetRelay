@@ -171,7 +171,7 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
     } else if (hasProperty(getMapper().getIdField())) {
       Object id = get(getMapper().getIdField());
       IQuery<T> query = netRelay.getDatastore().createQuery(getMapper().getMapperClass());
-      query.field(query.getMapper().getIdField().getName()).is(id);
+      query.setSearchCondition(query.isEqual(query.getMapper().getIdField().getName(), id));
       query.execute(qrr -> {
         if (qrr.failed()) {
           handler.handle(Future.failedFuture(qrr.cause()));
