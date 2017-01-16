@@ -184,31 +184,7 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
     if (entity != null) {
       handler.handle(Future.succeededFuture(entity));
     } else if (hasProperty(getMapper().getIdField())) {
-<<<<<<< 378beb40fd3de1b6713ff2e2addcf387f4ea652f
-      Object id = get(getMapper().getIdField());
-      IQuery<T> query = netRelay.getDatastore().createQuery(getMapper().getMapperClass());
-      query.setSearchCondition(query.isEqual(query.getMapper().getIdField().getName(), id));
-      query.execute(qrr -> {
-        if (qrr.failed()) {
-          handler.handle(Future.failedFuture(qrr.cause()));
-        } else {
-          IQueryResult<T> qr = qrr.result();
-          if (!qr.iterator().hasNext()) {
-            handler.handle(Future.failedFuture(new NoSuchRecordException("Could not find record with ID " + id)));
-          } else {
-            qr.iterator().next(ir -> {
-              if (ir.failed()) {
-                handler.handle(Future.failedFuture(ir.cause()));
-              } else {
-                handler.handle(Future.succeededFuture(ir.result()));
-              }
-            });
-          }
-        }
-      });
-=======
       queryEntity(handler);
->>>>>>> replacing CounterObject by CompositeFuture
     } else {
       T returnObject = getMapper().getObjectFactory().createInstance(getMapper().getMapperClass());
       handler.handle(Future.succeededFuture(returnObject));
@@ -223,7 +199,7 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
   private void queryEntity(Handler<AsyncResult<T>> handler) {
     Object id = get(getMapper().getIdField());
     IQuery<T> query = netRelay.getDatastore().createQuery(getMapper().getMapperClass());
-    query.field(query.getMapper().getIdField().getName()).is(id);
+    query.isEqual(query.getMapper().getIdField().getName(), id);
     query.execute(qrr -> {
       if (qrr.failed()) {
         handler.handle(Future.failedFuture(qrr.cause()));
