@@ -16,9 +16,6 @@
 
 
 	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<thymeleaf.version>2.1.4.RELEASE</thymeleaf.version>
-		<vertx.web.version>${stack.version}</vertx.web.version>
 		<jacoco.haltOnFailure>false</jacoco.haltOnFailure>
 		<ignoreFailedTests>true</ignoreFailedTests>
 		<testjar.skip>false</testjar.skip>
@@ -64,7 +61,6 @@
 		<dependency>
 			<groupId>io.vertx</groupId>
 			<artifactId>vertx-web</artifactId>
-			<version>${vertx.web.version}</version>
 			<scope>test</scope>
 			<type>test-jar</type>
 		</dependency>
