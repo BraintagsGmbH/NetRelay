@@ -14,7 +14,7 @@ package de.braintags.netrelay.processor;
 
 import java.util.Properties;
 
-import de.braintags.io.vertx.util.ExceptionUtil;
+import de.braintags.vertx.util.ExceptionUtil;
 import de.braintags.netrelay.NetRelay;
 import io.vertx.core.Vertx;
 

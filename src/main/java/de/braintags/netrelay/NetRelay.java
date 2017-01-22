@@ -16,12 +16,12 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.List;
 
-import de.braintags.io.vertx.pojomapper.IDataStore;
-import de.braintags.io.vertx.pojomapper.init.IDataStoreInit;
-import de.braintags.io.vertx.pojomapper.mapping.IMapperFactory;
-import de.braintags.io.vertx.pojomapper.mongo.init.MongoDataStoreInit;
-import de.braintags.io.vertx.util.exception.InitException;
-import de.braintags.io.vertx.util.security.CertificateHelper;
+import de.braintags.vertx.jomnigate.IDataStore;
+import de.braintags.vertx.jomnigate.init.IDataStoreInit;
+import de.braintags.vertx.jomnigate.mapping.IMapperFactory;
+import de.braintags.vertx.jomnigate.mongo.init.MongoDataStoreInit;
+import de.braintags.vertx.util.exception.InitException;
+import de.braintags.vertx.util.security.CertificateHelper;
 import de.braintags.netrelay.controller.BodyController;
 import de.braintags.netrelay.controller.CookieController;
 import de.braintags.netrelay.controller.FailureController;

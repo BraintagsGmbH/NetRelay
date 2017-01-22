@@ -12,8 +12,8 @@
  */
 package examples;
 
-import de.braintags.io.vertx.keygenerator.KeyGeneratorSettings;
-import de.braintags.io.vertx.keygenerator.KeyGeneratorVerticle;
+import de.braintags.vertx.keygenerator.KeyGeneratorSettings;
+import de.braintags.vertx.keygenerator.KeyGeneratorVerticle;
 import de.braintags.netrelay.NetRelay;
 import de.braintags.netrelay.init.Settings;
 import io.vertx.core.AbstractVerticle;

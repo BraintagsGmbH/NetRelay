@@ -16,8 +16,8 @@ import org.junit.AfterClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import de.braintags.io.vertx.pojomapper.testdatastore.TestHelper;
-import de.braintags.io.vertx.util.exception.InitException;
+import de.braintags.vertx.jomnigate.testdatastore.TestHelper;
+import de.braintags.vertx.util.exception.InitException;
 import de.braintags.netrelay.impl.NetRelayExt_FileBasedSettings;
 import de.braintags.netrelay.init.Settings;
 import de.braintags.netrelay.mapper.SimpleNetRelayMapper;

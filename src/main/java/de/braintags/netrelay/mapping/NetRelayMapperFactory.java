@@ -12,9 +12,9 @@
  */
 package de.braintags.netrelay.mapping;
 
-import de.braintags.io.vertx.pojomapper.json.mapping.JsonPropertyMapperFactory;
-import de.braintags.io.vertx.pojomapper.mapping.impl.MapperFactory;
-import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
+import de.braintags.vertx.jomnigate.json.mapping.JsonPropertyMapperFactory;
+import de.braintags.vertx.jomnigate.mapping.impl.MapperFactory;
+import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerFactory;
 import de.braintags.netrelay.NetRelay;
 import de.braintags.netrelay.typehandler.HttpTypehandlerFactory;
 

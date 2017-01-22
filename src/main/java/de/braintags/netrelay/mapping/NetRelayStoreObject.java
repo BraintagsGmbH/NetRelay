@@ -20,13 +20,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IQuery;
-import de.braintags.io.vertx.pojomapper.dataaccess.query.IQueryResult;
-import de.braintags.io.vertx.pojomapper.exception.NoSuchRecordException;
-import de.braintags.io.vertx.pojomapper.mapping.IField;
-import de.braintags.io.vertx.pojomapper.mapping.IMapper;
-import de.braintags.io.vertx.pojomapper.mapping.IObjectReference;
-import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
+import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
+import de.braintags.vertx.jomnigate.dataaccess.query.IQueryResult;
+import de.braintags.vertx.jomnigate.exception.NoSuchRecordException;
+import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IMapper;
+import de.braintags.vertx.jomnigate.mapping.IObjectReference;
+import de.braintags.vertx.jomnigate.mapping.IStoreObject;
 import de.braintags.netrelay.NetRelay;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
@@ -90,7 +90,7 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IStoreObject#get(de.braintags.io.vertx.pojomapper.mapping.IField)
+   * @see de.braintags.vertx.jomnigate.mapping.IStoreObject#get(de.braintags.vertx.jomnigate.mapping.IField)
    */
   @Override
   public Object get(IField field) {
@@ -101,7 +101,7 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
    * (non-Javadoc)
    * 
    * @see
-   * de.braintags.io.vertx.pojomapper.mapping.IStoreObject#hasProperty(de.braintags.io.vertx.pojomapper.mapping.IField)
+   * de.braintags.vertx.jomnigate.mapping.IStoreObject#hasProperty(de.braintags.vertx.jomnigate.mapping.IField)
    */
   @Override
   public boolean hasProperty(IField field) {
@@ -111,7 +111,7 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IStoreObject#put(de.braintags.io.vertx.pojomapper.mapping.IField,
+   * @see de.braintags.vertx.jomnigate.mapping.IStoreObject#put(de.braintags.vertx.jomnigate.mapping.IField,
    * java.lang.Object)
    */
   @Override
@@ -316,7 +316,7 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IStoreObject#getObjectReferences()
+   * @see de.braintags.vertx.jomnigate.mapping.IStoreObject#getObjectReferences()
    */
   @Override
   public Collection<IObjectReference> getObjectReferences() {
@@ -336,7 +336,7 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.mapping.IStoreObject#isNewInstance()
+   * @see de.braintags.vertx.jomnigate.mapping.IStoreObject#isNewInstance()
    */
   @Override
   public boolean isNewInstance() {

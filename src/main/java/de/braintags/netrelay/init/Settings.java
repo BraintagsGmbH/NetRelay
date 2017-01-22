@@ -12,8 +12,8 @@
  */
 package de.braintags.netrelay.init;
 
-import de.braintags.io.vertx.pojomapper.init.DataStoreSettings;
-import de.braintags.io.vertx.util.exception.InitException;
+import de.braintags.vertx.jomnigate.init.DataStoreSettings;
+import de.braintags.vertx.util.exception.InitException;
 import de.braintags.netrelay.NetRelay;
 import de.braintags.netrelay.processor.ProcessorDefinitions;
 import de.braintags.netrelay.routing.RouterDefinitions;

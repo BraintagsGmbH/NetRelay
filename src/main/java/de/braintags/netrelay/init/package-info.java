@@ -34,7 +34,7 @@
  * When you are now launching the application for the first time, it will shown an InitException like that:
  * 
  * ----
- * de.braintags.io.vertx.util.exception.InitException: Settings file did not exist
+ * de.braintags.vertx.util.exception.InitException: Settings file did not exist
  *      and was created new in path src/main/resources/fairytale-settings.json.
  *      NOTE: edit the file, set edited to true and restart the server
  *        at de.braintags.netrelay.init.Settings.loadSettings(Settings.java:182)
@@ -61,7 +61,7 @@
  *   "edited" : true,
  *   "defaultLoginPage" : "/backend/login.html",
  *   "datastoreSettings" : {
- *   "datastoreInit" : "de.braintags.io.vertx.pojomapper.mongo.init.MongoDataStoreInit",
+ *   "datastoreInit" : "de.braintags.vertx.jomnigate.mongo.init.MongoDataStoreInit",
  *   "properties" : {
  *     "startMongoLocal" : "false",
  *     "handleReferencedRecursive" : "true",
@@ -80,7 +80,7 @@
  * ----
  * 
  *   "datastoreSettings" : {
- *     "datastoreInit" : "de.braintags.io.vertx.pojomapper.mysql.init.MySqlDataStoreinit",
+ *     "datastoreInit" : "de.braintags.vertx.jomnigate.mysql.init.MySqlDataStoreinit",
  *     "properties" : {
  *     "host" : "localhost",
  *     "port" : "3306",
@@ -115,7 +115,7 @@
  * * some application specific adjustments like the port, where the server shall run, or the even the
  * {@link de.braintags.netrelay.init.MailClientSettings} to enable the system to send and receive emails by controllers
  * or processors
- * * the datastore settings to define, which {@link de.braintags.io.vertx.pojomapper.IDataStore} shall be used by
+ * * the datastore settings to define, which {@link de.braintags.vertx.jomnigate.IDataStore} shall be used by
  * NetRelay. ( This will include the use of the coming MultiDataStores from the project
  * link:https://github.com/BraintagsGmbH/vertx-pojo-mapper[ vertx-pojo-mapper ] )
  * * the Router / Controller definitions to configure {@link de.braintags.netrelay.controller.IController}s and to
@@ -158,18 +158,18 @@
  * ----
  * 
  * * encoders
- * If you are using the annotation {@link de.braintags.io.vertx.pojomapper.annotation.field.Encoder} inside your
+ * If you are using the annotation {@link de.braintags.vertx.jomnigate.annotation.field.Encoder} inside your
  * mappers, you will have to define the name of the encoder to be used. The existing encoders are defined in the part
  * encoders of the settings. Per default the standard encoder is created and initialized. Each encoder definition
  * consists of the name, which is the name you are referencing in the mapper; the encoderClass, which is a class which
- * implements {@link de.braintags.io.vertx.util.security.crypt.IEncoder} and some optional properties, which are used by
+ * implements {@link de.braintags.vertx.util.security.crypt.IEncoder} and some optional properties, which are used by
  * the concrete implementation.
  * 
  * [source, json]
  * ----
  *   "encoders" : [ {
  *     "name" : "StandardEncoder",
- *     "encoderClass" : "de.braintags.io.vertx.util.security.crypt.impl.StandardEncoder",
+ *     "encoderClass" : "de.braintags.vertx.util.security.crypt.impl.StandardEncoder",
  *     "properties" : {
  *       "salt" : "61DD62293E7CBE37D9D6B3C69282B964A4BEAC9EEEEA70D05C32AE1A8E50413B"
  *   }

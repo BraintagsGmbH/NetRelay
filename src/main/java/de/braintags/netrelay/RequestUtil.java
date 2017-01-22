@@ -15,8 +15,8 @@ package de.braintags.netrelay;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
-import de.braintags.io.vertx.util.ExceptionUtil;
-import de.braintags.io.vertx.util.exception.ParameterRequiredException;
+import de.braintags.vertx.util.ExceptionUtil;
+import de.braintags.vertx.util.exception.ParameterRequiredException;
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpHeaders;
 import io.vertx.core.http.HttpServerRequest;

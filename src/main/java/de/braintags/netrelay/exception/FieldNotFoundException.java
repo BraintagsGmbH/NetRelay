@@ -12,7 +12,7 @@
  */
 package de.braintags.netrelay.exception;
 
-import de.braintags.io.vertx.pojomapper.mapping.IMapper;
+import de.braintags.vertx.jomnigate.mapping.IMapper;
 
 /**
  * 

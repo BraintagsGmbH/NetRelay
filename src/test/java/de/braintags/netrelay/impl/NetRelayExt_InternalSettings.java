@@ -12,7 +12,7 @@
  */
 package de.braintags.netrelay.impl;
 
-import de.braintags.io.vertx.util.ErrorObject;
+import de.braintags.vertx.util.ErrorObject;
 import de.braintags.netrelay.NetRelay;
 import de.braintags.netrelay.init.Settings;
 import de.braintags.netrelay.mapper.SimpleNetRelayMapper;

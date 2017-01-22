@@ -14,8 +14,8 @@ package de.braintags.netrelay.controller;
 
 import java.util.Properties;
 
-import de.braintags.io.vertx.util.HttpContentType;
-import de.braintags.io.vertx.util.exception.ParameterRequiredException;
+import de.braintags.vertx.util.HttpContentType;
+import de.braintags.vertx.util.exception.ParameterRequiredException;
 import de.braintags.netrelay.NetRelay;
 import de.braintags.netrelay.RequestUtil;
 import de.braintags.netrelay.routing.CaptureCollection;

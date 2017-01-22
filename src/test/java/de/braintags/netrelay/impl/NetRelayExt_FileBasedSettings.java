@@ -12,9 +12,9 @@
  */
 package de.braintags.netrelay.impl;
 
-import de.braintags.io.vertx.pojomapper.init.DataStoreSettings;
-import de.braintags.io.vertx.pojomapper.mongo.init.MongoDataStoreInit;
-import de.braintags.io.vertx.pojomapper.mysql.init.MySqlDataStoreinit;
+import de.braintags.vertx.jomnigate.init.DataStoreSettings;
+import de.braintags.vertx.jomnigate.mongo.init.MongoDataStoreInit;
+import de.braintags.vertx.jomnigate.mysql.init.MySqlDataStoreinit;
 import de.braintags.netrelay.NetRelay;
 import de.braintags.netrelay.init.Settings;
 import de.braintags.netrelay.mapper.SimpleNetRelayMapper;

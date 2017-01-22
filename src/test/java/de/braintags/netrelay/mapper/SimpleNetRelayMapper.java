@@ -12,9 +12,9 @@
  */
 package de.braintags.netrelay.mapper;
 
-import de.braintags.io.vertx.pojomapper.annotation.Entity;
-import de.braintags.io.vertx.pojomapper.datatypes.geojson.GeoPoint;
-import de.braintags.io.vertx.pojomapper.testdatastore.mapper.typehandler.BaseRecord;
+import de.braintags.vertx.jomnigate.annotation.Entity;
+import de.braintags.vertx.jomnigate.datatypes.geojson.GeoPoint;
+import de.braintags.vertx.jomnigate.testdatastore.mapper.typehandler.BaseRecord;
 
 /**
  * 

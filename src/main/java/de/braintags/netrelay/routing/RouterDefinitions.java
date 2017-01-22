@@ -14,7 +14,7 @@ package de.braintags.netrelay.routing;
 
 import java.util.ArrayList;
 
-import de.braintags.io.vertx.util.exception.InitException;
+import de.braintags.vertx.util.exception.InitException;
 import de.braintags.netrelay.init.Settings;
 
 /**

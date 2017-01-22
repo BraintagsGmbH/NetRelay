@@ -19,8 +19,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import de.braintags.io.vertx.util.ExceptionUtil;
-import de.braintags.io.vertx.util.exception.InitException;
+import de.braintags.vertx.util.ExceptionUtil;
+import de.braintags.vertx.util.exception.InitException;
 import de.braintags.netrelay.RequestUtil;
 import de.braintags.netrelay.routing.RouterDefinition;
 import io.netty.handler.codec.http.HttpResponseStatus;

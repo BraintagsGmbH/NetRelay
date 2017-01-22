@@ -12,10 +12,10 @@
  */
 package de.braintags.netrelay.typehandler;
 
-import de.braintags.io.vertx.pojomapper.mapping.IField;
-import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
-import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
-import de.braintags.io.vertx.pojomapper.typehandler.stringbased.handlers.BooleanTypeHandler;
+import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerFactory;
+import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerResult;
+import de.braintags.vertx.jomnigate.typehandler.stringbased.handlers.BooleanTypeHandler;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 

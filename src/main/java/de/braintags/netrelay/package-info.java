@@ -65,7 +65,7 @@
  * == Adding a KeyGenerator Verticle
  * 
  * To be able to use a clean key generator for your mappers, you should launch the
- * {@link de.braintags.io.vertx.keygenerator.KeyGeneratorVerticle} from the project
+ * {@link de.braintags.vertx.keygenerator.KeyGeneratorVerticle} from the project
  * link:https://github.com/BraintagsGmbH/vertx-key-generator[ vertx-key-generator ].
  * 
  * [source, java]

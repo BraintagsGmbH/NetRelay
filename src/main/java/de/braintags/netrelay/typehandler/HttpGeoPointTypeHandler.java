@@ -12,12 +12,12 @@
  */
 package de.braintags.netrelay.typehandler;
 
-import de.braintags.io.vertx.pojomapper.datatypes.geojson.GeoPoint;
-import de.braintags.io.vertx.pojomapper.datatypes.geojson.Position;
-import de.braintags.io.vertx.pojomapper.mapping.IField;
-import de.braintags.io.vertx.pojomapper.typehandler.AbstractTypeHandler;
-import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerFactory;
-import de.braintags.io.vertx.pojomapper.typehandler.ITypeHandlerResult;
+import de.braintags.vertx.jomnigate.datatypes.geojson.GeoPoint;
+import de.braintags.vertx.jomnigate.datatypes.geojson.Position;
+import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.typehandler.AbstractTypeHandler;
+import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerFactory;
+import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerResult;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.json.JsonArray;
@@ -46,8 +46,8 @@ public class HttpGeoPointTypeHandler extends AbstractTypeHandler {
   /*
    * (non-Javadoc)
    * 
-   * @see de.braintags.io.vertx.pojomapper.typehandler.ITypeHandler#intoStore(java.lang.Object,
-   * de.braintags.io.vertx.pojomapper.mapping.IField, io.vertx.core.Handler)
+   * @see de.braintags.vertx.jomnigate.typehandler.ITypeHandler#intoStore(java.lang.Object,
+   * de.braintags.vertx.jomnigate.mapping.IField, io.vertx.core.Handler)
    */
   @Override
   public void intoStore(Object source, IField field, Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {

@@ -14,10 +14,10 @@ package de.braintags.netrelay.model;
 
 import java.sql.Timestamp;
 
-import de.braintags.io.vertx.pojomapper.annotation.Entity;
-import de.braintags.io.vertx.pojomapper.annotation.field.Id;
-import de.braintags.io.vertx.pojomapper.annotation.lifecycle.BeforeSave;
-import de.braintags.io.vertx.util.ObjectUtil;
+import de.braintags.vertx.jomnigate.annotation.Entity;
+import de.braintags.vertx.jomnigate.annotation.field.Id;
+import de.braintags.vertx.jomnigate.annotation.lifecycle.BeforeSave;
+import de.braintags.vertx.util.ObjectUtil;
 
 /**
  * Abstract implementation for a record, which takes care about modification date and other basic information

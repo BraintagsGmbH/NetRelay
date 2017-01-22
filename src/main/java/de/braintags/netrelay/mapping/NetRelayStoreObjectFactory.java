@@ -14,9 +14,9 @@ package de.braintags.netrelay.mapping;
 
 import java.util.Map;
 
-import de.braintags.io.vertx.pojomapper.mapping.IMapper;
-import de.braintags.io.vertx.pojomapper.mapping.IStoreObject;
-import de.braintags.io.vertx.pojomapper.mapping.impl.AbstractStoreObjectFactory;
+import de.braintags.vertx.jomnigate.mapping.IMapper;
+import de.braintags.vertx.jomnigate.mapping.IStoreObject;
+import de.braintags.vertx.jomnigate.mapping.impl.AbstractStoreObjectFactory;
 import de.braintags.netrelay.NetRelay;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
