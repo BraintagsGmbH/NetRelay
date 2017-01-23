@@ -58,7 +58,7 @@ import io.vertx.ext.unit.junit.VertxUnitRunner;
  * 
  */
 @RunWith(VertxUnitRunner.class)
-public class NetRelayBaseTest {
+public abstract class NetRelayBaseTest {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(NetRelayBaseTest.class);
 

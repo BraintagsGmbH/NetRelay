@@ -47,7 +47,7 @@ public class NetRelayExt_InternalSettings extends NetRelay {
 
   public static NetRelayExt_InternalSettings getInstance(Vertx vertx, TestContext context, NetRelayBaseTest baseTest) {
     if (netRelay == null) {
-      netRelay = new NetRelayExt_InternalSettings();
+      NetRelayExt_InternalSettings netRelay = new NetRelayExt_InternalSettings();
       LOGGER.info("init NetRelay");
       Async async = context.async();
       ErrorObject err = new ErrorObject<>(null);
@@ -63,6 +63,8 @@ public class NetRelayExt_InternalSettings extends NetRelay {
       async.awaitSuccess();
       if (err.isError()) {
         throw err.getRuntimeException();
+      } else {
+        NetRelayExt_InternalSettings.netRelay = netRelay;
       }
     }
     return netRelay;
