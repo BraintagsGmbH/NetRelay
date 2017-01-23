@@ -89,7 +89,7 @@ class should be the classpath to your Main class, of course. +
 When you are now launching the application for the first time, it will shown an InitException like that:
 
 ----
-de.braintags.io.vertx.util.exception.InitException: Settings file did not exist
+de.braintags.vertx.util.exception.InitException: Settings file did not exist
      and was created new in path src/main/resources/fairytale-settings.json.
      NOTE: edit the file, set edited to true and restart the server
        at de.braintags.netrelay.init.Settings.loadSettings(Settings.java:182)
@@ -116,7 +116,7 @@ is running.
   "edited" : true,
   "defaultLoginPage" : "/backend/login.html",
   "datastoreSettings" : {
-  "datastoreInit" : "de.braintags.io.vertx.pojomapper.mongo.init.MongoDataStoreInit",
+  "datastoreInit" : "de.braintags.vertx.jomnigate.mongo.init.MongoDataStoreInit",
   "properties" : {
     "startMongoLocal" : "false",
     "handleReferencedRecursive" : "true",
@@ -135,7 +135,7 @@ If you prefer a MySql, then here is the suitable configuration template:
 ----
 
   "datastoreSettings" : {
-    "datastoreInit" : "de.braintags.io.vertx.pojomapper.mysql.init.MySqlDataStoreinit",
+    "datastoreInit" : "de.braintags.vertx.jomnigate.mysql.init.MySqlDataStoreinit",
     "properties" : {
     "host" : "localhost",
     "port" : "3306",
@@ -224,7 +224,7 @@ the concrete implementation.
 ----
   "encoders" : [ {
     "name" : "StandardEncoder",
-    "encoderClass" : "de.braintags.io.vertx.util.security.crypt.impl.StandardEncoder",
+    "encoderClass" : "de.braintags.vertx.util.security.crypt.impl.StandardEncoder",
     "properties" : {
       "salt" : "61DD62293E7CBE37D9D6B3C69282B964A4BEAC9EEEEA70D05C32AE1A8E50413B"
   }
