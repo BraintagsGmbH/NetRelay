@@ -14,12 +14,12 @@ package de.braintags.netrelay.controller;
 
 import java.util.Properties;
 
-import de.braintags.vertx.util.HttpContentType;
-import de.braintags.vertx.util.exception.ParameterRequiredException;
 import de.braintags.netrelay.NetRelay;
 import de.braintags.netrelay.RequestUtil;
 import de.braintags.netrelay.routing.CaptureCollection;
 import de.braintags.netrelay.routing.RouterDefinition;
+import de.braintags.vertx.util.HttpContentType;
+import de.braintags.vertx.util.exception.ParameterRequiredException;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.RoutingContext;
 
@@ -320,6 +320,23 @@ public abstract class AbstractController implements IController {
    *          the context from the current request
    * @param key
    *          the key to search for
+   * @param required
+   *          is the value required?
+   * @return a found value, the default value or null
+   * @throws ParameterRequiredException,
+   *           if required parameter wasn't found
+   */
+  public static String readParameter(RoutingContext context, String key, boolean required) {
+    return readParameter(context, key, null, required);
+  }
+
+  /**
+   * Reads a value from the request
+   * 
+   * @param context
+   *          the context from the current request
+   * @param key
+   *          the key to search for
    * @param defaultValue
    *          the default value
    * @param required
@@ -328,10 +345,10 @@ public abstract class AbstractController implements IController {
    * @throws ParameterRequiredException,
    *           if required parameter wasn't found
    */
-  public static String readParameter(RoutingContext context, String key, boolean required) {
+  public static String readParameter(RoutingContext context, String key, String defaultValue, boolean required) {
     String value = RequestUtil.readFormAttribute(context, key, null, false);
     if (value == null) {
-      value = RequestUtil.readParameterAttribute(context, key, null, false);
+      value = RequestUtil.readParameterAttribute(context, key, defaultValue, false);
     }
     if (value == null && required)
       throw new ParameterRequiredException(key);
