@@ -246,30 +246,12 @@ public abstract class AbstractController implements IController {
   }
 
   /**
-   * Reads a value either from the request or - if not found there - from the context
-   * 
-   * @param context
-   *          the context from the current request
-   * @param key
-   *          the key to search for
-   * @param defaultValue
-   *          the default value
-   * @param required
-   *          is the value required?
-   * @return a found value, the default value or null
-   * @throws ParameterRequiredException,
-   *           if required parameter wasn't found
+   * @deprecated use {@link RequestUtil#readParameterOrContext(RoutingContext, String, String, boolean)} instead
    */
+  @Deprecated
   public static String readParameterOrContext(RoutingContext context, String key, String defaultValue,
       boolean required) {
-    String value = readParameter(context, key, false);
-    if (value == null) {
-      value = context.get(key);
-    }
-
-    if (value == null && required)
-      throw new ParameterRequiredException(key);
-    return value == null ? defaultValue : value;
+    return RequestUtil.readParameterOrContext(context, key, defaultValue, required);
   }
 
   /**
@@ -290,7 +272,7 @@ public abstract class AbstractController implements IController {
    */
   public String readParameterOrPropertyOrContext(RoutingContext context, String key, String defaultValue,
       boolean required) {
-    String value = readParameter(context, key, false);
+    String value = RequestUtil.readParameter(context, key, false);
     if (value == null) {
       value = readProperty(key, null, false);
     }
@@ -314,45 +296,19 @@ public abstract class AbstractController implements IController {
   }
 
   /**
-   * Reads a value from the request
-   * 
-   * @param context
-   *          the context from the current request
-   * @param key
-   *          the key to search for
-   * @param required
-   *          is the value required?
-   * @return a found value, the default value or null
-   * @throws ParameterRequiredException,
-   *           if required parameter wasn't found
+   * @deprecated use {@link RequestUtil#readParameter(RoutingContext, String, boolean)} instead
    */
+  @Deprecated
   public static String readParameter(RoutingContext context, String key, boolean required) {
-    return readParameter(context, key, null, required);
+    return RequestUtil.readParameter(context, key, null, required);
   }
 
   /**
-   * Reads a value from the request
-   * 
-   * @param context
-   *          the context from the current request
-   * @param key
-   *          the key to search for
-   * @param defaultValue
-   *          the default value
-   * @param required
-   *          is the value required?
-   * @return a found value, the default value or null
-   * @throws ParameterRequiredException,
-   *           if required parameter wasn't found
+   * @deprecated use {@link RequestUtil#readParameter(RoutingContext, String, String, boolean)} instead
    */
+  @Deprecated
   public static String readParameter(RoutingContext context, String key, String defaultValue, boolean required) {
-    String value = RequestUtil.readFormAttribute(context, key, null, false);
-    if (value == null) {
-      value = RequestUtil.readParameterAttribute(context, key, defaultValue, false);
-    }
-    if (value == null && required)
-      throw new ParameterRequiredException(key);
-    return value;
+    return RequestUtil.readParameter(context, key, defaultValue, required);
   }
 
   /**
