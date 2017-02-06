@@ -331,7 +331,7 @@ public abstract class AbstractController implements IController {
    * @param content
    */
   protected void sendJson(RoutingContext context, String content) {
-    LOGGER.info("sending result as JSON: " + content);
+    LOGGER.info("sending result as JSON");
     context.response().putHeader("content-type", HttpContentType.JSON_UTF8.toString()).end(content);
   }
 
