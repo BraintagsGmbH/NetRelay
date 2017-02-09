@@ -5,11 +5,13 @@ dependencies {
     compile (group:'de.braintags', name:'vertx-pojo-mapper-mysql', version: btVertxVersion) {
       exclude module:'netty-all'
     }
+    
+    commonTestCompile group: 'de.braintags', name: 'vertx-pojo-mapper-common-test', version:btVertxVersion
 
-    compile group: 'io.vertx', name: 'vertx-web', version:vertxWebVersion
-    testCompile group: 'io.vertx', name: 'vertx-web', version:vertxWebVersion, classifier:'tests'
+    compile group: 'io.vertx', name: 'vertx-web', version:vertxVersion
+    testCompile group: 'io.vertx', name: 'vertx-web', version:vertxVersion, classifier:'tests'
 
-    compile group: 'io.vertx', name: 'vertx-web-templ-thymeleaf', version:vertxWebVersion
+    compile group: 'io.vertx', name: 'vertx-web-templ-thymeleaf', version:vertxVersion
     compile group: 'io.vertx', name: 'vertx-auth-mongo', version:vertxVersion
     compile group: 'io.vertx', name: 'vertx-mail-client', version:vertxVersion
 
