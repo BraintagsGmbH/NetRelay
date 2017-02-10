@@ -20,14 +20,15 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import de.braintags.netrelay.NetRelay;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQueryResult;
+import de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition;
 import de.braintags.vertx.jomnigate.exception.NoSuchRecordException;
 import de.braintags.vertx.jomnigate.mapping.IField;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IObjectReference;
 import de.braintags.vertx.jomnigate.mapping.IStoreObject;
-import de.braintags.netrelay.NetRelay;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
 import io.vertx.core.Future;
@@ -199,7 +200,7 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
   private void queryEntity(Handler<AsyncResult<T>> handler) {
     Object id = get(getMapper().getIdField());
     IQuery<T> query = netRelay.getDatastore().createQuery(getMapper().getMapperClass());
-    query.isEqual(query.getMapper().getIdField().getName(), id);
+    ISearchCondition.isEqual(query.getMapper().getIdField().getName(), id);
     query.execute(qrr -> {
       if (qrr.failed()) {
         handler.handle(Future.failedFuture(qrr.cause()));
