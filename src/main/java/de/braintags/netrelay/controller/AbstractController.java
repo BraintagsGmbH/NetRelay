@@ -242,6 +242,7 @@ public abstract class AbstractController implements IController {
     }
     if (value == null && required)
       throw new ParameterRequiredException(key);
+    }
     return value == null ? defaultValue : value;
   }
 
@@ -257,7 +258,7 @@ public abstract class AbstractController implements IController {
   /**
    * Reads a value either from the request or - if not found there - from the configuration properties, or - if not
    * found there neither - from the context
-   * 
+   *
    * @param context
    *          the context from the current request
    * @param key
@@ -331,8 +332,18 @@ public abstract class AbstractController implements IController {
    * @param content
    */
   protected void sendJson(RoutingContext context, String content) {
+    sendJson(context, content, 200);
+  }
+
+  /**
+   * Send a reply as Json
+   *
+   * @param content
+   */
+  protected void sendJson(RoutingContext context, String content, int statusCode) {
     LOGGER.info("sending result as JSON");
-    context.response().putHeader("content-type", HttpContentType.JSON_UTF8.toString()).end(content);
+    context.response().putHeader("content-type", HttpContentType.JSON_UTF8.toString()).setStatusCode(statusCode)
+        .end(content);
   }
 
   /**
