@@ -291,7 +291,7 @@ public class NetRelay extends AbstractVerticle {
       throws GeneralSecurityException, IOException {
     if (settings.isCertificateSelfSigned()) {
       String password = validateSslPassword();
-      CertificateHelper.createSelfCertificate(options, settings.getHostName(), password);
+      CertificateHelper.generateSelfSignedCertificate(options, settings.getHostName(), password);
     } else if (settings.getCertificatePath() != null && settings.getCertificatePath().hashCode() != 0) {
       importCertificate(options);
     } else {
