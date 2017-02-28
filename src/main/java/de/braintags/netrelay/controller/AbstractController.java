@@ -25,7 +25,7 @@ import io.vertx.ext.web.RoutingContext;
 
 /**
  * An abstract implementation of {@link IController}
- * 
+ *
  * <br/>
  * Documentation Template for Controllers:<br/>
  * Config-Parameter:<br/>
@@ -35,7 +35,7 @@ import io.vertx.ext.web.RoutingContext;
  * <LI>parameter2 - describe the sense of the parameter
  * </UL>
  * <br>
- * 
+ *
  * Request-Parameter:<br/>
  * possible parameters, which are read from a request
  * <UL>
@@ -43,16 +43,16 @@ import io.vertx.ext.web.RoutingContext;
  * <LI>parameter2 - describe the sense of the parameter
  * </UL>
  * <br/>
- * 
+ *
  * Result-Parameter:<br/>
  * possible paramters, which will be placed into the context
  * <UL>
  * <LI>parameter1 - describe the content, which is stored under the given parameter name
  * </UL>
  * <br/>
- * 
+ *
  * Example configuration:<br/>
- * 
+ *
  * <pre>
  * {
       "name" : "ExampleController",
@@ -69,11 +69,11 @@ import io.vertx.ext.web.RoutingContext;
       "captureCollection" : null
     }
  * </pre>
- * 
- * 
- * 
+ *
+ *
+ *
  * @author Michael Remme
- * 
+ *
  */
 public abstract class AbstractController implements IController {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
@@ -87,7 +87,7 @@ public abstract class AbstractController implements IController {
 
   /**
    * The instance of {@link Vertx} which is used to initialize NetRelay
-   * 
+   *
    * @return the vertx
    */
   public final Vertx getVertx() {
@@ -96,7 +96,7 @@ public abstract class AbstractController implements IController {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see io.vertx.core.Handler#handle(java.lang.Object)
    */
   @Override
@@ -111,7 +111,7 @@ public abstract class AbstractController implements IController {
 
   /**
    * The default implementation lets the context fail with the error
-   * 
+   *
    * @param context
    * @param e
    */
@@ -121,14 +121,14 @@ public abstract class AbstractController implements IController {
 
   /**
    * internal method to handle the request
-   * 
+   *
    * @param context
    */
   protected abstract void handleController(RoutingContext context);
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.netrelay.controller.IController#init(io.vertx.core.Vertx, java.util.Properties)
    */
   @Override
@@ -145,7 +145,7 @@ public abstract class AbstractController implements IController {
   /**
    * Initialize the given {@link CaptureCollection}. The default implementation just stores it inside the current
    * instance
-   * 
+   *
    * @param captureCollection
    */
   public void initCaptureCollection(CaptureCollection[] captureCollection) {
@@ -154,7 +154,7 @@ public abstract class AbstractController implements IController {
 
   /**
    * Initialize the controller by using the definitions inside the {@link Properties}
-   * 
+   *
    * @param properties
    *          the properties to be used for init
    */
@@ -162,7 +162,7 @@ public abstract class AbstractController implements IController {
 
   /**
    * The {@link CaptureCollection} which was defined inside the {@link RouterDefinition}
-   * 
+   *
    * @return the captureCollection
    */
   public final CaptureCollection[] getCaptureCollections() {
@@ -171,7 +171,7 @@ public abstract class AbstractController implements IController {
 
   /**
    * Get the parent instance of {@link NetRelay}
-   * 
+   *
    * @return the netRelay
    */
   public final NetRelay getNetRelay() {
@@ -180,7 +180,7 @@ public abstract class AbstractController implements IController {
 
   /**
    * Read the property with the given name
-   * 
+   *
    * @param propertyName
    *          the name of the property to be read
    * @param defaultValue
@@ -193,14 +193,15 @@ public abstract class AbstractController implements IController {
    */
   public String readProperty(String propertyName, String defaultValue, boolean required) {
     String value = (String) properties.get(propertyName);
-    if (value == null && required)
+    if (value == null && required) {
       throw new ParameterRequiredException(propertyName);
+    }
     return value == null ? defaultValue : value;
   }
 
   /**
    * Read the property with the given name
-   * 
+   *
    * @param properties
    *          the properties to read from
    * @param propertyName
@@ -215,14 +216,15 @@ public abstract class AbstractController implements IController {
    */
   public static String readProperty(Properties properties, String propertyName, String defaultValue, boolean required) {
     String value = (String) properties.get(propertyName);
-    if (value == null && required)
+    if (value == null && required) {
       throw new ParameterRequiredException(propertyName);
+    }
     return value == null ? defaultValue : value;
   }
 
   /**
    * Reads a value either from the request or - if not found there - from the configuration properties
-   * 
+   *
    * @param context
    *          the context from the current request
    * @param key
@@ -240,7 +242,7 @@ public abstract class AbstractController implements IController {
     if (value == null) {
       value = readProperty(key, null, false);
     }
-    if (value == null && required)
+    if (value == null && required) {
       throw new ParameterRequiredException(key);
     }
     return value == null ? defaultValue : value;
@@ -281,15 +283,16 @@ public abstract class AbstractController implements IController {
       value = context.get(key);
     }
 
-    if (value == null && required)
+    if (value == null && required) {
       throw new ParameterRequiredException(key);
+    }
     return value == null ? defaultValue : value;
   }
 
   /**
    * This mehtod adds the instance of NetRelay into the context, so that it is accessible by template specific
    * processors for instance
-   * 
+   *
    * @param context
    */
   protected void addNetRelayToContext(RoutingContext context) {
@@ -314,7 +317,7 @@ public abstract class AbstractController implements IController {
 
   /**
    * Returns true, if a URL parameter or form parameter exists with the given key
-   * 
+   *
    * @param context
    *          the context
    * @param key
@@ -328,7 +331,7 @@ public abstract class AbstractController implements IController {
 
   /**
    * Send a reply as Json
-   * 
+   *
    * @param content
    */
   protected void sendJson(RoutingContext context, String content) {
@@ -348,7 +351,7 @@ public abstract class AbstractController implements IController {
 
   /**
    * Get the name of the definition
-   * 
+   *
    * @return
    */
   public final String getName() {
@@ -362,7 +365,7 @@ public abstract class AbstractController implements IController {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.netrelay.controller.IController#validateRoutingDefinition(de.braintags.netrelay.routing.
    * RouterDefinition)
    */
