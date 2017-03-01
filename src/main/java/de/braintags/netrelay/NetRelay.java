@@ -16,12 +16,6 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.List;
 
-import de.braintags.vertx.jomnigate.IDataStore;
-import de.braintags.vertx.jomnigate.init.IDataStoreInit;
-import de.braintags.vertx.jomnigate.mapping.IMapperFactory;
-import de.braintags.vertx.jomnigate.mongo.init.MongoDataStoreInit;
-import de.braintags.vertx.util.exception.InitException;
-import de.braintags.vertx.util.security.CertificateHelper;
 import de.braintags.netrelay.controller.BodyController;
 import de.braintags.netrelay.controller.CookieController;
 import de.braintags.netrelay.controller.FailureController;
@@ -35,6 +29,12 @@ import de.braintags.netrelay.mapping.NetRelayMapperFactory;
 import de.braintags.netrelay.processor.ProcessorDefinition;
 import de.braintags.netrelay.routing.RouterDefinition;
 import de.braintags.netrelay.routing.RoutingInit;
+import de.braintags.vertx.jomnigate.IDataStore;
+import de.braintags.vertx.jomnigate.init.IDataStoreInit;
+import de.braintags.vertx.jomnigate.mapping.IMapperFactory;
+import de.braintags.vertx.jomnigate.mongo.init.MongoDataStoreInit;
+import de.braintags.vertx.util.exception.InitException;
+import de.braintags.vertx.util.security.CertificateHelper;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -291,7 +291,8 @@ public class NetRelay extends AbstractVerticle {
       throws GeneralSecurityException, IOException {
     if (settings.isCertificateSelfSigned()) {
       String password = validateSslPassword();
-      CertificateHelper.createSelfCertificate(options, settings.getHostName(), password);
+      // CertificateHelper.createSelfCertificate(options, settings.getHostName(), password);
+      CertificateHelper.generateSelfSignedCertificate(options, settings.getHostName(), password);
     } else if (settings.getCertificatePath() != null && settings.getCertificatePath().hashCode() != 0) {
       importCertificate(options);
     } else {
