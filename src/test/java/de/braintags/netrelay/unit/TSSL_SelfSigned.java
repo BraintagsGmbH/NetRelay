@@ -26,6 +26,7 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import de.braintags.netrelay.init.Settings;
@@ -43,6 +44,7 @@ import io.vertx.ext.unit.TestContext;
  * @author Michael Remme
  * 
  */
+@Ignore("Self signed will be implemented by vertx shortly")
 public class TSSL_SelfSigned extends NetRelayBaseTest {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(TSSL_SelfSigned.class);
