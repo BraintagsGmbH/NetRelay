@@ -486,4 +486,14 @@ public class MockHttpServerResponse implements HttpServerResponse {
     return null;
   }
 
+  /*
+   * (non-Javadoc)
+   * 
+   * @see io.vertx.core.http.HttpServerResponse#endHandler(io.vertx.core.Handler)
+   */
+  @Override
+  public HttpServerResponse endHandler(@Nullable Handler<Void> handler) {
+    return null;
+  }
+
 }
