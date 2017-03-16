@@ -27,16 +27,24 @@ import io.vertx.ext.web.impl.RoutingContextImpl;
  */
 public class MockRoutingContext extends RoutingContextImpl {
   private Vertx vertx;
+  private boolean exceptionOnFail = true;
 
-  /**
-   * @param mountPoint
-   * @param router
-   * @param request
-   * @param routes
-   */
+  private boolean failed;
+  private int statusCode;
+  private Throwable exception;
+
   public MockRoutingContext(Vertx vertx, URI uri) {
-    super(null, null, createRequest(vertx, uri), new ConcurrentSkipListSet<>());
+    this(vertx, uri, true);
+  }
+
+  public MockRoutingContext(Vertx vertx, URI uri, boolean exceptionOnFail) {
+    this(vertx, createRequest(vertx, uri), exceptionOnFail);
+  }
+
+  public MockRoutingContext(Vertx vertx, HttpServerRequest request, boolean exceptionOnFail) {
+    super(null, null, request, new ConcurrentSkipListSet<>());
     this.vertx = vertx;
+    this.exceptionOnFail = exceptionOnFail;
   }
 
   private static final HttpServerRequest createRequest(Vertx vertx, URI uri) {
@@ -51,6 +59,57 @@ public class MockRoutingContext extends RoutingContextImpl {
   @Override
   public Vertx vertx() {
     return vertx;
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see io.vertx.ext.web.impl.RoutingContextImpl#fail(int)
+   */
+  @Override
+  public void fail(int statusCode) {
+    this.statusCode = statusCode;
+    doFail();
+  }
+
+  private void doFail() {
+    failed = true;
+    if (exceptionOnFail) {
+      if (exception != null) {
+        throw new RuntimeException("Mock routing context failed", exception);
+      } else {
+        throw new RuntimeException("Mock routing context failed");
+      }
+    }
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see io.vertx.ext.web.impl.RoutingContextImpl#fail(java.lang.Throwable)
+   */
+  @Override
+  public void fail(Throwable t) {
+    this.exception = t;
+    doFail();
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see io.vertx.ext.web.impl.RoutingContextImpl#statusCode()
+   */
+  @Override
+  public int statusCode() {
+    return statusCode;
+  }
+
+  public Throwable getException() {
+    return exception;
+  }
+
+  public boolean isFailed() {
+    return failed;
   }
 
 }
