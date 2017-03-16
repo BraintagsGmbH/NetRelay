@@ -12,11 +12,12 @@
  */
 package de.braintags.netrelay.init;
 
-import de.braintags.vertx.jomnigate.init.DataStoreSettings;
-import de.braintags.vertx.util.exception.InitException;
 import de.braintags.netrelay.NetRelay;
 import de.braintags.netrelay.processor.ProcessorDefinitions;
 import de.braintags.netrelay.routing.RouterDefinitions;
+import de.braintags.vertx.jomnigate.init.DataStoreSettings;
+import de.braintags.vertx.util.exception.InitException;
+import de.braintags.vertx.util.security.JWTSettings;
 import io.vertx.core.Context;
 import io.vertx.core.Vertx;
 import io.vertx.core.buffer.Buffer;
@@ -68,6 +69,8 @@ public class Settings {
   private String certificatePassword;
   private String certificatePath;
   private String certificateKeyPath;
+
+  private JWTSettings jwtSettings;
 
   /**
    * The port, where the server shall run on
@@ -386,6 +389,25 @@ public class Settings {
    */
   public void setCertificateKeyPath(String certificateKeyPath) {
     this.certificateKeyPath = certificateKeyPath;
+  }
+
+  /**
+   * The settings for the JWT to use for authentication and verification
+   * 
+   * @return the current JWT settings
+   */
+  public JWTSettings getJwtSettings() {
+    return jwtSettings;
+  }
+
+  /**
+   * The settings for the JWT to use for authentication and verification
+   * 
+   * @param jwtSettings
+   *          the new JWT settings
+   */
+  public void setJwtSettings(JWTSettings jwtSettings) {
+    this.jwtSettings = jwtSettings;
   }
 
 }
