@@ -45,12 +45,15 @@ public class MockHttpServerRequest implements HttpServerRequest {
   private MultiMap attributes = MultiMap.caseInsensitiveMultiMap();
 
   private URI uri;
+  private HttpMethod method;
 
-  /**
-   * 
-   */
   public MockHttpServerRequest(URI uri, HttpServerResponse response) {
+    this(uri, null, response);
+  }
+
+  public MockHttpServerRequest(URI uri, HttpMethod method, HttpServerResponse response) {
     this.uri = uri;
+    this.method = method;
     this.response = response;
   }
 
@@ -121,7 +124,7 @@ public class MockHttpServerRequest implements HttpServerRequest {
    */
   @Override
   public HttpMethod method() {
-    return null;
+    return this.method;
   }
 
   /*
