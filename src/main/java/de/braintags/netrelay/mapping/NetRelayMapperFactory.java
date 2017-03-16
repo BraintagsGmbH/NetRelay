@@ -12,11 +12,14 @@
  */
 package de.braintags.netrelay.mapping;
 
-import de.braintags.vertx.jomnigate.json.mapping.JsonPropertyMapperFactory;
-import de.braintags.vertx.jomnigate.mapping.impl.MapperFactory;
-import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerFactory;
+import java.util.Map;
+
 import de.braintags.netrelay.NetRelay;
 import de.braintags.netrelay.typehandler.HttpTypehandlerFactory;
+import de.braintags.vertx.jomnigate.json.mapping.JsonPropertyMapperFactory;
+import de.braintags.vertx.jomnigate.mapping.IStoreObjectFactory;
+import de.braintags.vertx.jomnigate.mapping.impl.MapperFactory;
+import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerFactory;
 
 /**
  * NetRelayMapperFactory is used as factory for mapper definitions for the communication with the underlaying
@@ -26,11 +29,21 @@ import de.braintags.netrelay.typehandler.HttpTypehandlerFactory;
  * @author Michael Remme
  * 
  */
-public class NetRelayMapperFactory extends MapperFactory {
+public class NetRelayMapperFactory extends MapperFactory<Map<String, String>> {
+  private NetRelay netRelay;
 
   public NetRelayMapperFactory(NetRelay netrelay) {
-    super(null, new HttpTypehandlerFactory(), new JsonPropertyMapperFactory(),
-        new NetRelayStoreObjectFactory(netrelay));
+    super(null, new HttpTypehandlerFactory(), new JsonPropertyMapperFactory());
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see de.braintags.vertx.jomnigate.mapping.impl.AbstractMapperFactory#getStoreObjectFactory()
+   */
+  @Override
+  public IStoreObjectFactory<Map<String, String>> getStoreObjectFactory() {
+    return netRelay.getStoreObjectFactory();
   }
 
 }
