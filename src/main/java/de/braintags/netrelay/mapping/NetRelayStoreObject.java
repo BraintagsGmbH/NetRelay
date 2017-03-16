@@ -25,7 +25,7 @@ import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQueryResult;
 import de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition;
 import de.braintags.vertx.jomnigate.exception.NoSuchRecordException;
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IObjectReference;
 import de.braintags.vertx.jomnigate.mapping.IStoreObject;
@@ -94,7 +94,7 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
    * @see de.braintags.vertx.jomnigate.mapping.IStoreObject#get(de.braintags.vertx.jomnigate.mapping.IField)
    */
   @Override
-  public Object get(IField field) {
+  public Object get(IProperty field) {
     return requestMap.get(field.getName().toLowerCase());
   }
 
@@ -105,7 +105,7 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
    * de.braintags.vertx.jomnigate.mapping.IStoreObject#hasProperty(de.braintags.vertx.jomnigate.mapping.IField)
    */
   @Override
-  public boolean hasProperty(IField field) {
+  public boolean hasProperty(IProperty field) {
     return requestMap.containsKey(field.getName().toLowerCase());
   }
 
@@ -116,7 +116,7 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
    * java.lang.Object)
    */
   @Override
-  public IStoreObject<T, Map<String, String>> put(IField field, Object value) {
+  public IStoreObject<T, Map<String, String>> put(IProperty field, Object value) {
     requestMap.put(field.getName().toLowerCase(), String.valueOf(value));
     return this;
   }
@@ -245,7 +245,7 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
     for (String fieldName : fieldNames) {
       Future f = Future.future();
       fl.add(f);
-      IField field = getMapper().getField(fieldName);
+      IProperty field = getMapper().getField(fieldName);
       if (hasProperty(field)) {
         LOGGER.debug("handling field " + field.getFullName());
         field.getPropertyMapper().fromStoreObject(tmpObject, this, field, f.completer());
@@ -299,7 +299,7 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
   public void initFromEntity(Handler<AsyncResult<Void>> handler) {
     List<Future> fl = new ArrayList<>(mapper.getFieldNames().size());
     for (String fieldName : mapper.getFieldNames()) {
-      IField field = mapper.getField(fieldName);
+      IProperty field = mapper.getField(fieldName);
       Future f = Future.future();
       fl.add(f);
       field.getPropertyMapper().intoStoreObject(entity, this, field, f.completer());
