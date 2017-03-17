@@ -184,7 +184,7 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
   private void createEntity(Handler<AsyncResult<T>> handler) {
     if (entity != null) {
       handler.handle(Future.succeededFuture(entity));
-    } else if (hasProperty(getMapper().getIdField())) {
+    } else if (hasProperty(getMapper().getIdField().getField())) {
       queryEntity(handler);
     } else {
       T returnObject = getMapper().getObjectFactory().createInstance(getMapper().getMapperClass());
@@ -198,9 +198,9 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
    * @param handler
    */
   private void queryEntity(Handler<AsyncResult<T>> handler) {
-    Object id = get(getMapper().getIdField());
+    Object id = get(getMapper().getIdField().getField());
     IQuery<T> query = netRelay.getDatastore().createQuery(getMapper().getMapperClass());
-    ISearchCondition.isEqual(query.getMapper().getIdField().getName(), id);
+    ISearchCondition.isEqual(query.getMapper().getIdField(), id);
     query.execute(qrr -> {
       if (qrr.failed()) {
         handler.handle(Future.failedFuture(qrr.cause()));
