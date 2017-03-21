@@ -12,7 +12,7 @@
  */
 package de.braintags.netrelay.typehandler;
 
-import de.braintags.vertx.jomnigate.mapping.IField;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerFactory;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerResult;
 import de.braintags.vertx.jomnigate.typehandler.stringbased.handlers.BooleanTypeHandler;
@@ -35,7 +35,7 @@ public class HttpBooleanTypeHandler extends BooleanTypeHandler {
   }
 
   @Override
-  public void fromStore(Object source, IField field, Class<?> cls,
+  public void fromStore(Object source, IProperty field, Class<?> cls,
       Handler<AsyncResult<ITypeHandlerResult>> resultHandler) {
     String bv = source == null ? "false" : source.toString();
     bv = bv.equalsIgnoreCase("on") ? "true" : bv;

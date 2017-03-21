@@ -26,6 +26,7 @@ import de.braintags.netrelay.controller.TimeoutController;
 import de.braintags.netrelay.init.MailClientSettings;
 import de.braintags.netrelay.init.Settings;
 import de.braintags.netrelay.mapping.NetRelayMapperFactory;
+import de.braintags.netrelay.mapping.NetRelayStoreObjectFactory;
 import de.braintags.netrelay.processor.ProcessorDefinition;
 import de.braintags.netrelay.routing.RouterDefinition;
 import de.braintags.netrelay.routing.RoutingInit;
@@ -64,7 +65,7 @@ public class NetRelay extends AbstractVerticle {
   public static final String NETRELAY_PROPERTY = "NetRelay";
 
   // to be able to handle multiple datastores, an IDatastoreCollection will come from pojo-mapper later
-  private IDataStore datastore;
+  private IDataStore<?, ?> datastore;
   private Settings settings;
   private Router router;
   private MailClient mailClient;
@@ -72,7 +73,8 @@ public class NetRelay extends AbstractVerticle {
   /**
    * The mapper factory which translates between the browser and the server
    */
-  private IMapperFactory mapperFactory;
+  private NetRelayMapperFactory mapperFactory;
+  private NetRelayStoreObjectFactory storeObjectFactory;
 
   /*
    * (non-Javadoc)
@@ -110,6 +112,7 @@ public class NetRelay extends AbstractVerticle {
     try {
       router = Router.router(vertx);
       mapperFactory = new NetRelayMapperFactory(this);
+      storeObjectFactory = new NetRelayStoreObjectFactory(this);
       initJwt();
       initMailClient();
       initController(router);
@@ -187,8 +190,17 @@ public class NetRelay extends AbstractVerticle {
    * 
    * @return the {@link IMapperFactory} of NetRelay
    */
-  public IMapperFactory getNetRelayMapperFactory() {
+  public NetRelayMapperFactory getNetRelayMapperFactory() {
     return mapperFactory;
+  }
+
+  /**
+   * Get the StoreObjectFactory used by NetRelay
+   * 
+   * @return
+   */
+  public NetRelayStoreObjectFactory getStoreObjectFactory() {
+    return storeObjectFactory;
   }
 
   /**
@@ -392,7 +404,7 @@ public class NetRelay extends AbstractVerticle {
    * 
    * @return the datastore
    */
-  public final IDataStore getDatastore() {
+  public final IDataStore<?, ?> getDatastore() {
     return datastore;
   }
 

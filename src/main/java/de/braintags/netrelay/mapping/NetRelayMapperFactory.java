@@ -12,11 +12,11 @@
  */
 package de.braintags.netrelay.mapping;
 
+import de.braintags.netrelay.NetRelay;
+import de.braintags.netrelay.typehandler.HttpTypehandlerFactory;
 import de.braintags.vertx.jomnigate.json.mapping.JsonPropertyMapperFactory;
 import de.braintags.vertx.jomnigate.mapping.impl.MapperFactory;
 import de.braintags.vertx.jomnigate.typehandler.ITypeHandlerFactory;
-import de.braintags.netrelay.NetRelay;
-import de.braintags.netrelay.typehandler.HttpTypehandlerFactory;
 
 /**
  * NetRelayMapperFactory is used as factory for mapper definitions for the communication with the underlaying
@@ -27,10 +27,10 @@ import de.braintags.netrelay.typehandler.HttpTypehandlerFactory;
  * 
  */
 public class NetRelayMapperFactory extends MapperFactory {
+  private NetRelay netRelay;
 
   public NetRelayMapperFactory(NetRelay netrelay) {
-    super(null, new HttpTypehandlerFactory(), new JsonPropertyMapperFactory(),
-        new NetRelayStoreObjectFactory(netrelay));
+    super(null, new HttpTypehandlerFactory(), new JsonPropertyMapperFactory());
   }
 
 }
