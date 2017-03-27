@@ -26,7 +26,7 @@ import de.braintags.netrelay.controller.IController;
  * 
  */
 public class MappingDefinitions {
-  private HashMap<String, Class> mapperMap = new HashMap();
+  private HashMap<String, Class> mapperMap = new HashMap<>();
 
   /**
    * The mappermap contains the key, by which a template for instance can refer to a mapper and the mapper class as
