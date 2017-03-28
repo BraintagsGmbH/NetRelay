@@ -31,7 +31,7 @@ import io.vertx.ext.web.handler.StaticHandler;
  * <br/>
  * Result-Parameter:<br/>
  * <br/>
- * 
+ *
  * @author Michael Remme
  */
 public class StaticController extends AbstractController {
@@ -47,11 +47,17 @@ public class StaticController extends AbstractController {
    * The property to define the timeout of cached elements, if caching is enabled
    */
   public static final String CACHE_TIMEOUT_PROPERTY = "cacheTimeout";
+  public static final String WEBROOT                = "webroot";
   private StaticHandler staticHandler;
 
   @Override
   public void initProperties(Properties properties) {
-    staticHandler = StaticHandler.create();
+    if (properties.containsKey(WEBROOT)) {
+      staticHandler = StaticHandler.create(properties.getProperty(WEBROOT));
+    } else {
+      staticHandler = StaticHandler.create();
+    }
+
     if (properties.containsKey(CACHE_ENABLED_PROPERTY)) {
       staticHandler.setCachingEnabled(Boolean.valueOf(properties.getProperty(CACHE_ENABLED_PROPERTY, "true")));
     }
@@ -62,7 +68,7 @@ public class StaticController extends AbstractController {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see io.vertx.core.Handler#handle(java.lang.Object)
    */
   @Override
@@ -73,7 +79,7 @@ public class StaticController extends AbstractController {
 
   /**
    * Creates a default definition for the current instance
-   * 
+   *
    * @return
    */
   public static RouterDefinition createDefaultRouterDefinition() {
@@ -88,7 +94,7 @@ public class StaticController extends AbstractController {
 
   /**
    * Get the default properties for an implementation of StaticController
-   * 
+   *
    * @return
    */
   public static Properties getDefaultProperties() {
