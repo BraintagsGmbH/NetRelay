@@ -73,7 +73,7 @@ public class StaticController extends AbstractController {
    */
   @Override
   public void handleController(RoutingContext event) {
-    LOGGER.info("handling " + getClass().getName() + " for " + event.request().path());
+    LOGGER.debug("handling " + getClass().getName() + " for " + event.request().path());
     staticHandler.handle(event);
   }
 

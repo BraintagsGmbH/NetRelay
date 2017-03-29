@@ -32,8 +32,6 @@ import io.vertx.ext.web.handler.FaviconHandler;
  * 
  */
 public class FavIconController extends AbstractController {
-  private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
-      .getLogger(FavIconController.class);
 
   private static final String PATH_PROPERTY = "path";
   private FaviconHandler fh;
@@ -45,7 +43,6 @@ public class FavIconController extends AbstractController {
    */
   @Override
   public void handleController(RoutingContext context) {
-    LOGGER.info("calling " + getClass().getName());
     try {
       fh.handle(context);
     } catch (Exception e) {
