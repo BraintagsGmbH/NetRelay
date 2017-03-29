@@ -13,6 +13,7 @@
 package de.braintags.netrelay.init;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import de.braintags.netrelay.controller.IController;
 
@@ -21,12 +22,12 @@ import de.braintags.netrelay.controller.IController;
  * can be used by which reference name.
  * The definitions inside here can be predefined as part of the {@link Settings}. Additionally some instances of
  * {@link IController} can add further mapping definitions, id needed.
- * 
+ *
  * @author Michael Remme
- * 
+ *
  */
 public class MappingDefinitions {
-  private HashMap<String, Class> mapperMap = new HashMap<>();
+  private Map<String, Class> mapperMap = new HashMap<>();
 
   /**
    * The mappermap contains the key, by which a template for instance can refer to a mapper and the mapper class as
@@ -34,7 +35,7 @@ public class MappingDefinitions {
    *
    * @return the mapperMap
    */
-  public HashMap<String, Class> getMapperMap() {
+  public Map<String, Class> getMapperMap() {
     return mapperMap;
   }
 
@@ -45,14 +46,14 @@ public class MappingDefinitions {
    * @param mapperMap
    *          the mapperMap to set
    */
-  public void setMapperMap(HashMap<String, Class> mapperMap) {
+  public void setMapperMap(Map<String, Class> mapperMap) {
     this.mapperMap = mapperMap;
   }
 
   /**
    * add a new entry into the mapper definition by using the simple name of the class. The name is the name, like it is
    * used later inside templates and links to reference the mapper
-   * 
+   *
    * @param mapperClass
    *          the class of the mapper
    */
@@ -64,7 +65,7 @@ public class MappingDefinitions {
    * add a new entry into the mapper definition. The name is the name, like it is used later inside templates and links
    * to
    * reference the mapper
-   * 
+   *
    * @param name
    *          the name of the mapper
    * @param mapperClass
@@ -76,10 +77,10 @@ public class MappingDefinitions {
 
   /**
    * Get the mapper class for the specified name
-   * 
+   *
    * @param name
    *          the name of the mapper
-   * 
+   *
    * @return the mapper class or null, if none found
    */
   public Class getMapperClass(String name) {
