@@ -12,13 +12,13 @@
  */
 package de.braintags.netrelay.impl;
 
-import de.braintags.vertx.jomnigate.init.DataStoreSettings;
-import de.braintags.vertx.jomnigate.mongo.init.MongoDataStoreInit;
-import de.braintags.vertx.jomnigate.mysql.init.MySqlDataStoreinit;
 import de.braintags.netrelay.NetRelay;
 import de.braintags.netrelay.init.Settings;
 import de.braintags.netrelay.mapper.SimpleNetRelayMapper;
 import de.braintags.netrelay.unit.NetRelayBaseTest;
+import de.braintags.vertx.jomnigate.init.DataStoreSettings;
+import de.braintags.vertx.jomnigate.mongo.init.MongoDataStoreInit;
+import de.braintags.vertx.jomnigate.mysql.init.MySqlDataStoreinit;
 
 /**
  * An extension of NetRelay which is loading the Settings from a file
@@ -74,12 +74,14 @@ public class NetRelayExt_FileBasedSettings extends NetRelay {
   }
 
   public static void applySystemProperties(Settings settings) {
-    String dbName = settings.getDatastoreSettings().getDatabaseName();
+    DataStoreSettings oldSettings = settings.getDatastoreSettings();
+    String dbName = oldSettings.getDatabaseName();
     DataStoreSettings dsSettings = MySqlDataStoreinit.hasSystemProperties() ? MySqlDataStoreinit.createSettings()
         : MongoDataStoreInit.createSettings();
     if (dbName != null && dbName.hashCode() != 0) {
       dsSettings.setDatabaseName(dbName);
     }
+    dsSettings.setClearDatabaseOnInit(oldSettings.isClearDatabaseOnInit());
     settings.setDatastoreSettings(dsSettings);
     String portString = System.getProperty(NetRelayBaseTest.SERVER_PORT_PROPERTY, null);
     if (portString != null) {
