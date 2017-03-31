@@ -44,6 +44,7 @@ import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServer;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.net.PemKeyCertOptions;
+import io.vertx.core.net.PfxOptions;
 import io.vertx.core.net.SelfSignedCertificate;
 import io.vertx.ext.auth.jwt.JWT;
 import io.vertx.ext.mail.MailClient;
@@ -345,10 +346,12 @@ public class NetRelay extends AbstractVerticle {
       httpOpts.setPemKeyCertOptions(
           new PemKeyCertOptions().setCertPath(certPath).setKeyPath(settings.getCertificateKeyPath()));
       httpOpts.setSsl(true);
+    } else if (certPath.matches("^.*\\.(P12|p12)$")) {
+      httpOpts.setPfxKeyCertOptions(new PfxOptions().setPath(certPath).setPassword(password));
     } else {
-      throw new IllegalArgumentException("Please specify the certificate as PEM file in the format pkcs8");
+      throw new IllegalArgumentException(
+          "Please specify the certificate as PEM file in the format pkcs8, or as p12 file in the Pfx format");
     }
-
   }
 
   /*
