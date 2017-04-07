@@ -12,6 +12,10 @@
  */
 package de.braintags.netrelay.unit;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -22,19 +26,20 @@ import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 
-import de.braintags.vertx.keygenerator.KeyGeneratorSettings;
-import de.braintags.vertx.keygenerator.KeyGeneratorVerticle;
-import de.braintags.vertx.keygenerator.impl.DebugGenerator;
-import de.braintags.vertx.jomnigate.testdatastore.DatastoreBaseTest;
-import de.braintags.vertx.jomnigate.testdatastore.TestHelper;
-import de.braintags.vertx.util.ResultObject;
-import de.braintags.vertx.util.exception.InitException;
 import de.braintags.netrelay.NetRelay;
 import de.braintags.netrelay.impl.NetRelayExt_InternalSettings;
 import de.braintags.netrelay.init.MailClientSettings;
 import de.braintags.netrelay.init.Settings;
 import de.braintags.netrelay.routing.RouterDefinition;
+import de.braintags.vertx.jomnigate.testdatastore.DatastoreBaseTest;
+import de.braintags.vertx.jomnigate.testdatastore.TestHelper;
+import de.braintags.vertx.keygenerator.KeyGeneratorSettings;
+import de.braintags.vertx.keygenerator.KeyGeneratorVerticle;
+import de.braintags.vertx.keygenerator.impl.DebugGenerator;
+import de.braintags.vertx.util.ResultObject;
+import de.braintags.vertx.util.exception.InitException;
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
@@ -349,5 +354,12 @@ public abstract class NetRelayBaseTest {
     ms.setSsl(false);
     ms.setStarttls(StartTLSOptions.DISABLED);
     ms.setActive(true);
+  }
+
+  protected static <T> Handler<AsyncResult<T>> assertException(Class<? extends Exception> exceptionClass,
+      TestContext context) {
+    return context.asyncAssertFailure(failure -> {
+      assertThat(failure, is(instanceOf(exceptionClass)));
+    });
   }
 }
