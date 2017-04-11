@@ -12,6 +12,10 @@
  */
 package de.braintags.netrelay.unit;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -22,19 +26,20 @@ import org.junit.Rule;
 import org.junit.rules.TestName;
 import org.junit.runner.RunWith;
 
-import de.braintags.vertx.keygenerator.KeyGeneratorSettings;
-import de.braintags.vertx.keygenerator.KeyGeneratorVerticle;
-import de.braintags.vertx.keygenerator.impl.DebugGenerator;
-import de.braintags.vertx.jomnigate.testdatastore.DatastoreBaseTest;
-import de.braintags.vertx.jomnigate.testdatastore.TestHelper;
-import de.braintags.vertx.util.ResultObject;
-import de.braintags.vertx.util.exception.InitException;
 import de.braintags.netrelay.NetRelay;
 import de.braintags.netrelay.impl.NetRelayExt_InternalSettings;
 import de.braintags.netrelay.init.MailClientSettings;
 import de.braintags.netrelay.init.Settings;
 import de.braintags.netrelay.routing.RouterDefinition;
+import de.braintags.vertx.jomnigate.testdatastore.DatastoreBaseTest;
+import de.braintags.vertx.jomnigate.testdatastore.TestHelper;
+import de.braintags.vertx.keygenerator.KeyGeneratorSettings;
+import de.braintags.vertx.keygenerator.KeyGeneratorVerticle;
+import de.braintags.vertx.keygenerator.impl.DebugGenerator;
+import de.braintags.vertx.util.ResultObject;
+import de.braintags.vertx.util.exception.InitException;
 import io.vertx.core.AbstractVerticle;
+import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
@@ -86,7 +91,12 @@ public abstract class NetRelayBaseTest {
   }
 
   @Rule
-  public Timeout rule = Timeout.seconds(Integer.parseInt(System.getProperty("testTimeout", "20")));
+  public Timeout rule = Timeout.seconds(getTimeout());
+
+  private static int getTimeout() {
+    return Integer.parseInt(System.getProperty("testTimeout", "20"));
+  }
+
   @Rule
   public TestName name = new TestName();
 
@@ -145,7 +155,8 @@ public abstract class NetRelayBaseTest {
   public static void startup(TestContext context) throws Exception {
     LOGGER.debug("starting class");
     vertx = Vertx.vertx(getVertxOptions());
-    client = vertx.createHttpClient(new HttpClientOptions().setDefaultPort(8080));
+    client = vertx.createHttpClient(
+        new HttpClientOptions().setDefaultPort(8080).setConnectTimeout(getTimeout()).setIdleTimeout(getTimeout()));
     // boolean startMongoLocal = Boolean.getBoolean("startMongoLocal");
     // String portString = System.getProperty(MongoDataStoreInit.LOCAL_PORT_PROP, "27017");
     // int port = Integer.parseInt(portString);
@@ -213,32 +224,6 @@ public abstract class NetRelayBaseTest {
     testRequest(context, method, path, null, statusCode, statusMessage, null);
   }
 
-  protected static final void testRequest(TestContext context, HttpMethod method, String path, int statusCode,
-      String statusMessage, String responseBody) throws Exception {
-    testRequest(context, method, path, null, statusCode, statusMessage, responseBody);
-  }
-
-  protected static final void testRequest(TestContext context, HttpMethod method, String path, int statusCode,
-      String statusMessage, Buffer responseBody) throws Exception {
-    testRequestBuffer(context, method, path, null, null, statusCode, statusMessage, responseBody);
-  }
-
-  protected static final void testRequestWithContentType(TestContext context, HttpMethod method, String path,
-      String contentType, int statusCode, String statusMessage) throws Exception {
-    testRequest(context, method, path, req -> req.putHeader("content-type", contentType), statusCode, statusMessage,
-        null);
-  }
-
-  protected static final void testRequestWithAccepts(TestContext context, HttpMethod method, String path,
-      String accepts, int statusCode, String statusMessage) throws Exception {
-    testRequest(context, method, path, req -> req.putHeader("accept", accepts), statusCode, statusMessage, null);
-  }
-
-  protected static final void testRequestWithCookies(TestContext context, HttpMethod method, String path,
-      String cookieHeader, int statusCode, String statusMessage) throws Exception {
-    testRequest(context, method, path, req -> req.putHeader("cookie", cookieHeader), statusCode, statusMessage, null);
-  }
-
   protected static final void testRequest(TestContext context, HttpMethod method, String path,
       Consumer<HttpClientRequest> requestAction, int statusCode, String statusMessage, String responseBody)
       throws Exception {
@@ -248,15 +233,8 @@ public abstract class NetRelayBaseTest {
   protected static final void testRequest(TestContext context, HttpMethod method, String path,
       Consumer<HttpClientRequest> requestAction, Consumer<ResponseCopy> responseAction, int statusCode,
       String statusMessage, String responseBody) throws Exception {
-    testRequestBuffer(context, method, path, requestAction, responseAction, statusCode, statusMessage,
-        responseBody != null ? Buffer.buffer(responseBody) : null);
-  }
-
-  protected static final void testRequestBuffer(TestContext context, HttpMethod method, String path,
-      Consumer<HttpClientRequest> requestAction, Consumer<ResponseCopy> responseAction, int statusCode,
-      String statusMessage, Buffer responseBodyBuffer) throws Exception {
     testRequestBuffer(context, client, method, PORT, path, requestAction, responseAction, statusCode, statusMessage,
-        responseBodyBuffer);
+        responseBody != null ? Buffer.buffer(responseBody) : null);
   }
 
   protected static final void testRequestBuffer(TestContext context, HttpClient client, HttpMethod method, int port,
@@ -349,5 +327,12 @@ public abstract class NetRelayBaseTest {
     ms.setSsl(false);
     ms.setStarttls(StartTLSOptions.DISABLED);
     ms.setActive(true);
+  }
+
+  protected static <T> Handler<AsyncResult<T>> assertException(Class<? extends Exception> exceptionClass,
+      TestContext context) {
+    return context.asyncAssertFailure(failure -> {
+      assertThat(failure, is(instanceOf(exceptionClass)));
+    });
   }
 }
