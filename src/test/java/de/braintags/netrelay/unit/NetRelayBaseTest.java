@@ -91,7 +91,12 @@ public abstract class NetRelayBaseTest {
   }
 
   @Rule
-  public Timeout rule = Timeout.seconds(Integer.parseInt(System.getProperty("testTimeout", "20")));
+  public Timeout rule = Timeout.seconds(getTimeout());
+
+  private static int getTimeout() {
+    return Integer.parseInt(System.getProperty("testTimeout", "20"));
+  }
+
   @Rule
   public TestName name = new TestName();
 
@@ -150,7 +155,8 @@ public abstract class NetRelayBaseTest {
   public static void startup(TestContext context) throws Exception {
     LOGGER.debug("starting class");
     vertx = Vertx.vertx(getVertxOptions());
-    client = vertx.createHttpClient(new HttpClientOptions().setDefaultPort(8080));
+    client = vertx.createHttpClient(
+        new HttpClientOptions().setDefaultPort(8080).setConnectTimeout(getTimeout()).setIdleTimeout(getTimeout()));
     // boolean startMongoLocal = Boolean.getBoolean("startMongoLocal");
     // String portString = System.getProperty(MongoDataStoreInit.LOCAL_PORT_PROP, "27017");
     // int port = Integer.parseInt(portString);
@@ -218,32 +224,6 @@ public abstract class NetRelayBaseTest {
     testRequest(context, method, path, null, statusCode, statusMessage, null);
   }
 
-  protected static final void testRequest(TestContext context, HttpMethod method, String path, int statusCode,
-      String statusMessage, String responseBody) throws Exception {
-    testRequest(context, method, path, null, statusCode, statusMessage, responseBody);
-  }
-
-  protected static final void testRequest(TestContext context, HttpMethod method, String path, int statusCode,
-      String statusMessage, Buffer responseBody) throws Exception {
-    testRequestBuffer(context, method, path, null, null, statusCode, statusMessage, responseBody);
-  }
-
-  protected static final void testRequestWithContentType(TestContext context, HttpMethod method, String path,
-      String contentType, int statusCode, String statusMessage) throws Exception {
-    testRequest(context, method, path, req -> req.putHeader("content-type", contentType), statusCode, statusMessage,
-        null);
-  }
-
-  protected static final void testRequestWithAccepts(TestContext context, HttpMethod method, String path,
-      String accepts, int statusCode, String statusMessage) throws Exception {
-    testRequest(context, method, path, req -> req.putHeader("accept", accepts), statusCode, statusMessage, null);
-  }
-
-  protected static final void testRequestWithCookies(TestContext context, HttpMethod method, String path,
-      String cookieHeader, int statusCode, String statusMessage) throws Exception {
-    testRequest(context, method, path, req -> req.putHeader("cookie", cookieHeader), statusCode, statusMessage, null);
-  }
-
   protected static final void testRequest(TestContext context, HttpMethod method, String path,
       Consumer<HttpClientRequest> requestAction, int statusCode, String statusMessage, String responseBody)
       throws Exception {
@@ -253,15 +233,8 @@ public abstract class NetRelayBaseTest {
   protected static final void testRequest(TestContext context, HttpMethod method, String path,
       Consumer<HttpClientRequest> requestAction, Consumer<ResponseCopy> responseAction, int statusCode,
       String statusMessage, String responseBody) throws Exception {
-    testRequestBuffer(context, method, path, requestAction, responseAction, statusCode, statusMessage,
-        responseBody != null ? Buffer.buffer(responseBody) : null);
-  }
-
-  protected static final void testRequestBuffer(TestContext context, HttpMethod method, String path,
-      Consumer<HttpClientRequest> requestAction, Consumer<ResponseCopy> responseAction, int statusCode,
-      String statusMessage, Buffer responseBodyBuffer) throws Exception {
     testRequestBuffer(context, client, method, PORT, path, requestAction, responseAction, statusCode, statusMessage,
-        responseBodyBuffer);
+        responseBody != null ? Buffer.buffer(responseBody) : null);
   }
 
   protected static final void testRequestBuffer(TestContext context, HttpClient client, HttpMethod method, int port,
