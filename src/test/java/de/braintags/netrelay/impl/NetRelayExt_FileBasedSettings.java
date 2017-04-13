@@ -36,7 +36,7 @@ public class NetRelayExt_FileBasedSettings extends NetRelay {
   /**
    * 
    */
-  public NetRelayExt_FileBasedSettings(boolean settingsEdited) {
+  public NetRelayExt_FileBasedSettings(final boolean settingsEdited) {
     this.settingsEdited = settingsEdited;
   }
 
@@ -73,15 +73,16 @@ public class NetRelayExt_FileBasedSettings extends NetRelay {
     return settings;
   }
 
-  public static void applySystemProperties(Settings settings) {
+  public static void applySystemProperties(final Settings settings) {
     DataStoreSettings oldSettings = settings.getDatastoreSettings();
-    String dbName = oldSettings.getDatabaseName();
-    DataStoreSettings dsSettings = MySqlDataStoreinit.hasSystemProperties() ? MySqlDataStoreinit.createSettings()
-        : MongoDataStoreInit.createSettings();
-    if (dbName != null && dbName.hashCode() != 0) {
-      dsSettings.setDatabaseName(dbName);
+
+    DataStoreSettings dsSettings = oldSettings.deepCopy();
+    if (MySqlDataStoreinit.hasSystemProperties()) {
+      MySqlDataStoreinit.applySystemProperties(dsSettings);
+    } else {
+      MongoDataStoreInit.applySystemProperties(dsSettings);
     }
-    dsSettings.setClearDatabaseOnInit(oldSettings.isClearDatabaseOnInit());
+
     settings.setDatastoreSettings(dsSettings);
     String portString = System.getProperty(NetRelayBaseTest.SERVER_PORT_PROPERTY, null);
     if (portString != null) {
