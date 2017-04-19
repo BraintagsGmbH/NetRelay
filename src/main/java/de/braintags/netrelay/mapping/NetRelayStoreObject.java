@@ -25,9 +25,9 @@ import de.braintags.vertx.jomnigate.dataaccess.query.IQuery;
 import de.braintags.vertx.jomnigate.dataaccess.query.IQueryResult;
 import de.braintags.vertx.jomnigate.dataaccess.query.ISearchCondition;
 import de.braintags.vertx.jomnigate.exception.NoSuchRecordException;
-import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IObjectReference;
+import de.braintags.vertx.jomnigate.mapping.IProperty;
 import de.braintags.vertx.jomnigate.mapping.IStoreObject;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.CompositeFuture;
@@ -46,9 +46,9 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
       .getLogger(NetRelayStoreObject.class);
 
-  private IMapper<T> mapper;
+  private final IMapper<T> mapper;
   private T entity = null;
-  private Collection<IObjectReference> objectReferences = new ArrayList<>();
+  private final Collection<IObjectReference> objectReferences = new ArrayList<>();
   private Map<String, String> requestMap = new HashMap<>();
   private NetRelay netRelay;
 
@@ -60,7 +60,7 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
    * @param entity
    *          the entity to be used
    */
-  public NetRelayStoreObject(IMapper<T> mapper, T entity) {
+  public NetRelayStoreObject(final IMapper<T> mapper, final T entity) {
     if (mapper == null)
       throw new NullPointerException("Mapper must not be null");
     this.mapper = mapper;
@@ -79,7 +79,7 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
    * @param netRelay
    *          the instance of NetRelay
    */
-  public NetRelayStoreObject(Map<String, String> requestMap, T entity, IMapper<T> mapper, NetRelay netRelay) {
+  public NetRelayStoreObject(final Map<String, String> requestMap, final T entity, final IMapper<T> mapper, final NetRelay netRelay) {
     Objects.requireNonNull(mapper, "Mapper must not be null");
     Objects.requireNonNull(requestMap, "requestMap must not be null");
     this.mapper = mapper;
@@ -94,7 +94,7 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
    * @see de.braintags.vertx.jomnigate.mapping.IStoreObject#get(de.braintags.vertx.jomnigate.mapping.IField)
    */
   @Override
-  public Object get(IProperty field) {
+  public Object get(final IProperty field) {
     return requestMap.get(field.getName().toLowerCase());
   }
 
@@ -105,7 +105,7 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
    * de.braintags.vertx.jomnigate.mapping.IStoreObject#hasProperty(de.braintags.vertx.jomnigate.mapping.IField)
    */
   @Override
-  public boolean hasProperty(IProperty field) {
+  public boolean hasProperty(final IProperty field) {
     return requestMap.containsKey(field.getName().toLowerCase());
   }
 
@@ -116,7 +116,7 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
    * java.lang.Object)
    */
   @Override
-  public IStoreObject<T, Map<String, String>> put(IProperty field, Object value) {
+  public IStoreObject<T, Map<String, String>> put(final IProperty field, final Object value) {
     requestMap.put(field.getName().toLowerCase(), String.valueOf(value));
     return this;
   }
@@ -148,7 +148,7 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
    * 
    * @param handler
    */
-  public final void initToEntity(Handler<AsyncResult<Void>> handler) {
+  public final void initToEntity(final Handler<AsyncResult<Void>> handler) {
     createEntity(result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
@@ -164,7 +164,7 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
    * @param tmpObject
    * @param handler
    */
-  private void initToEntity(T tmpObject, Handler<AsyncResult<Void>> handler) {
+  private void initToEntity(final T tmpObject, final Handler<AsyncResult<Void>> handler) {
     iterateFields(tmpObject, fieldResult -> {
       if (fieldResult.failed()) {
         handler.handle(fieldResult);
@@ -181,10 +181,10 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
     });
   }
 
-  private void createEntity(Handler<AsyncResult<T>> handler) {
+  private void createEntity(final Handler<AsyncResult<T>> handler) {
     if (entity != null) {
       handler.handle(Future.succeededFuture(entity));
-    } else if (hasProperty(getMapper().getIdField().getField())) {
+    } else if (hasProperty(getMapper().getIdInfo().getField())) {
       queryEntity(handler);
     } else {
       T returnObject = getMapper().getObjectFactory().createInstance(getMapper().getMapperClass());
@@ -197,10 +197,10 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
    * 
    * @param handler
    */
-  private void queryEntity(Handler<AsyncResult<T>> handler) {
-    Object id = get(getMapper().getIdField().getField());
+  private void queryEntity(final Handler<AsyncResult<T>> handler) {
+    Object id = get(getMapper().getIdInfo().getField());
     IQuery<T> query = netRelay.getDatastore().createQuery(getMapper().getMapperClass());
-    ISearchCondition.isEqual(query.getMapper().getIdField(), id);
+    ISearchCondition.isEqual(query.getMapper().getIdInfo().getIndexedField(), id);
     query.execute(qrr -> {
       if (qrr.failed()) {
         handler.handle(Future.failedFuture(qrr.cause()));
@@ -221,7 +221,7 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
     });
   }
 
-  protected void finishToEntity(T tmpObject, Handler<AsyncResult<Void>> handler) {
+  protected void finishToEntity(final T tmpObject, final Handler<AsyncResult<Void>> handler) {
     this.entity = tmpObject;
     try {
       handler.handle(Future.succeededFuture());
@@ -238,7 +238,7 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
    * @param handler
    */
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  protected final void iterateFields(T tmpObject, Handler<AsyncResult<Void>> handler) {
+  protected final void iterateFields(final T tmpObject, final Handler<AsyncResult<Void>> handler) {
     LOGGER.debug("start iterateFields");
     Set<String> fieldNames = getMapper().getFieldNames();
     List<Future> fl = new ArrayList<>();
@@ -264,7 +264,7 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
   }
 
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  protected void iterateObjectReferences(Object tmpObject, Handler<AsyncResult<Void>> handler) {
+  protected void iterateObjectReferences(final Object tmpObject, final Handler<AsyncResult<Void>> handler) {
     LOGGER.debug("start iterateObjectReferences");
     if (getObjectReferences().isEmpty()) {
       LOGGER.debug("nothing to do");
@@ -296,7 +296,7 @@ public class NetRelayStoreObject<T> implements IStoreObject<T, Map<String, Strin
    * @param handler
    */
   @SuppressWarnings({ "rawtypes", "unchecked" })
-  public void initFromEntity(Handler<AsyncResult<Void>> handler) {
+  public void initFromEntity(final Handler<AsyncResult<Void>> handler) {
     List<Future> fl = new ArrayList<>(mapper.getFieldNames().size());
     for (String fieldName : mapper.getFieldNames()) {
       IProperty field = mapper.getField(fieldName);
