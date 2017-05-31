@@ -21,7 +21,7 @@ import java.util.Properties;
 
 import de.braintags.vertx.util.ExceptionUtil;
 import de.braintags.vertx.util.exception.InitException;
-import de.braintags.netrelay.RequestUtil;
+import de.braintags.vertx.util.request.RequestUtil;
 import de.braintags.netrelay.routing.RouterDefinition;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.ext.web.RoutingContext;

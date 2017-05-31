@@ -14,7 +14,7 @@ package de.braintags.netrelay.unit;
 
 import org.junit.Test;
 
-import de.braintags.netrelay.RequestUtil;
+import de.braintags.vertx.util.request.RequestUtil;
 import io.vertx.ext.unit.TestContext;
 
 /**

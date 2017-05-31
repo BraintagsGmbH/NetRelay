@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Properties;
 
 import de.braintags.vertx.util.exception.ParameterRequiredException;
-import de.braintags.netrelay.RequestUtil;
+import de.braintags.vertx.util.request.RequestUtil;
 import de.braintags.netrelay.routing.CaptureCollection;
 import de.braintags.netrelay.routing.CaptureDefinition;
 import io.vertx.core.AsyncResult;
