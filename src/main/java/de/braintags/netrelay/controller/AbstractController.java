@@ -15,11 +15,11 @@ package de.braintags.netrelay.controller;
 import java.util.Properties;
 
 import de.braintags.netrelay.NetRelay;
-import de.braintags.netrelay.RequestUtil;
 import de.braintags.netrelay.routing.CaptureCollection;
 import de.braintags.netrelay.routing.RouterDefinition;
 import de.braintags.vertx.util.HttpContentType;
 import de.braintags.vertx.util.exception.ParameterRequiredException;
+import de.braintags.vertx.util.request.RequestUtil;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.RoutingContext;
 
