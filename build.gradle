@@ -22,6 +22,4 @@ dependencies {
 
 test {
   systemProperty 'startMongoLocal', 'true'
-  systemProperty "mailClientUserName", mailClientUserName
-  systemProperty "mailClientPassword", mailClientPassword
 }
