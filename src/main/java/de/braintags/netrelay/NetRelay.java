@@ -46,7 +46,7 @@ import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.net.PemKeyCertOptions;
 import io.vertx.core.net.PfxOptions;
 import io.vertx.core.net.SelfSignedCertificate;
-import io.vertx.ext.auth.jwt.JWT;
+import io.vertx.ext.jwt.JWT;
 import io.vertx.ext.mail.MailClient;
 import io.vertx.ext.web.Router;
 
