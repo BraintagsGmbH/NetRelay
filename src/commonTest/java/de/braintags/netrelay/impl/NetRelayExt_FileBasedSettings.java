@@ -12,13 +12,13 @@
  */
 package de.braintags.netrelay.impl;
 
-import de.braintags.vertx.jomnigate.init.DataStoreSettings;
-import de.braintags.vertx.jomnigate.mongo.init.MongoDataStoreInit;
-import de.braintags.vertx.jomnigate.mysql.init.MySqlDataStoreinit;
 import de.braintags.netrelay.NetRelay;
 import de.braintags.netrelay.init.Settings;
 import de.braintags.netrelay.mapper.SimpleNetRelayMapper;
 import de.braintags.netrelay.unit.NetRelayBaseTest;
+import de.braintags.vertx.jomnigate.init.DataStoreSettings;
+import de.braintags.vertx.jomnigate.mongo.init.MongoDataStoreInit;
+import de.braintags.vertx.jomnigate.mysql.init.MySqlDataStoreinit;
 
 /**
  * An extension of NetRelay which is loading the Settings from a file
@@ -36,7 +36,7 @@ public class NetRelayExt_FileBasedSettings extends NetRelay {
   /**
    * 
    */
-  public NetRelayExt_FileBasedSettings(boolean settingsEdited) {
+  public NetRelayExt_FileBasedSettings(final boolean settingsEdited) {
     this.settingsEdited = settingsEdited;
   }
 
@@ -73,13 +73,16 @@ public class NetRelayExt_FileBasedSettings extends NetRelay {
     return settings;
   }
 
-  public static void applySystemProperties(Settings settings) {
-    String dbName = settings.getDatastoreSettings().getDatabaseName();
-    DataStoreSettings dsSettings = MySqlDataStoreinit.hasSystemProperties() ? MySqlDataStoreinit.createSettings()
-        : MongoDataStoreInit.createSettings();
-    if (dbName != null && dbName.hashCode() != 0) {
-      dsSettings.setDatabaseName(dbName);
+  public static void applySystemProperties(final Settings settings) {
+    DataStoreSettings oldSettings = settings.getDatastoreSettings();
+
+    DataStoreSettings dsSettings = oldSettings.deepCopy();
+    if (MySqlDataStoreinit.hasSystemProperties()) {
+      MySqlDataStoreinit.applySystemProperties(dsSettings);
+    } else {
+      MongoDataStoreInit.applySystemProperties(dsSettings);
     }
+
     settings.setDatastoreSettings(dsSettings);
     String portString = System.getProperty(NetRelayBaseTest.SERVER_PORT_PROPERTY, null);
     if (portString != null) {

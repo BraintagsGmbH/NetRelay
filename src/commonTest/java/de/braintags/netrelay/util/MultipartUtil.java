@@ -1,4 +1,3 @@
-package de.braintags.netrelay.util;
 /*
  * #%L
  * netrelay
@@ -11,7 +10,7 @@ package de.braintags.netrelay.util;
  * http://www.eclipse.org/legal/epl-v10.html
  * #L%
  */
-
+package de.braintags.netrelay.util;
 
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.http.HttpClientRequest;
