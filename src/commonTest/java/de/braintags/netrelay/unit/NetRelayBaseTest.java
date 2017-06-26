@@ -156,7 +156,7 @@ public abstract class NetRelayBaseTest {
     LOGGER.debug("starting class");
     vertx = Vertx.vertx(getVertxOptions());
     client = vertx.createHttpClient(
-        new HttpClientOptions().setDefaultPort(8080).setConnectTimeout(getTimeout()).setIdleTimeout(getTimeout()));
+        new HttpClientOptions().setDefaultPort(PORT).setConnectTimeout(getTimeout()).setIdleTimeout(getTimeout()));
     // boolean startMongoLocal = Boolean.getBoolean("startMongoLocal");
     // String portString = System.getProperty(MongoDataStoreInit.LOCAL_PORT_PROP, "27017");
     // int port = Integer.parseInt(portString);
@@ -248,8 +248,8 @@ public abstract class NetRelayBaseTest {
 
       @Override
       public void handle(Throwable ex) {
-        LOGGER.error("", ex);
-        async.complete();
+      LOGGER.error("", ex);
+      async.complete();
       }
     };
 
