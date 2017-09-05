@@ -14,10 +14,10 @@ package de.braintags.netrelay.mapping;
 
 import java.util.Map;
 
+import de.braintags.netrelay.NetRelay;
 import de.braintags.vertx.jomnigate.mapping.IMapper;
 import de.braintags.vertx.jomnigate.mapping.IStoreObject;
 import de.braintags.vertx.jomnigate.mapping.impl.AbstractStoreObjectFactory;
-import de.braintags.netrelay.NetRelay;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
 import io.vertx.core.Handler;
@@ -29,14 +29,15 @@ import io.vertx.core.Handler;
  * 
  */
 public class NetRelayStoreObjectFactory extends AbstractStoreObjectFactory<Map<String, String>> {
-  private NetRelay netRelay;
+  private final NetRelay netRelay;
 
-  public NetRelayStoreObjectFactory(NetRelay netRelay) {
+  public NetRelayStoreObjectFactory(final NetRelay netRelay) {
     this.netRelay = netRelay;
   }
 
   @Override
-  public <T> void createStoreObject(IMapper<T> mapper, T entity, Handler<AsyncResult<IStoreObject<T, ?>>> handler) {
+  public <T> void createStoreObject(final IMapper<T> mapper, final T entity,
+      final Handler<AsyncResult<IStoreObject<T, Map<String, String>>>> handler) {
     NetRelayStoreObject<T> storeObject = new NetRelayStoreObject<>(mapper, entity);
     storeObject.initFromEntity(initResult -> {
       if (initResult.failed()) {
@@ -48,8 +49,8 @@ public class NetRelayStoreObjectFactory extends AbstractStoreObjectFactory<Map<S
   }
 
   @Override
-  public <T> void createStoreObject(Map<String, String> storedObject, IMapper<T> mapper,
-      Handler<AsyncResult<IStoreObject<T, ?>>> handler) {
+  public <T> void createStoreObject(final Map<String, String> storedObject, final IMapper<T> mapper,
+      final Handler<AsyncResult<IStoreObject<T, Map<String, String>>>> handler) {
     createStoreObject(storedObject, null, mapper, handler);
   }
 
@@ -61,8 +62,8 @@ public class NetRelayStoreObjectFactory extends AbstractStoreObjectFactory<Map<S
    * @param mapper
    * @param handler
    */
-  public <T> void createStoreObject(Map<String, String> storedObject, T entity, IMapper<T> mapper,
-      Handler<AsyncResult<IStoreObject<T, ?>>> handler) {
+  public <T> void createStoreObject(final Map<String, String> storedObject, final T entity, final IMapper<T> mapper,
+      final Handler<AsyncResult<IStoreObject<T, Map<String, String>>>> handler) {
     NetRelayStoreObject<T> storeObject = new NetRelayStoreObject<>(storedObject, entity, mapper, netRelay);
     storeObject.initToEntity(result -> {
       if (result.failed()) {
