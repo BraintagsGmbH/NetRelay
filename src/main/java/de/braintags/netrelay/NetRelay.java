@@ -51,10 +51,10 @@ import io.vertx.ext.mail.MailClient;
 import io.vertx.ext.web.Router;
 
 /**
- * 
- * 
+ *
+ *
  * @author Michael Remme
- * 
+ *
  */
 public class NetRelay extends AbstractVerticle {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
@@ -79,11 +79,11 @@ public class NetRelay extends AbstractVerticle {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see io.vertx.core.AbstractVerticle#start()
    */
   @Override
-  public void start(Future<Void> startFuture) {
+  public void start(final Future<Void> startFuture) {
     try {
       settings = initSettings();
       initDataStore(dsInitResult -> {
@@ -106,10 +106,10 @@ public class NetRelay extends AbstractVerticle {
 
   /**
    * Initialize all needed resources of NetRelay
-   * 
+   *
    * @param handler
    */
-  protected void init(Handler<AsyncResult<Void>> handler) {
+  protected void init(final Handler<AsyncResult<Void>> handler) {
     try {
       router = Router.router(vertx);
       mapperFactory = new NetRelayMapperFactory(this);
@@ -137,7 +137,7 @@ public class NetRelay extends AbstractVerticle {
   }
 
   /**
-   * 
+   *
    */
   private void initJwt() {
     if (settings.getJwtSettings() != null) {
@@ -147,10 +147,10 @@ public class NetRelay extends AbstractVerticle {
 
   /**
    * Set the future to be completed
-   * 
+   *
    * @param startFuture
    */
-  protected void initComplete(Future<Void> startFuture) {
+  protected void initComplete(final Future<Void> startFuture) {
     startFuture.complete();
   }
 
@@ -165,7 +165,7 @@ public class NetRelay extends AbstractVerticle {
     }
   }
 
-  private void initMailClientSettings(MailClientSettings ms) {
+  private void initMailClientSettings(final MailClientSettings ms) {
     String mailUserName = System.getProperty(MailClientSettings.USERNAME_SYS_PROPERTY);
     if (mailUserName != null && mailUserName.hashCode() != 0) {
       ms.setUsername(mailUserName);
@@ -188,7 +188,7 @@ public class NetRelay extends AbstractVerticle {
 
   /**
    * Retrive the {@link IMapperFactory} which translates between the mappers and the browser
-   * 
+   *
    * @return the {@link IMapperFactory} of NetRelay
    */
   public NetRelayMapperFactory getNetRelayMapperFactory() {
@@ -197,7 +197,7 @@ public class NetRelay extends AbstractVerticle {
 
   /**
    * Get the StoreObjectFactory used by NetRelay
-   * 
+   *
    * @return
    */
   public NetRelayStoreObjectFactory getStoreObjectFactory() {
@@ -206,7 +206,7 @@ public class NetRelay extends AbstractVerticle {
 
   /**
    * Get the router, which is used by NetRelay
-   * 
+   *
    * @return the router
    */
   public Router getRouter() {
@@ -215,7 +215,7 @@ public class NetRelay extends AbstractVerticle {
 
   /**
    * Init the definitions inside {@link Settings#getProcessorDefinitons()}
-   * 
+   *
    * @throws Exception
    */
   protected void initProcessors() {
@@ -227,10 +227,10 @@ public class NetRelay extends AbstractVerticle {
 
   /**
    * Init the definitions inside {@link Settings#getRouterDefinitions()}
-   * 
+   *
    * @throws Exception
    */
-  protected void initController(Router router) throws Exception {
+  protected void initController(final Router router) throws Exception {
     List<RouterDefinition> rd = settings.getRouterDefinitions().getRouterDefinitions();
     for (RouterDefinition def : rd) {
       RoutingInit.initRoutingDefinition(vertx, this, router, def);
@@ -239,7 +239,7 @@ public class NetRelay extends AbstractVerticle {
 
   /**
    * Initialize the {@link Settings} which are used to init the current instance
-   * 
+   *
    * @return
    */
   protected Settings initSettings() {
@@ -259,13 +259,13 @@ public class NetRelay extends AbstractVerticle {
   /**
    * Create an instance of {@link IDataStore} which will be used by the current instance of NetRelay.
    * The init is performed by using the {@link Settings#getDatastoreSettings()}
-   * 
+   *
    * @handler the handler to be informed
    * @return the {@link IDataStore} to be used
    * @throws IllegalAccessException
    * @throws InstantiationException
    */
-  public final void initDataStore(Handler<AsyncResult<Void>> handler)
+  public final void initDataStore(final Handler<AsyncResult<Void>> handler)
       throws InstantiationException, IllegalAccessException {
     IDataStoreInit dsInit = settings.getDatastoreSettings().getDatastoreInit().newInstance();
     dsInit.initDataStore(vertx, settings.getDatastoreSettings(), dsInitResult -> {
@@ -278,7 +278,7 @@ public class NetRelay extends AbstractVerticle {
     });
   }
 
-  private void initHttpServer(Router router, Handler<AsyncResult<Void>> handler) {
+  private void initHttpServer(final Router router, final Handler<AsyncResult<Void>> handler) {
     HttpServerOptions options = new HttpServerOptions().setPort(settings.getServerPort());
     HttpServer server = vertx.createHttpServer(options);
     server.requestHandler(router::accept).listen(result -> {
@@ -290,7 +290,7 @@ public class NetRelay extends AbstractVerticle {
     });
   }
 
-  private void initHttpsServer(Router router, Handler<AsyncResult<Void>> handler) {
+  private void initHttpsServer(final Router router, final Handler<AsyncResult<Void>> handler) {
     if (settings.getSslPort() > 0) {
       LOGGER.info("launching ssl server listening on port " + settings.getSslPort());
       HttpServerOptions options = new HttpServerOptions().setPort(settings.getSslPort());
@@ -314,7 +314,7 @@ public class NetRelay extends AbstractVerticle {
     }
   }
 
-  private void handleSslCertificate(HttpServerOptions options, Handler<AsyncResult<Void>> handler)
+  private void handleSslCertificate(final HttpServerOptions options, final Handler<AsyncResult<Void>> handler)
       throws GeneralSecurityException, IOException {
     if (settings.isCertificateSelfSigned()) {
       SelfSignedCertificate certificate = SelfSignedCertificate.create();
@@ -334,9 +334,8 @@ public class NetRelay extends AbstractVerticle {
     return settings.getCertificatePassword();
   }
 
-  private void importCertificate(HttpServerOptions httpOpts) {
+  private void importCertificate(final HttpServerOptions httpOpts) {
     String certPath = settings.getCertificatePath();
-    String password = settings.getCertificatePassword();
 
     if (certPath.matches("^.*\\.(pem|PEM)$")) {
       // Use a PEM key/cert pair
@@ -347,6 +346,7 @@ public class NetRelay extends AbstractVerticle {
           new PemKeyCertOptions().setCertPath(certPath).setKeyPath(settings.getCertificateKeyPath()));
       httpOpts.setSsl(true);
     } else if (certPath.matches("^.*\\.(P12|p12)$")) {
+      String password = validateSslPassword();
       httpOpts.setPfxKeyCertOptions(new PfxOptions().setPath(certPath).setPassword(password));
     } else {
       throw new IllegalArgumentException(
@@ -356,11 +356,11 @@ public class NetRelay extends AbstractVerticle {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see io.vertx.core.AbstractVerticle#stop(io.vertx.core.Future)
    */
   @Override
-  public void stop(Future<Void> stopFuture) throws Exception {
+  public void stop(final Future<Void> stopFuture) throws Exception {
     getDatastore().shutdown(result -> {
       if (result.failed()) {
         stopFuture.fail(new RuntimeException(result.cause()));
@@ -372,7 +372,7 @@ public class NetRelay extends AbstractVerticle {
 
   /**
    * The default instance is requested, when there was no saved instance found
-   * 
+   *
    * @return
    */
   public Settings createDefaultSettings() {
@@ -383,7 +383,7 @@ public class NetRelay extends AbstractVerticle {
     return st;
   }
 
-  protected void addDefaultProcessorDefinitions(Settings settings) {
+  protected void addDefaultProcessorDefinitions(final Settings settings) {
     ProcessorDefinition def = new ProcessorDefinition();
     def.setActive(false);
     def.setName("dummyprocessor");
@@ -392,7 +392,7 @@ public class NetRelay extends AbstractVerticle {
     settings.getProcessorDefinitons().add(def);
   }
 
-  protected void addDefaultRouterDefinitions(Settings settings) {
+  protected void addDefaultRouterDefinitions(final Settings settings) {
     settings.getRouterDefinitions().add(FavIconController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(CookieController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(SessionController.createDefaultRouterDefinition());
@@ -404,7 +404,7 @@ public class NetRelay extends AbstractVerticle {
 
   /**
    * Get the {@link IDataStore} for the current instance
-   * 
+   *
    * @return the datastore
    */
   public final IDataStore<?, ?> getDatastore() {
@@ -413,7 +413,7 @@ public class NetRelay extends AbstractVerticle {
 
   /**
    * Get the {@link Settings} which are configuring NetRelay
-   * 
+   *
    * @return the settings
    */
   public Settings getSettings() {
@@ -422,7 +422,7 @@ public class NetRelay extends AbstractVerticle {
 
   /**
    * Resets and rebuilds the routes by using the {@link Settings#getRouterDefinitions()}
-   * 
+   *
    * @throws Exception
    */
   public void resetRoutes() throws Exception {
@@ -433,7 +433,7 @@ public class NetRelay extends AbstractVerticle {
   /**
    * If {@link MailClientSettings#isActive()} from the {@link Settings}, then this will return
    * the initialized instance of {@link MailClient}
-   * 
+   *
    * @return the mailClient
    */
   public final MailClient getMailClient() {
@@ -443,7 +443,7 @@ public class NetRelay extends AbstractVerticle {
   /**
    * If the {@link JWTSettings} inside the {@link Settings} are configured, this will return a JWT instance to de- and
    * encode JWTs. Otherwise, it will return null
-   * 
+   *
    * @return the jwt
    */
   public JWT getJwt() {
