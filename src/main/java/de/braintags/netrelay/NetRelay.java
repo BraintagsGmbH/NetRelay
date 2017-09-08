@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import de.braintags.netrelay.controller.BodyController;
 import de.braintags.netrelay.controller.CookieController;
 import de.braintags.netrelay.controller.FailureController;
@@ -328,7 +330,7 @@ public class NetRelay extends AbstractVerticle {
   }
 
   private String validateSslPassword() {
-    if (settings.getCertificatePassword() == null || settings.getCertificatePassword().hashCode() == 0) {
+    if (StringUtils.isEmpty(settings.getCertificatePassword())) {
       throw new IllegalArgumentException("The property 'certificatePassword' must be set in the settings of NetRelay");
     }
     return settings.getCertificatePassword();
