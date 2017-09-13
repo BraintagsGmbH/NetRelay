@@ -113,7 +113,7 @@
  * The settings are consisting mainly of five parts:
  * 
  * * some application specific adjustments like the port, where the server shall run, or the even the
- * {@link de.braintags.netrelay.init.MailClientSettings} to enable the system to send and receive emails by controllers
+ * {@link io.vertx.ext.mail.MailConfig} to enable the system to send and receive emails by controllers
  * or processors
  * * the datastore settings to define, which {@link de.braintags.vertx.jomnigate.IDataStore} shall be used by
  * NetRelay. ( This will include the use of the coming MultiDataStores from the project

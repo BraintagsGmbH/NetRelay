@@ -28,7 +28,6 @@ import org.junit.runner.RunWith;
 
 import de.braintags.netrelay.NetRelay;
 import de.braintags.netrelay.impl.NetRelayExt_InternalSettings;
-import de.braintags.netrelay.init.MailClientSettings;
 import de.braintags.netrelay.init.Settings;
 import de.braintags.netrelay.routing.RouterDefinition;
 import de.braintags.vertx.jomnigate.testdatastore.DatastoreBaseTest;
@@ -49,6 +48,7 @@ import io.vertx.core.http.HttpClient;
 import io.vertx.core.http.HttpClientOptions;
 import io.vertx.core.http.HttpClientRequest;
 import io.vertx.core.http.HttpMethod;
+import io.vertx.ext.mail.MailConfig;
 import io.vertx.ext.mail.StartTLSOptions;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
@@ -101,7 +101,7 @@ public abstract class NetRelayBaseTest {
   public TestName name = new TestName();
 
   @Before
-  public void initBeforeTest(TestContext context) {
+  public void initBeforeTest(final TestContext context) {
     LOGGER.info("Starting test: " + this.getClass().getSimpleName() + "#" + name.getMethodName());
     initNetRelay(context);
     DatastoreBaseTest.EXTERNAL_DATASTORE = netRelay.getDatastore();
@@ -122,19 +122,19 @@ public abstract class NetRelayBaseTest {
     initTest(context);
   }
 
-  public void initTest(TestContext context) {
+  public void initTest(final TestContext context) {
 
   }
 
   @Before
-  public final void afterTest(TestContext context) {
+  public final void afterTest(final TestContext context) {
     stopTest(context);
   }
 
-  protected void stopTest(TestContext context) {
+  protected void stopTest(final TestContext context) {
   }
 
-  protected void undeployVerticle(TestContext context, AbstractVerticle verticle) {
+  protected void undeployVerticle(final TestContext context, final AbstractVerticle verticle) {
     LOGGER.debug("undeploying verticle " + verticle.deploymentID());
     Async async = context.async();
     vertx.undeploy(verticle.deploymentID(), result -> {
@@ -152,7 +152,7 @@ public abstract class NetRelayBaseTest {
   }
 
   @BeforeClass
-  public static void startup(TestContext context) throws Exception {
+  public static void startup(final TestContext context) throws Exception {
     LOGGER.debug("starting class");
     vertx = Vertx.vertx(getVertxOptions());
     client = vertx.createHttpClient(
@@ -163,7 +163,7 @@ public abstract class NetRelayBaseTest {
   }
 
   @AfterClass
-  public static void shutdown(TestContext context) throws Exception {
+  public static void shutdown(final TestContext context) throws Exception {
     LOGGER.debug("performing shutdown");
     if (netRelay != null) {
       netRelay.stop();
@@ -180,7 +180,7 @@ public abstract class NetRelayBaseTest {
     }
   }
 
-  public KeyGeneratorVerticle createKeyGenerator(TestContext context) {
+  public KeyGeneratorVerticle createKeyGenerator(final TestContext context) {
     KeyGeneratorSettings settings = new KeyGeneratorSettings();
     modifyKeyGeneratorVerticleSettings(context, settings);
     return new KeyGeneratorVerticle(settings);
@@ -192,7 +192,7 @@ public abstract class NetRelayBaseTest {
    * @param context
    * @param settings
    */
-  protected void modifyKeyGeneratorVerticleSettings(TestContext context, KeyGeneratorSettings settings) {
+  protected void modifyKeyGeneratorVerticleSettings(final TestContext context, final KeyGeneratorSettings settings) {
     settings.setKeyGeneratorClass(DebugGenerator.class);
   }
 
@@ -200,7 +200,7 @@ public abstract class NetRelayBaseTest {
     return TestHelper.getOptions();
   }
 
-  public void initNetRelay(TestContext context) {
+  public void initNetRelay(final TestContext context) {
     if (netRelay == null) {
       LOGGER.info("init NetRelay");
       netRelay = NetRelayExt_InternalSettings.getInstance(vertx, context, this);
@@ -213,44 +213,40 @@ public abstract class NetRelayBaseTest {
    * 
    * @param settings
    */
-  public void modifySettings(TestContext context, Settings settings) {
+  public void modifySettings(final TestContext context, final Settings settings) {
     LOGGER.info("modifySettings, setting port to " + PORT);
     settings.setServerPort(PORT);
     settings.getDatastoreSettings().setDatabaseName(getClass().getSimpleName());
   }
 
-  protected static final void testRequest(TestContext context, HttpMethod method, String path, int statusCode,
-      String statusMessage) throws Exception {
+  protected static final void testRequest(final TestContext context, final HttpMethod method, final String path, final int statusCode,
+      final String statusMessage) throws Exception {
     testRequest(context, method, path, null, statusCode, statusMessage, null);
   }
 
-  protected static final void testRequest(TestContext context, HttpMethod method, String path,
-      Consumer<HttpClientRequest> requestAction, int statusCode, String statusMessage, String responseBody)
+  protected static final void testRequest(final TestContext context, final HttpMethod method, final String path,
+      final Consumer<HttpClientRequest> requestAction, final int statusCode, final String statusMessage, final String responseBody)
       throws Exception {
     testRequest(context, method, path, requestAction, null, statusCode, statusMessage, responseBody);
   }
 
-  protected static final void testRequest(TestContext context, HttpMethod method, String path,
-      Consumer<HttpClientRequest> requestAction, Consumer<ResponseCopy> responseAction, int statusCode,
-      String statusMessage, String responseBody) throws Exception {
+  protected static final void testRequest(final TestContext context, final HttpMethod method, final String path,
+      final Consumer<HttpClientRequest> requestAction, final Consumer<ResponseCopy> responseAction, final int statusCode,
+      final String statusMessage, final String responseBody) throws Exception {
     testRequestBuffer(context, client, method, PORT, path, requestAction, responseAction, statusCode, statusMessage,
         responseBody != null ? Buffer.buffer(responseBody) : null);
   }
 
-  protected static final void testRequestBuffer(TestContext context, HttpClient client, HttpMethod method, int port,
-      String path, Consumer<HttpClientRequest> requestAction, Consumer<ResponseCopy> responseAction, int statusCode,
-      String statusMessage, Buffer responseBodyBuffer) throws Exception {
+  protected static final void testRequestBuffer(final TestContext context, final HttpClient client, final HttpMethod method, final int port,
+      final String path, final Consumer<HttpClientRequest> requestAction, final Consumer<ResponseCopy> responseAction, final int statusCode,
+      final String statusMessage, final Buffer responseBodyBuffer) throws Exception {
     LOGGER.info("calling URL " + path);
     Async async = context.async();
     ResultObject<ResponseCopy> resultObject = new ResultObject<>(null);
 
-    Handler<Throwable> exceptionHandler = new Handler<Throwable>() {
-
-      @Override
-      public void handle(Throwable ex) {
-      LOGGER.error("", ex);
-      async.complete();
-      }
+    Handler<Throwable> exceptionHandler = ex -> {
+    LOGGER.error("", ex);
+    async.complete();
     };
 
     HttpClientRequest req = client.request(method, port, HOSTNAME, path, resp -> {
@@ -292,7 +288,7 @@ public abstract class NetRelayBaseTest {
     }
   }
 
-  protected RouterDefinition defineRouterDefinition(Class controllerClass, String route) {
+  protected RouterDefinition defineRouterDefinition(final Class controllerClass, final String route) {
     RouterDefinition rd = new RouterDefinition();
     rd.setName(controllerClass.getSimpleName());
     rd.setController(controllerClass);
@@ -309,7 +305,7 @@ public abstract class NetRelayBaseTest {
   }
 
   // "-DmailClientUserName=dev-test@braintags.net -DmailClientPassword=thoo4ati "
-  protected void initMailClient(Settings settings) {
+  protected void initMailClient(final Settings settings) {
     String mailUserName = System.getProperty("mailClientUserName");
     if (mailUserName == null || mailUserName.hashCode() == 0) {
       throw new InitException("Need System parameter 'mailClientUserName'");
@@ -318,19 +314,17 @@ public abstract class NetRelayBaseTest {
     if (mailClientPassword == null || mailClientPassword.hashCode() == 0) {
       throw new InitException("Need System parameter 'mailClientPassword'");
     }
-    MailClientSettings ms = settings.getMailClientSettings();
-    ms.setHostname("mail.braintags.net");
-    ms.setPort(8025);
-    ms.setName("mailclient");
-    ms.setUsername(mailUserName);
-    ms.setPassword(mailClientPassword);
-    ms.setSsl(false);
-    ms.setStarttls(StartTLSOptions.DISABLED);
-    ms.setActive(true);
+    MailConfig mailConfig = settings.getMailConfig();
+    mailConfig.setHostname("mail.braintags.net");
+    mailConfig.setPort(8025);
+    mailConfig.setUsername(mailUserName);
+    mailConfig.setPassword(mailClientPassword);
+    mailConfig.setSsl(false);
+    mailConfig.setStarttls(StartTLSOptions.DISABLED);
   }
 
-  protected static <T> Handler<AsyncResult<T>> assertException(Class<? extends Exception> exceptionClass,
-      TestContext context) {
+  protected static <T> Handler<AsyncResult<T>> assertException(final Class<? extends Exception> exceptionClass,
+      final TestContext context) {
     return context.asyncAssertFailure(failure -> {
       assertThat(failure, is(instanceOf(exceptionClass)));
     });
