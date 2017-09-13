@@ -25,7 +25,6 @@ import de.braintags.netrelay.controller.FavIconController;
 import de.braintags.netrelay.controller.SessionController;
 import de.braintags.netrelay.controller.StaticController;
 import de.braintags.netrelay.controller.TimeoutController;
-import de.braintags.netrelay.init.MailClientSettings;
 import de.braintags.netrelay.init.Settings;
 import de.braintags.netrelay.mapping.NetRelayMapperFactory;
 import de.braintags.netrelay.mapping.NetRelayStoreObjectFactory;
@@ -50,6 +49,7 @@ import io.vertx.core.net.PfxOptions;
 import io.vertx.core.net.SelfSignedCertificate;
 import io.vertx.ext.jwt.JWT;
 import io.vertx.ext.mail.MailClient;
+import io.vertx.ext.mail.MailConfig;
 import io.vertx.ext.web.Router;
 
 /**
@@ -157,35 +157,13 @@ public class NetRelay extends AbstractVerticle {
   }
 
   private void initMailClient() {
-    MailClientSettings ms = settings.getMailClientSettings();
-    initMailClientSettings(ms);
-    if (ms.isActive()) {
-      mailClient = MailClient.createShared(vertx, ms, ms.getName());
-      LOGGER.info("MailClient startet with configuration " + ms.toJson());
+    MailConfig mailConfig = settings.getMailConfig();
+    if (mailConfig != null) {
+      mailClient = MailClient.createShared(vertx, mailConfig);
+      LOGGER.info("MailClient startet with configuration " + mailConfig.toJson());
     } else {
-      LOGGER.info("MailClient NOT started, cause not activated in configuration");
+      LOGGER.info("MailClient NOT started, cause not configured");
     }
-  }
-
-  private void initMailClientSettings(final MailClientSettings ms) {
-    String mailUserName = System.getProperty(MailClientSettings.USERNAME_SYS_PROPERTY);
-    if (mailUserName != null && mailUserName.hashCode() != 0) {
-      ms.setUsername(mailUserName);
-    }
-    String mailClientPassword = System.getProperty(MailClientSettings.PASSWORD_SYS_PROPERTY);
-    if (mailClientPassword != null && mailClientPassword.hashCode() != 0) {
-      ms.setPassword(mailClientPassword);
-    }
-    String mailClientHost = System.getProperty(MailClientSettings.HOST_SYS_PROPERTY);
-    if (mailClientHost != null && mailClientHost.hashCode() != 0) {
-      ms.setHostname(mailClientHost);
-    }
-
-    String mailClientPort = System.getProperty(MailClientSettings.PORT_SYS_PROPERTY);
-    if (mailClientPort != null && mailClientPort.hashCode() != 0) {
-      ms.setPort(Integer.parseInt(mailClientPort));
-    }
-
   }
 
   /**
@@ -433,7 +411,7 @@ public class NetRelay extends AbstractVerticle {
   }
 
   /**
-   * If {@link MailClientSettings#isActive()} from the {@link Settings}, then this will return
+   * If the {@link MailConfig} from the {@link Settings} is configured, then this will return
    * the initialized instance of {@link MailClient}
    *
    * @return the mailClient

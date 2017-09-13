@@ -24,6 +24,7 @@ import io.vertx.core.buffer.Buffer;
 import io.vertx.core.file.FileSystem;
 import io.vertx.core.json.Json;
 import io.vertx.ext.mail.MailClient;
+import io.vertx.ext.mail.MailConfig;
 
 /**
  * The settings contain the preferences to launch NetRelay and are stored locally as file. They are loaded / created on
@@ -62,7 +63,7 @@ public class Settings {
   private DataStoreSettings datastoreSettings;
   private RouterDefinitions routerDefinitions = new RouterDefinitions();
   private ProcessorDefinitions processorDefinitons = new ProcessorDefinitions();
-  private MailClientSettings mailClientSettings = new MailClientSettings();
+  private MailConfig mailConfig;
   private MappingDefinitions mappingDefinitions = new MappingDefinitions();
   private int sslPort = -1;
   private boolean certificateSelfSigned = false;
@@ -87,7 +88,7 @@ public class Settings {
    * @param serverPort
    *          the serverPort to set
    */
-  public final void setServerPort(int serverPort) {
+  public final void setServerPort(final int serverPort) {
     if (serverPort <= 0) {
       throw new IllegalArgumentException("Port must be > 0");
     }
@@ -109,7 +110,7 @@ public class Settings {
    * @param routerDefinitions
    *          the routerDefinitions to set
    */
-  public final void setRouterDefinitions(RouterDefinitions routerDefinitions) {
+  public final void setRouterDefinitions(final RouterDefinitions routerDefinitions) {
     this.routerDefinitions = routerDefinitions;
   }
 
@@ -128,7 +129,7 @@ public class Settings {
    * @param processorDefinitons
    *          the processorDefinitons to set
    */
-  public final void setProcessorDefinitons(ProcessorDefinitions processorDefinitons) {
+  public final void setProcessorDefinitons(final ProcessorDefinitions processorDefinitons) {
     this.processorDefinitons = processorDefinitons;
   }
 
@@ -147,7 +148,7 @@ public class Settings {
    * @param datastoreSettings
    *          the datastoreSettings to set
    */
-  public final void setDatastoreSettings(DataStoreSettings datastoreSettings) {
+  public final void setDatastoreSettings(final DataStoreSettings datastoreSettings) {
     this.datastoreSettings = datastoreSettings;
   }
 
@@ -164,7 +165,7 @@ public class Settings {
    *          the settings file is defined
    * @return
    */
-  public static Settings loadSettings(NetRelay netRelay, Vertx vertx, Context context) {
+  public static Settings loadSettings(final NetRelay netRelay, final Vertx vertx, final Context context) {
     String path = context.config().getString(SETTINGS_LOCATION_PROPERTY);
     if (path != null) {
       return loadSettings(netRelay, vertx, path);
@@ -175,7 +176,7 @@ public class Settings {
     }
   }
 
-  private static Settings loadSettings(NetRelay netRelay, Vertx vertx, String path) {
+  private static Settings loadSettings(final NetRelay netRelay, final Vertx vertx, final String path) {
     FileSystem fs = vertx.fileSystem();
     if (fs.existsBlocking(path)) {
       LOGGER.info("going to load settings from " + path);
@@ -216,7 +217,7 @@ public class Settings {
    * @param edited
    *          set it to true, so that system is able to launch
    */
-  public final void setEdited(boolean edited) {
+  public final void setEdited(final boolean edited) {
     this.edited = edited;
   }
 
@@ -235,27 +236,27 @@ public class Settings {
    * @param mappingDefinitions
    *          the mappingDefinitions to set
    */
-  public void setMappingDefinitions(MappingDefinitions mappingDefinitions) {
+  public void setMappingDefinitions(final MappingDefinitions mappingDefinitions) {
     this.mappingDefinitions = mappingDefinitions;
   }
 
   /**
    * The settings, by which the internally used {@link MailClient} is initialized
    * 
-   * @return the mailClientSettings
+   * @return the mailConfig
    */
-  public final MailClientSettings getMailClientSettings() {
-    return mailClientSettings;
+  public final MailConfig getMailConfig() {
+    return mailConfig;
   }
 
   /**
    * The settings, by which the internally used {@link MailClient} is initialized
    * 
-   * @param mailClientSettings
-   *          the mailClientSettings to set
+   * @param mailConfig
+   *          the mailConfig to set
    */
-  public final void setMailClientSettings(MailClientSettings mailClientSettings) {
-    this.mailClientSettings = mailClientSettings;
+  public final void setMailConfig(final MailConfig mailConfig) {
+    this.mailConfig = mailConfig;
   }
 
   /**
@@ -273,7 +274,7 @@ public class Settings {
    * @param defaultLoginPage
    *          the defaultLoginPage to set
    */
-  public final void setDefaultLoginPage(String defaultLoginPage) {
+  public final void setDefaultLoginPage(final String defaultLoginPage) {
     this.defaultLoginPage = defaultLoginPage;
   }
 
@@ -292,7 +293,7 @@ public class Settings {
    * @param hostName
    *          the hostName to set
    */
-  public final void setHostName(String hostName) {
+  public final void setHostName(final String hostName) {
     this.hostName = hostName;
   }
 
@@ -311,7 +312,7 @@ public class Settings {
    * @param sslPort
    *          the sslPort to set
    */
-  public void setSslPort(int sslPort) {
+  public void setSslPort(final int sslPort) {
     this.sslPort = sslPort;
   }
 
@@ -330,7 +331,7 @@ public class Settings {
    * @param certificateSelfSigned
    *          the certificateSelfSigned to set
    */
-  public void setCertificateSelfSigned(boolean certificateSelfSigned) {
+  public void setCertificateSelfSigned(final boolean certificateSelfSigned) {
     this.certificateSelfSigned = certificateSelfSigned;
   }
 
@@ -349,7 +350,7 @@ public class Settings {
    * @param certificatePassword
    *          the certificatePassword to set
    */
-  public void setCertificatePassword(String certificatePassword) {
+  public void setCertificatePassword(final String certificatePassword) {
     this.certificatePassword = certificatePassword;
   }
 
@@ -368,7 +369,7 @@ public class Settings {
    * @param certificatePath
    *          the certificatePath to set
    */
-  public void setCertificatePath(String certificatePath) {
+  public void setCertificatePath(final String certificatePath) {
     this.certificatePath = certificatePath;
   }
 
@@ -387,7 +388,7 @@ public class Settings {
    * @param certificateKeyPath
    *          the certificateKeyPath to set
    */
-  public void setCertificateKeyPath(String certificateKeyPath) {
+  public void setCertificateKeyPath(final String certificateKeyPath) {
     this.certificateKeyPath = certificateKeyPath;
   }
 
@@ -406,7 +407,7 @@ public class Settings {
    * @param jwtSettings
    *          the new JWT settings
    */
-  public void setJwtSettings(JWTSettings jwtSettings) {
+  public void setJwtSettings(final JWTSettings jwtSettings) {
     this.jwtSettings = jwtSettings;
   }
 
