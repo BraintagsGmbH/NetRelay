@@ -159,7 +159,7 @@ public class NetRelay extends AbstractVerticle {
   private void initMailClient() {
     MailConfig mailConfig = settings.getMailConfig();
     if (mailConfig != null) {
-      mailClient = MailClient.createShared(vertx, mailConfig);
+      mailClient = MailClient.createShared(vertx, mailConfig, "netrelay");
       LOGGER.info("MailClient startet with configuration " + mailConfig.toJson());
     } else {
       LOGGER.info("MailClient NOT started, cause not configured");
