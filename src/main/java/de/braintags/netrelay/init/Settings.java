@@ -29,18 +29,18 @@ import io.vertx.ext.mail.MailConfig;
 /**
  * The settings contain the preferences to launch NetRelay and are stored locally as file. They are loaded / created on
  * startup following the rules:
- * 
+ *
  * checking wether there exists a defined location inside the {@link Context} under the property
  * {@link #SETTINGS_LOCATION_PROPERTY}. If so, then the data are loaded from that file.
- * 
+ *
  * checking wether there exists a file named "nrSettings.json" in the directory ".netrelay" inside the user directory
  * If so, then it is loaded.
- * 
+ *
  * If it does not exist, a default instance is created and saved in the user directory in the subdirectory ".netrelay"
- * 
- * 
+ *
+ *
  * @author Michael Remme
- * 
+ *
  */
 public class Settings {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
@@ -70,12 +70,13 @@ public class Settings {
   private String certificatePassword;
   private String certificatePath;
   private String certificateKeyPath;
+  private boolean compressionEnabled = true;
 
   private JWTSettings jwtSettings;
 
   /**
    * The port, where the server shall run on
-   * 
+   *
    * @return the serverPort
    */
   public final int getServerPort() {
@@ -84,7 +85,7 @@ public class Settings {
 
   /**
    * The port, where the server shall run on
-   * 
+   *
    * @param serverPort
    *          the serverPort to set
    */
@@ -97,7 +98,7 @@ public class Settings {
 
   /**
    * the {@link RouterDefinitions} for the current settings
-   * 
+   *
    * @return the routerDefinitions
    */
   public final RouterDefinitions getRouterDefinitions() {
@@ -106,7 +107,7 @@ public class Settings {
 
   /**
    * the {@link RouterDefinitions} for the current settings
-   * 
+   *
    * @param routerDefinitions
    *          the routerDefinitions to set
    */
@@ -116,7 +117,7 @@ public class Settings {
 
   /**
    * The {@link ProcessorDefinitions} of the current settings
-   * 
+   *
    * @return the processorDefinitons
    */
   public final ProcessorDefinitions getProcessorDefinitons() {
@@ -125,7 +126,7 @@ public class Settings {
 
   /**
    * The {@link ProcessorDefinitions} of the current settings
-   * 
+   *
    * @param processorDefinitons
    *          the processorDefinitons to set
    */
@@ -135,7 +136,7 @@ public class Settings {
 
   /**
    * The {@link DataStoreSettings} by which the IDataStore used by the current application is initialized
-   * 
+   *
    * @return the datastoreSettings
    */
   public final DataStoreSettings getDatastoreSettings() {
@@ -144,7 +145,7 @@ public class Settings {
 
   /**
    * The {@link DataStoreSettings} by which the IDataStore used by the current application is initialized
-   * 
+   *
    * @param datastoreSettings
    *          the datastoreSettings to set
    */
@@ -155,7 +156,7 @@ public class Settings {
   /**
    * Loads existing settings from the context, when the property {@link #SETTINGS_LOCATION_PROPERTY} is defined;
    * or loads or generates default settings and stores them in the local user directory, subdirectory .netrelay
-   * 
+   *
    * @param netRelay
    *          the instance of NetRelay, which would create the default settings
    * @param vertx
@@ -201,7 +202,7 @@ public class Settings {
    * project.
    * As long as this value is false ( which is the default value for new Settings ), the system won't start and cancel
    * the launch.
-   * 
+   *
    * @return false, as long as value wasn't changed manually
    */
   public final boolean isEdited() {
@@ -213,7 +214,7 @@ public class Settings {
    * project.
    * As long as this value is false ( which is the default value for new Settings ), the system won't start and cancel
    * the launch.
-   * 
+   *
    * @param edited
    *          set it to true, so that system is able to launch
    */
@@ -223,7 +224,7 @@ public class Settings {
 
   /**
    * The {@link MappingDefinitions} used by this instance
-   * 
+   *
    * @return the mappingDefinitions
    */
   public MappingDefinitions getMappingDefinitions() {
@@ -232,7 +233,7 @@ public class Settings {
 
   /**
    * The {@link MappingDefinitions} used by this instance
-   * 
+   *
    * @param mappingDefinitions
    *          the mappingDefinitions to set
    */
@@ -242,7 +243,7 @@ public class Settings {
 
   /**
    * The settings, by which the internally used {@link MailClient} is initialized
-   * 
+   *
    * @return the mailConfig
    */
   public final MailConfig getMailConfig() {
@@ -251,7 +252,7 @@ public class Settings {
 
   /**
    * The settings, by which the internally used {@link MailClient} is initialized
-   * 
+   *
    * @param mailConfig
    *          the mailConfig to set
    */
@@ -270,7 +271,7 @@ public class Settings {
 
   /**
    * The definition of the default page, which is used for a login redirect
-   * 
+   *
    * @param defaultLoginPage
    *          the defaultLoginPage to set
    */
@@ -280,7 +281,7 @@ public class Settings {
 
   /**
    * The name of the host
-   * 
+   *
    * @return the hostName
    */
   public final String getHostName() {
@@ -289,7 +290,7 @@ public class Settings {
 
   /**
    * The name of the host
-   * 
+   *
    * @param hostName
    *          the hostName to set
    */
@@ -299,7 +300,7 @@ public class Settings {
 
   /**
    * The ssl port, where the server shall listen to. If the port is <= 0, no ssl server is started
-   * 
+   *
    * @return the sslPort
    */
   public int getSslPort() {
@@ -308,7 +309,7 @@ public class Settings {
 
   /**
    * The ssl port, where the server shall listen to. If the port is <= 0, no ssl server is started
-   * 
+   *
    * @param sslPort
    *          the sslPort to set
    */
@@ -318,7 +319,7 @@ public class Settings {
 
   /**
    * Shall the system generate a certificate?
-   * 
+   *
    * @return the certificateSelfSigned
    */
   public boolean isCertificateSelfSigned() {
@@ -327,7 +328,7 @@ public class Settings {
 
   /**
    * Shall the system generate a certificate?
-   * 
+   *
    * @param certificateSelfSigned
    *          the certificateSelfSigned to set
    */
@@ -337,7 +338,7 @@ public class Settings {
 
   /**
    * The password which shall be used for a certificate
-   * 
+   *
    * @return the certificatePassword
    */
   public String getCertificatePassword() {
@@ -346,7 +347,7 @@ public class Settings {
 
   /**
    * The password which shall be used for a certificate
-   * 
+   *
    * @param certificatePassword
    *          the certificatePassword to set
    */
@@ -356,7 +357,7 @@ public class Settings {
 
   /**
    * The path to the certificate file as PEM file
-   * 
+   *
    * @return the certificatePath
    */
   public String getCertificatePath() {
@@ -365,7 +366,7 @@ public class Settings {
 
   /**
    * The path to the certificate file as PEM file
-   * 
+   *
    * @param certificatePath
    *          the certificatePath to set
    */
@@ -375,7 +376,7 @@ public class Settings {
 
   /**
    * The path to the key file of a certificate
-   * 
+   *
    * @return the certificateKeyPath
    */
   public String getCertificateKeyPath() {
@@ -384,7 +385,7 @@ public class Settings {
 
   /**
    * The path to the key file of a certificate
-   * 
+   *
    * @param certificateKeyPath
    *          the certificateKeyPath to set
    */
@@ -394,7 +395,7 @@ public class Settings {
 
   /**
    * The settings for the JWT to use for authentication and verification
-   * 
+   *
    * @return the current JWT settings
    */
   public JWTSettings getJwtSettings() {
@@ -403,12 +404,27 @@ public class Settings {
 
   /**
    * The settings for the JWT to use for authentication and verification
-   * 
+   *
    * @param jwtSettings
    *          the new JWT settings
    */
   public void setJwtSettings(final JWTSettings jwtSettings) {
     this.jwtSettings = jwtSettings;
+  }
+
+  /**
+   * @return the compressionEnabled
+   */
+  public boolean isCompressionEnabled() {
+    return compressionEnabled;
+  }
+
+  /**
+   * @param compressionEnabled
+   *          the compressionEnabled to set
+   */
+  public void setCompressionEnabled(final boolean compressionEnabled) {
+    this.compressionEnabled = compressionEnabled;
   }
 
 }
