@@ -259,7 +259,8 @@ public class NetRelay extends AbstractVerticle {
   }
 
   private void initHttpServer(final Router router, final Handler<AsyncResult<Void>> handler) {
-    HttpServerOptions options = new HttpServerOptions().setPort(settings.getServerPort());
+    HttpServerOptions options = new HttpServerOptions().setPort(settings.getServerPort())
+        .setCompressionSupported(settings.isCompressionEnabled());
     HttpServer server = vertx.createHttpServer(options);
     server.requestHandler(router::accept).listen(result -> {
       if (result.failed()) {
@@ -274,6 +275,7 @@ public class NetRelay extends AbstractVerticle {
     if (settings.getSslPort() > 0) {
       LOGGER.info("launching ssl server listening on port " + settings.getSslPort());
       HttpServerOptions options = new HttpServerOptions().setPort(settings.getSslPort());
+      options.setCompressionSupported(settings.isCompressionEnabled());
       options.setSsl(true);
       try {
         handleSslCertificate(options, handler);
