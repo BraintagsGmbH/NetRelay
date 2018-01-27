@@ -258,7 +258,7 @@ public class NetRelay extends AbstractVerticle {
     });
   }
 
-  private void initHttpServer(final Router router, final Handler<AsyncResult<Void>> handler) {
+  protected void initHttpServer(final Router router, final Handler<AsyncResult<Void>> handler) {
     HttpServerOptions options = new HttpServerOptions().setPort(settings.getServerPort())
         .setCompressionSupported(settings.isCompressionEnabled());
     HttpServer server = vertx.createHttpServer(options);
