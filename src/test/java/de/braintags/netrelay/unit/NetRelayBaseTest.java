@@ -81,14 +81,6 @@ public abstract class NetRelayBaseTest {
   protected KeyGeneratorVerticle keyGenVerticle;
 
   public static String HOSTNAME = "localhost";
-  public static int PORT = 8080;
-
-  static {
-    String portString = System.getProperty(SERVER_PORT_PROPERTY, null);
-    if (portString != null) {
-      PORT = Integer.parseInt(portString);
-    }
-  }
 
   @Rule
   public Timeout rule = Timeout.seconds(getTimeout());
@@ -155,8 +147,6 @@ public abstract class NetRelayBaseTest {
   public static void startup(final TestContext context) throws Exception {
     LOGGER.debug("starting class");
     vertx = Vertx.vertx(getVertxOptions());
-    client = vertx.createHttpClient(
-        new HttpClientOptions().setDefaultPort(PORT).setConnectTimeout(getTimeout()).setIdleTimeout(getTimeout()));
     // boolean startMongoLocal = Boolean.getBoolean("startMongoLocal");
     // String portString = System.getProperty(MongoDataStoreInit.LOCAL_PORT_PROP, "27017");
     // int port = Integer.parseInt(portString);
@@ -204,7 +194,14 @@ public abstract class NetRelayBaseTest {
     if (netRelay == null) {
       LOGGER.info("init NetRelay");
       netRelay = NetRelayExt_InternalSettings.getInstance(vertx, context, this);
+      client = vertx.createHttpClient(
+          new HttpClientOptions().setDefaultPort(netRelay.getActualServerPort()).setConnectTimeout(getTimeout())
+              .setIdleTimeout(getTimeout()));
     }
+  }
+
+  protected static int getNetrelayPort() {
+    return netRelay.getActualServerPort();
   }
 
   /**
@@ -214,8 +211,13 @@ public abstract class NetRelayBaseTest {
    * @param settings
    */
   public void modifySettings(final TestContext context, final Settings settings) {
-    LOGGER.info("modifySettings, setting port to " + PORT);
-    settings.setServerPort(PORT);
+    String portString = System.getProperty(SERVER_PORT_PROPERTY, null);
+    if (portString != null) {
+      settings.setServerPort(Integer.parseInt(portString));
+    } else {
+      settings.setServerPort(0);
+    }
+    LOGGER.info("modifySettings, setting port to " + settings.getServerPort());
     settings.getDatastoreSettings().setDatabaseName(getClass().getSimpleName());
   }
 
@@ -233,7 +235,8 @@ public abstract class NetRelayBaseTest {
   protected static final void testRequest(final TestContext context, final HttpMethod method, final String path,
       final Consumer<HttpClientRequest> requestAction, final Consumer<ResponseCopy> responseAction, final int statusCode,
       final String statusMessage, final String responseBody) throws Exception {
-    testRequestBuffer(context, client, method, PORT, path, requestAction, responseAction, statusCode, statusMessage,
+    testRequestBuffer(context, client, method, getNetrelayPort(), path, requestAction, responseAction, statusCode,
+        statusMessage,
         responseBody != null ? Buffer.buffer(responseBody) : null);
   }
 
