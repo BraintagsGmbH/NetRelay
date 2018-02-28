@@ -39,6 +39,7 @@ import de.braintags.vertx.util.ResultObject;
 import de.braintags.vertx.util.exception.InitException;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;
 import io.vertx.core.Vertx;
@@ -155,19 +156,26 @@ public abstract class NetRelayBaseTest {
   @AfterClass
   public static void shutdown(final TestContext context) throws Exception {
     LOGGER.debug("performing shutdown");
+    Future<Void> stopFuture = Future.future();
     if (netRelay != null) {
-      netRelay.stop();
+      netRelay.stop(stopFuture);
+    } else {
+      stopFuture.complete();
     }
     netRelay = null;
 
-    if (vertx != null) {
-      Async async = context.async();
-      vertx.close(ar -> {
-        vertx = null;
-        async.complete();
-      });
-      async.awaitSuccess();
-    }
+    Async async = context.async();
+    stopFuture.setHandler(v -> {
+      if (v.failed()) {
+        LOGGER.error("netrelay did not stop", v.cause());
+      }
+      if (vertx != null) {
+        vertx.close(ar -> {
+          vertx = null;
+          async.complete();
+        });
+      }
+    });
   }
 
   public KeyGeneratorVerticle createKeyGenerator(final TestContext context) {
