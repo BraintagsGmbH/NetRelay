@@ -76,7 +76,7 @@ public abstract class NetRelayBaseTest {
   public static final String TESTS_MAIL_FROM = "netrelayTesting@braintags.de";
 
   protected static Vertx vertx;
-  protected static HttpClient client;
+  private static HttpClient client;
   protected static NetRelay netRelay;
   protected KeyGeneratorVerticle keyGenVerticle;
 
@@ -194,10 +194,15 @@ public abstract class NetRelayBaseTest {
     if (netRelay == null) {
       LOGGER.info("init NetRelay");
       netRelay = NetRelayExt_InternalSettings.getInstance(vertx, context, this);
-      client = vertx.createHttpClient(
-          new HttpClientOptions().setDefaultPort(netRelay.getActualServerPort()).setConnectTimeout(getTimeout())
-              .setIdleTimeout(getTimeout()));
     }
+  }
+
+  public static synchronized HttpClient getClient() {
+    if (client == null) {
+      client = vertx.createHttpClient(new HttpClientOptions().setDefaultPort(netRelay.getActualServerPort())
+          .setConnectTimeout(getTimeout()).setIdleTimeout(getTimeout()));
+    }
+    return client;
   }
 
   protected static int getNetrelayPort() {
@@ -235,7 +240,7 @@ public abstract class NetRelayBaseTest {
   protected static final void testRequest(final TestContext context, final HttpMethod method, final String path,
       final Consumer<HttpClientRequest> requestAction, final Consumer<ResponseCopy> responseAction, final int statusCode,
       final String statusMessage, final String responseBody) throws Exception {
-    testRequestBuffer(context, client, method, getNetrelayPort(), path, requestAction, responseAction, statusCode,
+    testRequestBuffer(context, getClient(), method, getNetrelayPort(), path, requestAction, responseAction, statusCode,
         statusMessage,
         responseBody != null ? Buffer.buffer(responseBody) : null);
   }
