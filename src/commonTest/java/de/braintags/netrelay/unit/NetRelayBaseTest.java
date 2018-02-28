@@ -157,15 +157,20 @@ public abstract class NetRelayBaseTest {
   public static void shutdown(final TestContext context) throws Exception {
     LOGGER.info("performing shutdown");
     Future<Void> stopFuture = Future.future();
+    if (client != null) {
+      client.close();
+      client = null;
+    }
+
     if (netRelay != null) {
       netRelay.stop(stopFuture);
     } else {
       stopFuture.complete();
     }
-    netRelay = null;
 
     Async async = context.async();
     stopFuture.setHandler(v -> {
+      netRelay = null;
       if (v.failed()) {
         LOGGER.error("NetRelay did not stop", v.cause());
       } else {
