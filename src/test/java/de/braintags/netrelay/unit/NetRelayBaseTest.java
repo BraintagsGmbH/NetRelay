@@ -194,6 +194,7 @@ public abstract class NetRelayBaseTest {
     if (netRelay == null) {
       LOGGER.info("init NetRelay");
       netRelay = NetRelayExt_InternalSettings.getInstance(vertx, context, this);
+      LOGGER.info("NetRelay started on port " + getNetrelayPort());
     }
   }
 
