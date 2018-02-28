@@ -167,7 +167,9 @@ public abstract class NetRelayBaseTest {
     Async async = context.async();
     stopFuture.setHandler(v -> {
       if (v.failed()) {
-        LOGGER.error("netrelay did not stop", v.cause());
+        LOGGER.error("NetRelay did not stop", v.cause());
+      } else {
+        LOGGER.debug("NetRelay stopped");
       }
       if (vertx != null) {
         vertx.close(ar -> {
