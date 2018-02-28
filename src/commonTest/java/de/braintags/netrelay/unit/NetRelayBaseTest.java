@@ -291,7 +291,12 @@ public abstract class NetRelayBaseTest {
     });
     req.exceptionHandler(exceptionHandler);
     if (requestAction != null) {
-      requestAction.accept(req);
+      try {
+        requestAction.accept(req);
+      } catch (Throwable t) {
+        context.fail(t);
+        return;
+      }
     }
     req.end();
     async.await();
@@ -299,7 +304,12 @@ public abstract class NetRelayBaseTest {
     LOGGER.debug("request executed");
     ResponseCopy rc = resultObject.getResult();
     if (responseAction != null) {
-      responseAction.accept(rc);
+      try {
+        responseAction.accept(rc);
+      } catch (Throwable t) {
+        context.fail(t);
+        return;
+      }
     }
     context.assertNotNull(rc, "Responsecopy is null");
     context.assertEquals(statusCode, rc.code);
