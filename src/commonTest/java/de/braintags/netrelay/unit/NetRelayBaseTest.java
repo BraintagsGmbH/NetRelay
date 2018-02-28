@@ -155,7 +155,7 @@ public abstract class NetRelayBaseTest {
 
   @AfterClass
   public static void shutdown(final TestContext context) throws Exception {
-    LOGGER.debug("performing shutdown");
+    LOGGER.info("performing shutdown");
     Future<Void> stopFuture = Future.future();
     if (netRelay != null) {
       netRelay.stop(stopFuture);
@@ -169,10 +169,15 @@ public abstract class NetRelayBaseTest {
       if (v.failed()) {
         LOGGER.error("NetRelay did not stop", v.cause());
       } else {
-        LOGGER.debug("NetRelay stopped");
+        LOGGER.info("NetRelay stopped");
       }
       if (vertx != null) {
         vertx.close(ar -> {
+          if (v.failed()) {
+            LOGGER.error("vertx did not stop", v.cause());
+          } else {
+            LOGGER.info("vertx stopped");
+          }
           vertx = null;
           async.complete();
         });
