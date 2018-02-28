@@ -79,6 +79,8 @@ public class NetRelay extends AbstractVerticle {
   private NetRelayMapperFactory mapperFactory;
   private NetRelayStoreObjectFactory storeObjectFactory;
 
+  private HttpServer server;
+
   /*
    * (non-Javadoc)
    *
@@ -194,6 +196,17 @@ public class NetRelay extends AbstractVerticle {
   }
 
   /**
+   * Get the actual server port the server is listening on.
+   * 
+   */
+  public int getActualServerPort() {
+    if (server == null) {
+      throw new IllegalStateException("server not stated");
+    }
+    return server.actualPort();
+  }
+
+  /**
    * Init the definitions inside {@link Settings#getProcessorDefinitons()}
    *
    * @throws Exception
@@ -261,7 +274,7 @@ public class NetRelay extends AbstractVerticle {
   protected void initHttpServer(final Router router, final Handler<AsyncResult<Void>> handler) {
     HttpServerOptions options = new HttpServerOptions().setPort(settings.getServerPort())
         .setCompressionSupported(settings.isCompressionEnabled());
-    HttpServer server = vertx.createHttpServer(options);
+    server = vertx.createHttpServer(options);
     server.requestHandler(router::accept).listen(result -> {
       if (result.failed()) {
         handler.handle(Future.failedFuture(result.cause()));
