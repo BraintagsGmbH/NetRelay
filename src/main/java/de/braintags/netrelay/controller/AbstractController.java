@@ -20,6 +20,7 @@ import de.braintags.netrelay.routing.RouterDefinition;
 import de.braintags.vertx.util.HttpContentType;
 import de.braintags.vertx.util.exception.ParameterRequiredException;
 import de.braintags.vertx.util.request.RequestUtil;
+import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.RoutingContext;
 
@@ -100,7 +101,7 @@ public abstract class AbstractController implements IController {
    * @see io.vertx.core.Handler#handle(java.lang.Object)
    */
   @Override
-  public final void handle(RoutingContext context) {
+  public final void handle(final RoutingContext context) {
     LOGGER.debug("handling controller " + getClass().getName());
     try {
       handleController(context);
@@ -115,7 +116,7 @@ public abstract class AbstractController implements IController {
    * @param context
    * @param e
    */
-  protected void handleError(RoutingContext context, Throwable e) {
+  protected void handleError(final RoutingContext context, final Throwable e) {
     context.fail(e);
   }
 
@@ -132,14 +133,23 @@ public abstract class AbstractController implements IController {
    * @see de.braintags.netrelay.controller.IController#init(io.vertx.core.Vertx, java.util.Properties)
    */
   @Override
-  public final void init(Vertx vertx, NetRelay netRelay, Properties properties, CaptureCollection[] captureCollection,
-      String name) {
+  public final void init(final Vertx vertx, final NetRelay netRelay, final Properties properties, final CaptureCollection[] captureCollection,
+      final String name) {
     this.vertx = vertx;
     this.netRelay = netRelay;
     this.properties = properties;
     this.name = name;
     initProperties(properties);
     initCaptureCollection(captureCollection);
+    // just add some async init, ignore for now
+    init().otherwise(t -> {
+      LOGGER.error("error during init of controller: " + this.name, t);
+      return null;
+    });
+  }
+
+  protected Future<Void> init() {
+    return Future.succeededFuture();
   }
 
   /**
@@ -148,7 +158,7 @@ public abstract class AbstractController implements IController {
    *
    * @param captureCollection
    */
-  public void initCaptureCollection(CaptureCollection[] captureCollection) {
+  public void initCaptureCollection(final CaptureCollection[] captureCollection) {
     this.captureCollection = captureCollection;
   }
 
@@ -191,7 +201,7 @@ public abstract class AbstractController implements IController {
    * @throws ParameterRequiredException,
    *           if required parameter wasn't found
    */
-  public String readProperty(String propertyName, String defaultValue, boolean required) {
+  public String readProperty(final String propertyName, final String defaultValue, final boolean required) {
     String value = (String) properties.get(propertyName);
     if (value == null && required) {
       throw new ParameterRequiredException(propertyName);
@@ -214,7 +224,7 @@ public abstract class AbstractController implements IController {
    * @throws ParameterRequiredException,
    *           if required parameter wasn't found
    */
-  public static String readProperty(Properties properties, String propertyName, String defaultValue, boolean required) {
+  public static String readProperty(final Properties properties, final String propertyName, final String defaultValue, final boolean required) {
     String value = (String) properties.get(propertyName);
     if (value == null && required) {
       throw new ParameterRequiredException(propertyName);
@@ -237,7 +247,7 @@ public abstract class AbstractController implements IController {
    * @throws ParameterRequiredException,
    *           if required parameter wasn't found
    */
-  public String readParameterOrProperty(RoutingContext context, String key, String defaultValue, boolean required) {
+  public String readParameterOrProperty(final RoutingContext context, final String key, final String defaultValue, final boolean required) {
     String value = readParameter(context, key, false);
     if (value == null) {
       value = readProperty(key, null, false);
@@ -252,8 +262,8 @@ public abstract class AbstractController implements IController {
    * @deprecated use {@link RequestUtil#readParameterOrContext(RoutingContext, String, String, boolean)} instead
    */
   @Deprecated
-  public static String readParameterOrContext(RoutingContext context, String key, String defaultValue,
-      boolean required) {
+  public static String readParameterOrContext(final RoutingContext context, final String key, final String defaultValue,
+      final boolean required) {
     return RequestUtil.readParameterOrContext(context, key, defaultValue, required);
   }
 
@@ -273,8 +283,8 @@ public abstract class AbstractController implements IController {
    * @throws ParameterRequiredException,
    *           if required parameter wasn't found
    */
-  public String readParameterOrPropertyOrContext(RoutingContext context, String key, String defaultValue,
-      boolean required) {
+  public String readParameterOrPropertyOrContext(final RoutingContext context, final String key, final String defaultValue,
+      final boolean required) {
     String value = RequestUtil.readParameter(context, key, false);
     if (value == null) {
       value = readProperty(key, null, false);
@@ -295,7 +305,7 @@ public abstract class AbstractController implements IController {
    *
    * @param context
    */
-  protected void addNetRelayToContext(RoutingContext context) {
+  protected void addNetRelayToContext(final RoutingContext context) {
     context.put(NetRelay.NETRELAY_PROPERTY, getNetRelay());
   }
 
@@ -303,7 +313,7 @@ public abstract class AbstractController implements IController {
    * @deprecated use {@link RequestUtil#readParameter(RoutingContext, String, boolean)} instead
    */
   @Deprecated
-  public static String readParameter(RoutingContext context, String key, boolean required) {
+  public static String readParameter(final RoutingContext context, final String key, final boolean required) {
     return RequestUtil.readParameter(context, key, null, required);
   }
 
@@ -311,7 +321,7 @@ public abstract class AbstractController implements IController {
    * @deprecated use {@link RequestUtil#readParameter(RoutingContext, String, String, boolean)} instead
    */
   @Deprecated
-  public static String readParameter(RoutingContext context, String key, String defaultValue, boolean required) {
+  public static String readParameter(final RoutingContext context, final String key, final String defaultValue, final boolean required) {
     return RequestUtil.readParameter(context, key, defaultValue, required);
   }
 
@@ -324,7 +334,7 @@ public abstract class AbstractController implements IController {
    *          the key to lookup
    * @return true, if exists
    */
-  public static boolean hasParameter(RoutingContext context, String key) {
+  public static boolean hasParameter(final RoutingContext context, final String key) {
     return context.request().params().contains(key)
         || (context.request().formAttributes() != null && context.request().formAttributes().contains(key));
   }
@@ -334,7 +344,7 @@ public abstract class AbstractController implements IController {
    *
    * @param content
    */
-  protected void sendJson(RoutingContext context, String content) {
+  protected void sendJson(final RoutingContext context, final String content) {
     sendJson(context, content, 200);
   }
 
@@ -343,7 +353,7 @@ public abstract class AbstractController implements IController {
    *
    * @param content
    */
-  protected void sendJson(RoutingContext context, String content, int statusCode) {
+  protected void sendJson(final RoutingContext context, final String content, final int statusCode) {
     LOGGER.debug("sending result as JSON");
     context.response().putHeader("content-type", HttpContentType.JSON_UTF8.toString()).setStatusCode(statusCode)
         .end(content);
@@ -370,7 +380,7 @@ public abstract class AbstractController implements IController {
    * RouterDefinition)
    */
   @Override
-  public void validateRoutingDefinition(RouterDefinition currentDefinition) {
+  public void validateRoutingDefinition(final RouterDefinition currentDefinition) {
   }
 
 }
