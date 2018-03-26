@@ -36,8 +36,6 @@ import de.braintags.vertx.jomnigate.init.IDataStoreInit;
 import de.braintags.vertx.jomnigate.mapping.IMapperFactory;
 import de.braintags.vertx.jomnigate.mongo.init.MongoDataStoreInit;
 import de.braintags.vertx.util.exception.InitException;
-import de.braintags.vertx.util.security.JWTHandler;
-import de.braintags.vertx.util.security.JWTSettings;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -47,7 +45,6 @@ import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.net.PemKeyCertOptions;
 import io.vertx.core.net.PfxOptions;
 import io.vertx.core.net.SelfSignedCertificate;
-import io.vertx.ext.jwt.JWT;
 import io.vertx.ext.mail.MailClient;
 import io.vertx.ext.mail.MailConfig;
 import io.vertx.ext.web.Router;
@@ -72,7 +69,6 @@ public class NetRelay extends AbstractVerticle {
   private Settings settings;
   private Router router;
   private MailClient mailClient;
-  private JWT jwt;
   /**
    * The mapper factory which translates between the browser and the server
    */
@@ -118,7 +114,6 @@ public class NetRelay extends AbstractVerticle {
       router = Router.router(vertx);
       mapperFactory = new NetRelayMapperFactory(this);
       storeObjectFactory = new NetRelayStoreObjectFactory(this);
-      initJwt();
       initMailClient();
       initController(router);
       initProcessors();
@@ -137,15 +132,6 @@ public class NetRelay extends AbstractVerticle {
       });
     } catch (Exception e) {
       handler.handle(Future.failedFuture(e));
-    }
-  }
-
-  /**
-   *
-   */
-  private void initJwt() {
-    if (settings.getJwtSettings() != null) {
-      this.jwt = JWTHandler.createJWT(getVertx(), settings.getJwtSettings());
     }
   }
 
@@ -435,13 +421,4 @@ public class NetRelay extends AbstractVerticle {
     return mailClient;
   }
 
-  /**
-   * If the {@link JWTSettings} inside the {@link Settings} are configured, this will return a JWT instance to de- and
-   * encode JWTs. Otherwise, it will return null
-   *
-   * @return the jwt
-   */
-  public JWT getJwt() {
-    return jwt;
-  }
 }
