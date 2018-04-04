@@ -183,7 +183,7 @@ public class NetRelay extends AbstractVerticle {
 
   /**
    * Get the actual server port the server is listening on.
-   * 
+   *
    */
   public int getActualServerPort() {
     if (server == null) {
@@ -270,7 +270,7 @@ public class NetRelay extends AbstractVerticle {
     });
   }
 
-  private void initHttpsServer(final Router router, final Handler<AsyncResult<Void>> handler) {
+  protected void initHttpsServer(final Router router, final Handler<AsyncResult<Void>> handler) {
     if (settings.getSslPort() > 0) {
       LOGGER.info("launching ssl server listening on port " + settings.getSslPort());
       HttpServerOptions options = new HttpServerOptions().setPort(settings.getSslPort());
