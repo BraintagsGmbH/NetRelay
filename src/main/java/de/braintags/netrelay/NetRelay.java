@@ -112,6 +112,7 @@ public class NetRelay extends AbstractVerticle {
   protected void init(final Handler<AsyncResult<Void>> handler) {
     try {
       router = Router.router(vertx);
+      initRouter(router);
       mapperFactory = new NetRelayMapperFactory(this);
       storeObjectFactory = new NetRelayStoreObjectFactory(this);
       initMailClient();
@@ -133,6 +134,9 @@ public class NetRelay extends AbstractVerticle {
     } catch (Exception e) {
       handler.handle(Future.failedFuture(e));
     }
+  }
+
+  protected void initRouter(final Router router) {
   }
 
   /**
