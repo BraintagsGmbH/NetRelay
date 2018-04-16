@@ -15,6 +15,7 @@ package de.braintags.netrelay.util;
 import java.net.URI;
 
 import javax.net.ssl.SSLPeerUnverifiedException;
+import javax.net.ssl.SSLSession;
 import javax.security.cert.X509Certificate;
 
 import io.vertx.codegen.annotations.Nullable;
@@ -40,18 +41,18 @@ import io.vertx.core.net.SocketAddress;
  */
 public class MockHttpServerRequest implements HttpServerRequest {
   private final HttpServerResponse response;
-  private MultiMap params = MultiMap.caseInsensitiveMultiMap();
-  private MultiMap headers = MultiMap.caseInsensitiveMultiMap();
-  private MultiMap attributes = MultiMap.caseInsensitiveMultiMap();
+  private final MultiMap params = MultiMap.caseInsensitiveMultiMap();
+  private final MultiMap headers = MultiMap.caseInsensitiveMultiMap();
+  private final MultiMap attributes = MultiMap.caseInsensitiveMultiMap();
 
-  private URI uri;
-  private HttpMethod method;
+  private final URI uri;
+  private final HttpMethod method;
 
-  public MockHttpServerRequest(URI uri, HttpServerResponse response) {
+  public MockHttpServerRequest(final URI uri, final HttpServerResponse response) {
     this(uri, null, response);
   }
 
-  public MockHttpServerRequest(URI uri, HttpMethod method, HttpServerResponse response) {
+  public MockHttpServerRequest(final URI uri, final HttpMethod method, final HttpServerResponse response) {
     this.uri = uri;
     this.method = method;
     this.response = response;
@@ -63,7 +64,7 @@ public class MockHttpServerRequest implements HttpServerRequest {
    * @see io.vertx.core.http.HttpServerRequest#exceptionHandler(io.vertx.core.Handler)
    */
   @Override
-  public HttpServerRequest exceptionHandler(Handler<Throwable> handler) {
+  public HttpServerRequest exceptionHandler(final Handler<Throwable> handler) {
     return null;
   }
 
@@ -73,7 +74,7 @@ public class MockHttpServerRequest implements HttpServerRequest {
    * @see io.vertx.core.http.HttpServerRequest#handler(io.vertx.core.Handler)
    */
   @Override
-  public HttpServerRequest handler(Handler<Buffer> handler) {
+  public HttpServerRequest handler(final Handler<Buffer> handler) {
     return null;
   }
 
@@ -103,7 +104,7 @@ public class MockHttpServerRequest implements HttpServerRequest {
    * @see io.vertx.core.http.HttpServerRequest#endHandler(io.vertx.core.Handler)
    */
   @Override
-  public HttpServerRequest endHandler(Handler<Void> endHandler) {
+  public HttpServerRequest endHandler(final Handler<Void> endHandler) {
     return null;
   }
 
@@ -179,12 +180,12 @@ public class MockHttpServerRequest implements HttpServerRequest {
   }
 
   @Override
-  public String getHeader(String headerName) {
+  public String getHeader(final String headerName) {
     return headers().get(headerName);
   }
 
   @Override
-  public String getHeader(CharSequence headerName) {
+  public String getHeader(final CharSequence headerName) {
     return headers().get(headerName);
   }
 
@@ -204,7 +205,7 @@ public class MockHttpServerRequest implements HttpServerRequest {
    * @see io.vertx.core.http.HttpServerRequest#getParam(java.lang.String)
    */
   @Override
-  public @Nullable String getParam(String paramName) {
+  public @Nullable String getParam(final String paramName) {
     return params().get(paramName);
   }
 
@@ -254,7 +255,7 @@ public class MockHttpServerRequest implements HttpServerRequest {
    * @see io.vertx.core.http.HttpServerRequest#bodyHandler(io.vertx.core.Handler)
    */
   @Override
-  public HttpServerRequest bodyHandler(@Nullable Handler<Buffer> bodyHandler) {
+  public HttpServerRequest bodyHandler(@Nullable final Handler<Buffer> bodyHandler) {
     return null;
   }
 
@@ -274,7 +275,7 @@ public class MockHttpServerRequest implements HttpServerRequest {
    * @see io.vertx.core.http.HttpServerRequest#setExpectMultipart(boolean)
    */
   @Override
-  public HttpServerRequest setExpectMultipart(boolean expect) {
+  public HttpServerRequest setExpectMultipart(final boolean expect) {
     return null;
   }
 
@@ -294,7 +295,7 @@ public class MockHttpServerRequest implements HttpServerRequest {
    * @see io.vertx.core.http.HttpServerRequest#uploadHandler(io.vertx.core.Handler)
    */
   @Override
-  public HttpServerRequest uploadHandler(@Nullable Handler<HttpServerFileUpload> uploadHandler) {
+  public HttpServerRequest uploadHandler(@Nullable final Handler<HttpServerFileUpload> uploadHandler) {
     return null;
   }
 
@@ -304,7 +305,7 @@ public class MockHttpServerRequest implements HttpServerRequest {
   }
 
   @Override
-  public String getFormAttribute(String attributeName) {
+  public String getFormAttribute(final String attributeName) {
     return formAttributes().get(attributeName);
   }
 
@@ -374,7 +375,7 @@ public class MockHttpServerRequest implements HttpServerRequest {
    * @see io.vertx.core.http.HttpServerRequest#customFrameHandler(io.vertx.core.Handler)
    */
   @Override
-  public HttpServerRequest customFrameHandler(Handler<HttpFrame> handler) {
+  public HttpServerRequest customFrameHandler(final Handler<HttpFrame> handler) {
     return null;
   }
 
@@ -385,6 +386,12 @@ public class MockHttpServerRequest implements HttpServerRequest {
    */
   @Override
   public HttpConnection connection() {
+    return null;
+  }
+
+  @Override
+  public SSLSession sslSession() {
+    // TODO Auto-generated method stub
     return null;
   }
 

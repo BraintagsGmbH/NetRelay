@@ -15,6 +15,7 @@ package de.braintags.netrelay.controller;
 import java.util.Properties;
 
 import de.braintags.netrelay.routing.RouterDefinition;
+import io.vertx.core.http.HttpHeaders;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.StaticHandler;
 
@@ -51,7 +52,7 @@ public class StaticController extends AbstractController {
   private StaticHandler staticHandler;
 
   @Override
-  public void initProperties(Properties properties) {
+  public void initProperties(final Properties properties) {
     if (properties.containsKey(WEBROOT)) {
       staticHandler = StaticHandler.create(properties.getProperty(WEBROOT));
     } else {
@@ -72,8 +73,9 @@ public class StaticController extends AbstractController {
    * @see io.vertx.core.Handler#handle(java.lang.Object)
    */
   @Override
-  public void handleController(RoutingContext event) {
+  public void handleController(final RoutingContext event) {
     LOGGER.debug("handling " + getClass().getName() + " for " + event.request().path());
+    event.response().headers().set(HttpHeaders.CONTENT_ENCODING, HttpHeaders.IDENTITY);
     staticHandler.handle(event);
   }
 

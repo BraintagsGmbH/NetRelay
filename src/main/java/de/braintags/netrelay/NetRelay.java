@@ -378,12 +378,12 @@ public class NetRelay extends AbstractVerticle {
   }
 
   protected void addDefaultRouterDefinitions(final Settings settings) {
+    settings.getRouterDefinitions().add(TimeoutController.createDefaultRouterDefinition());
+    settings.getRouterDefinitions().add(BodyController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(StaticController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(FavIconController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(CookieController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(SessionController.createDefaultRouterDefinition());
-    settings.getRouterDefinitions().add(TimeoutController.createDefaultRouterDefinition());
-    settings.getRouterDefinitions().add(BodyController.createDefaultRouterDefinition());
     settings.getRouterDefinitions().add(FailureController.createDefaultRouterDefinition());
   }
 
