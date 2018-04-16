@@ -48,7 +48,7 @@ public class StaticController extends AbstractController {
    * The property to define the timeout of cached elements, if caching is enabled
    */
   public static final String CACHE_TIMEOUT_PROPERTY = "cacheTimeout";
-  public static final String WEBROOT                = "webroot";
+  public static final String WEBROOT = "webroot";
   private StaticHandler staticHandler;
 
   @Override
@@ -74,7 +74,8 @@ public class StaticController extends AbstractController {
    */
   @Override
   public void handleController(final RoutingContext event) {
-    LOGGER.debug("handling " + getClass().getName() + " for " + event.request().path());
+    if (LOGGER.isDebugEnabled())
+      LOGGER.debug("handling " + getClass().getName() + " for " + event.request().path());
     event.response().headers().set(HttpHeaders.CONTENT_ENCODING, HttpHeaders.IDENTITY);
     staticHandler.handle(event);
   }

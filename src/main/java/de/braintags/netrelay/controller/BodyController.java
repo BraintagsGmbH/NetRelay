@@ -12,7 +12,6 @@
  */
 package de.braintags.netrelay.controller;
 
-import java.net.URI;
 import java.util.Properties;
 
 import de.braintags.netrelay.routing.RouterDefinition;
@@ -23,7 +22,7 @@ import io.vertx.ext.web.handler.BodyHandler;
  * A Controller, which creates and uses a {@link BodyHandler}.
  * The BodyController creates some variables and stores them inside the context, so that they can be used from out of a
  * template, for instance.<br/>
- * 
+ *
  * <UL>
  * <LI>REQUEST_HOST<br/>
  * the name of the host of the current request
@@ -32,17 +31,17 @@ import io.vertx.ext.web.handler.BodyHandler;
  * <LI>REQUEST_SCHEME<br/>
  * the scheme of the host of the current request
  * </UL>
- * 
+ *
  * <br/>
  * <br/>
  * possible paramters are:
  * <br/>
  * {@value #BODY_LIMIT_PROP}<br/>
  * {@value #UPLOAD_DIRECTORY_PROP}
- * 
- * 
+ *
+ *
  * @author Michael Remme
- * 
+ *
  */
 public class BodyController extends AbstractController {
   private static final io.vertx.core.logging.Logger LOGGER = io.vertx.core.logging.LoggerFactory
@@ -67,29 +66,21 @@ public class BodyController extends AbstractController {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see io.vertx.core.Handler#handle(java.lang.Object)
    */
   @Override
-  public void handleController(RoutingContext event) {
-    try {
-      URI uri = URI.create(event.request().absoluteURI());
-      event.put("REQUEST_HOST", uri.getHost());
-      event.put("REQUEST_PORT", uri.getPort());
-      event.put("REQUEST_SCHEME", uri.getScheme());
-    } catch (Exception e) {
-      LOGGER.warn(e);
-    }
+  public void handleController(final RoutingContext event) {
     bodyHandler.handle(event);
   }
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see de.braintags.netrelay.controller.AbstractController#initProperties(java.util.Properties)
    */
   @Override
-  public void initProperties(Properties properties) {
+  public void initProperties(final Properties properties) {
     int upSize = Integer.parseInt(readProperty(BODY_LIMIT_PROP, "-1", false));
     String upDir = readProperty(UPLOAD_DIRECTORY_PROP, null, false);
     bodyHandler = BodyHandler.create().setBodyLimit(upSize);
@@ -100,7 +91,7 @@ public class BodyController extends AbstractController {
 
   /**
    * Creates a default definition for the current instance
-   * 
+   *
    * @return
    */
   public static RouterDefinition createDefaultRouterDefinition() {
@@ -114,7 +105,7 @@ public class BodyController extends AbstractController {
 
   /**
    * Get the default properties for an implementation of StaticController
-   * 
+   *
    * @return
    */
   public static Properties getDefaultProperties() {

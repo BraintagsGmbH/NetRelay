@@ -102,7 +102,8 @@ public abstract class AbstractController implements IController {
    */
   @Override
   public final void handle(final RoutingContext context) {
-    LOGGER.debug("handling controller " + getClass().getName());
+    if (LOGGER.isDebugEnabled())
+      LOGGER.debug("handling controller " + getClass().getName());
     try {
       handleController(context);
     } catch (Exception e) {
@@ -133,8 +134,8 @@ public abstract class AbstractController implements IController {
    * @see de.braintags.netrelay.controller.IController#init(io.vertx.core.Vertx, java.util.Properties)
    */
   @Override
-  public final void init(final Vertx vertx, final NetRelay netRelay, final Properties properties, final CaptureCollection[] captureCollection,
-      final String name) {
+  public final void init(final Vertx vertx, final NetRelay netRelay, final Properties properties,
+      final CaptureCollection[] captureCollection, final String name) {
     this.vertx = vertx;
     this.netRelay = netRelay;
     this.properties = properties;
@@ -224,7 +225,8 @@ public abstract class AbstractController implements IController {
    * @throws ParameterRequiredException,
    *           if required parameter wasn't found
    */
-  public static String readProperty(final Properties properties, final String propertyName, final String defaultValue, final boolean required) {
+  public static String readProperty(final Properties properties, final String propertyName, final String defaultValue,
+      final boolean required) {
     String value = (String) properties.get(propertyName);
     if (value == null && required) {
       throw new ParameterRequiredException(propertyName);
@@ -247,7 +249,8 @@ public abstract class AbstractController implements IController {
    * @throws ParameterRequiredException,
    *           if required parameter wasn't found
    */
-  public String readParameterOrProperty(final RoutingContext context, final String key, final String defaultValue, final boolean required) {
+  public String readParameterOrProperty(final RoutingContext context, final String key, final String defaultValue,
+      final boolean required) {
     String value = readParameter(context, key, false);
     if (value == null) {
       value = readProperty(key, null, false);
@@ -283,8 +286,8 @@ public abstract class AbstractController implements IController {
    * @throws ParameterRequiredException,
    *           if required parameter wasn't found
    */
-  public String readParameterOrPropertyOrContext(final RoutingContext context, final String key, final String defaultValue,
-      final boolean required) {
+  public String readParameterOrPropertyOrContext(final RoutingContext context, final String key,
+      final String defaultValue, final boolean required) {
     String value = RequestUtil.readParameter(context, key, false);
     if (value == null) {
       value = readProperty(key, null, false);
@@ -321,7 +324,8 @@ public abstract class AbstractController implements IController {
    * @deprecated use {@link RequestUtil#readParameter(RoutingContext, String, String, boolean)} instead
    */
   @Deprecated
-  public static String readParameter(final RoutingContext context, final String key, final String defaultValue, final boolean required) {
+  public static String readParameter(final RoutingContext context, final String key, final String defaultValue,
+      final boolean required) {
     return RequestUtil.readParameter(context, key, defaultValue, required);
   }
 
