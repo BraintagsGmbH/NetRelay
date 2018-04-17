@@ -19,10 +19,10 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import de.braintags.netrelay.routing.RouterDefinition;
 import de.braintags.vertx.util.ExceptionUtil;
 import de.braintags.vertx.util.exception.InitException;
 import de.braintags.vertx.util.request.RequestUtil;
-import de.braintags.netrelay.routing.RouterDefinition;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.vertx.ext.web.RoutingContext;
 
@@ -87,12 +87,12 @@ public class FailureController extends AbstractController {
    */
   public static final String DEFAULT_PROPERTY = "DEFAULT";
 
-  private Map<Class, String> exceptionDefinitions = new HashMap<>();
-  private Map<Integer, String> codeDefinitions = new HashMap<>();
+  private final Map<Class, String> exceptionDefinitions = new HashMap<>();
+  private final Map<Integer, String> codeDefinitions = new HashMap<>();
   private String defaultRedirect;
 
   @Override
-  public void initProperties(Properties properties) {
+  public void initProperties(final Properties properties) {
     LOGGER.info("init " + getClass().getName());
     defaultRedirect = readProperty(DEFAULT_PROPERTY, null, false);
     Enumeration<Object> keys = properties.keys();
@@ -107,7 +107,7 @@ public class FailureController extends AbstractController {
   }
 
   @SuppressWarnings("rawtypes")
-  private void addException(String key, String value) {
+  private void addException(final String key, final String value) {
     try {
       Class defClass = Class.forName(key.substring(EXCEPTION_START_PARAMETER.length()));
       exceptionDefinitions.put(defClass, value);
@@ -116,7 +116,7 @@ public class FailureController extends AbstractController {
     }
   }
 
-  private void addErrorCode(String key, String value) {
+  private void addErrorCode(final String key, final String value) {
     Integer code = Integer.parseInt(key.substring(ERRORCODE_START_PARAMETER.length()));
     codeDefinitions.put(code, value);
   }
@@ -127,7 +127,7 @@ public class FailureController extends AbstractController {
    * @see io.vertx.core.Handler#handle(java.lang.Object)
    */
   @Override
-  public void handleController(RoutingContext context) {
+  public void handleController(final RoutingContext context) {
     HttpResponseStatus status = context.statusCode() > 0 ? HttpResponseStatus.valueOf(context.statusCode()) : null;
 
     String reply = String.format("Statuscode %d %s for request %s", context.statusCode(),
@@ -140,7 +140,14 @@ public class FailureController extends AbstractController {
     }
   }
 
-  private void reactByException(RoutingContext context) {
+  @Override
+  protected void handleError(final RoutingContext context, final Throwable e) {
+    // don't fail context, as that will just call the failure handler again and result in an endless loop
+    LOGGER.error("Error during failure handling", e);
+    context.next();
+  }
+
+  private void reactByException(final RoutingContext context) {
     Throwable error = context.failure();
     String redirect = getRedirectByException(error);
     LOGGER.error("", error);
@@ -157,7 +164,7 @@ public class FailureController extends AbstractController {
   }
 
   @SuppressWarnings({ "rawtypes" })
-  private String getRedirectByException(Throwable error) {
+  private String getRedirectByException(final Throwable error) {
     Iterator<Entry<Class, String>> keys = exceptionDefinitions.entrySet().iterator();
     while (keys.hasNext()) {
       Entry<Class, String> entry = keys.next();
@@ -171,7 +178,7 @@ public class FailureController extends AbstractController {
     return null;
   }
 
-  private void reactByStatusCode(RoutingContext context) {
+  private void reactByStatusCode(final RoutingContext context) {
     String redirect = getRedirectByStatusCode(context.statusCode());
     if (redirect != null && !context.request().path().equalsIgnoreCase(redirect)) {
       RequestUtil.sendRedirect(context, redirect);
@@ -181,7 +188,7 @@ public class FailureController extends AbstractController {
 
   }
 
-  private String getRedirectByStatusCode(int statusCode) {
+  private String getRedirectByStatusCode(final int statusCode) {
     if (codeDefinitions.containsKey(statusCode)) {
       return codeDefinitions.get(statusCode);
     }
@@ -191,7 +198,7 @@ public class FailureController extends AbstractController {
     return null;
   }
 
-  private void handleDefaultStatus(RoutingContext context, String message) {
+  private void handleDefaultStatus(final RoutingContext context, final String message) {
     if (!context.response().ended()) {
       int code = context.statusCode() > 0 ? context.statusCode() : HttpResponseStatus.INTERNAL_SERVER_ERROR.code();
       context.response().setStatusCode(code);
