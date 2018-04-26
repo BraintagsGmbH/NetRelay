@@ -24,6 +24,7 @@ import de.braintags.vertx.util.ExceptionUtil;
 import de.braintags.vertx.util.exception.InitException;
 import de.braintags.vertx.util.request.RequestUtil;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.RoutingContext;
 
 /**
@@ -201,10 +202,11 @@ public class FailureController extends AbstractController {
   }
 
   private void handleDefaultStatus(final RoutingContext context, final String message) {
-    if (!context.response().ended()) {
+    HttpServerResponse response = context.response();
+    if (!response.ended() && !!response.closed()) {
       int code = context.statusCode() > 0 ? context.statusCode() : HttpResponseStatus.INTERNAL_SERVER_ERROR.code();
-      context.response().setStatusCode(code);
-      context.response().end(message == null ? "" : message);
+      response.setStatusCode(code);
+      response.end(message == null ? "" : message);
     }
   }
 
