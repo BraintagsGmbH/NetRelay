@@ -24,6 +24,7 @@ import de.braintags.vertx.util.ExceptionUtil;
 import de.braintags.vertx.util.exception.InitException;
 import de.braintags.vertx.util.request.RequestUtil;
 import io.netty.handler.codec.http.HttpResponseStatus;
+import io.vertx.core.http.HttpServerResponse;
 import io.vertx.ext.web.RoutingContext;
 
 /**
@@ -124,7 +125,7 @@ public class FailureController extends AbstractController {
   @Override
   protected void handleError(final RoutingContext context, final Throwable e) {
     LOGGER.error("Exception during failure handling, something is really broken!", e);
-    if (!context.response().ended()) {
+    if (responseIsEndable(context.response())) {
       context.response().setStatusCode(HttpResponseStatus.INTERNAL_SERVER_ERROR.code());
       context.response().end(context.response().getStatusMessage());
     }
@@ -151,11 +152,11 @@ public class FailureController extends AbstractController {
     if (redirect != null && !context.request().path().equalsIgnoreCase(redirect)) {
       RequestUtil.sendRedirect(context, redirect);
     } else {
-      String reply = String.format("Statuscode %d for request %s", context.statusCode(),
-          context.request().absoluteURI());
-      reply += "\n" + error.toString();
-      reply += "\n" + ExceptionUtil.getStackTrace(error);
-      if (!context.response().ended()) {
+      if (responseIsEndable(context.response())) {
+        String reply = String.format("Statuscode %d for request %s", context.statusCode(),
+            context.request().absoluteURI());
+        reply += "\n" + error.toString();
+        reply += "\n" + ExceptionUtil.getStackTrace(error);
         handleDefaultStatus(context, reply);
       }
     }
@@ -201,11 +202,16 @@ public class FailureController extends AbstractController {
   }
 
   private void handleDefaultStatus(final RoutingContext context, final String message) {
-    if (!context.response().ended()) {
+    HttpServerResponse response = context.response();
+    if (responseIsEndable(response)) {
       int code = context.statusCode() > 0 ? context.statusCode() : HttpResponseStatus.INTERNAL_SERVER_ERROR.code();
-      context.response().setStatusCode(code);
-      context.response().end(message == null ? "" : message);
+      response.setStatusCode(code);
+      response.end(message == null ? "" : message);
     }
+  }
+
+  private boolean responseIsEndable(final HttpServerResponse response) {
+    return !response.ended() && !!response.closed();
   }
 
   /**
