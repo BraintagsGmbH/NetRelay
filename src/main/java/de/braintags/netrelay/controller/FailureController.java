@@ -211,7 +211,7 @@ public class FailureController extends AbstractController {
   }
 
   private boolean responseIsEndable(final HttpServerResponse response) {
-    return !response.ended() && !!response.closed();
+    return !response.ended() && !response.closed();
   }
 
   /**
