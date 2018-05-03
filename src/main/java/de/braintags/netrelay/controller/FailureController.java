@@ -94,7 +94,8 @@ public class FailureController extends AbstractController {
 
   @Override
   public void initProperties(final Properties properties) {
-    LOGGER.info("init " + getClass().getName());
+    if (LOGGER.isDebugEnabled())
+      LOGGER.debug("init " + getClass().getName());
     defaultRedirect = readProperty(DEFAULT_PROPERTY, null, false);
     Enumeration<Object> keys = properties.keys();
     while (keys.hasMoreElements()) {
