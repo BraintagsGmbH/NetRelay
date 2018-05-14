@@ -13,9 +13,14 @@
 package de.braintags.netrelay.controller;
 
 import java.util.Properties;
+import java.util.Set;
+
+import com.google.common.collect.ImmutableSet;
 
 import de.braintags.netrelay.routing.RouterDefinition;
+import de.braintags.vertx.util.HttpContentType;
 import io.vertx.core.http.HttpHeaders;
+import io.vertx.core.http.impl.MimeMapping;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.StaticHandler;
 
@@ -49,6 +54,15 @@ public class StaticController extends AbstractController {
    */
   public static final String CACHE_TIMEOUT_PROPERTY = "cacheTimeout";
   public static final String WEBROOT = "webroot";
+
+  private static final Set<HttpContentType> COMPRESSED_CONTENT_TYPES = ImmutableSet
+      .of(removeParams(HttpContentType.APPLICATION_JAVASCRIPT), removeParams(HttpContentType.TEXT_CSS),
+          removeParams(HttpContentType.IMAGE_SVG));
+
+  private static HttpContentType removeParams(final HttpContentType parsed) {
+    return new HttpContentType(parsed.getMainType(), parsed.getSubType());
+  }
+
   private StaticHandler staticHandler;
 
   @Override
@@ -65,6 +79,9 @@ public class StaticController extends AbstractController {
     if (properties.containsKey(CACHE_TIMEOUT_PROPERTY)) {
       staticHandler.setCacheEntryTimeout(Integer.parseInt(properties.getProperty(CACHE_TIMEOUT_PROPERTY)));
     }
+
+    // FIXME: remove this
+    staticHandler.setMaxAgeSeconds(3600);
   }
 
   /*
@@ -76,7 +93,22 @@ public class StaticController extends AbstractController {
   public void handleController(final RoutingContext event) {
     if (LOGGER.isDebugEnabled())
       LOGGER.debug("handling " + getClass().getName() + " for " + event.request().path());
-    event.response().headers().set(HttpHeaders.CONTENT_ENCODING, HttpHeaders.IDENTITY);
+
+    boolean compressed = false;
+    String contentType = MimeMapping.getMimeTypeForFilename(event.request().path());
+    if (contentType != null) {
+      try {
+        HttpContentType parsed = HttpContentType.parse(contentType);
+        if (COMPRESSED_CONTENT_TYPES.contains(removeParams(parsed))) {
+          compressed = true;
+        }
+      } catch (Throwable t) {
+        LOGGER.error("unable to detect mime type: " + event.request().path());
+      }
+    }
+    if (!compressed) {
+      event.response().headers().set(HttpHeaders.CONTENT_ENCODING, HttpHeaders.IDENTITY);
+    }
     staticHandler.handle(event);
   }
 
