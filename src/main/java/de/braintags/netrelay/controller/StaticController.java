@@ -55,9 +55,9 @@ public class StaticController extends AbstractController {
   public static final String CACHE_TIMEOUT_PROPERTY = "cacheTimeout";
   public static final String WEBROOT = "webroot";
 
-  private static final Set<HttpContentType> COMPRESSED_CONTENT_TYPES = ImmutableSet
-      .of(removeParams(HttpContentType.APPLICATION_JAVASCRIPT), removeParams(HttpContentType.TEXT_CSS),
-          removeParams(HttpContentType.IMAGE_SVG));
+  private static final Set<HttpContentType> COMPRESSED_CONTENT_TYPES = ImmutableSet.of(
+      removeParams(HttpContentType.APPLICATION_JAVASCRIPT), removeParams(HttpContentType.TEXT_CSS),
+      removeParams(HttpContentType.IMAGE_SVG));
 
   private static HttpContentType removeParams(final HttpContentType parsed) {
     return new HttpContentType(parsed.getMainType(), parsed.getSubType());
@@ -105,6 +105,10 @@ public class StaticController extends AbstractController {
       } catch (Throwable t) {
         LOGGER.error("unable to detect mime type: " + event.request().path());
       }
+    }
+    if (event.response().closed() || event.response().ended()) {
+      // noop
+      return;
     }
     if (!compressed) {
       event.response().headers().set(HttpHeaders.CONTENT_ENCODING, HttpHeaders.IDENTITY);
