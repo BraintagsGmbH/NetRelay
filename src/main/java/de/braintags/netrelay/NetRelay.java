@@ -346,13 +346,17 @@ public class NetRelay extends AbstractVerticle {
    */
   @Override
   public void stop(final Future<Void> stopFuture) throws Exception {
-    Future<Void> serverCloseFuture = Future.future();
-    server.close(serverCloseFuture);
-    serverCloseFuture.compose(v -> {
-      Future<Void> datastoreClose = Future.future();
-      getDatastore().shutdown(datastoreClose);
-      return datastoreClose;
-    }).setHandler(stopFuture);
+    if (server != null) {
+      Future<Void> serverCloseFuture = Future.future();
+      server.close(serverCloseFuture);
+      serverCloseFuture.compose(v -> {
+        Future<Void> datastoreClose = Future.future();
+        getDatastore().shutdown(datastoreClose);
+        return datastoreClose;
+      }).setHandler(stopFuture);
+    } else if (getDatastore() != null) {
+      getDatastore().shutdown(stopFuture);
+    }
   }
 
   /**
