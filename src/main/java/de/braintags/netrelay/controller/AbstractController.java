@@ -359,7 +359,7 @@ public abstract class AbstractController implements IController {
    */
   protected void sendJson(final RoutingContext context, final String content, final int statusCode) {
     LOGGER.debug("sending result as JSON");
-    context.response().putHeader("content-type", HttpContentType.JSON_UTF8.toString()).setStatusCode(statusCode)
+    context.response().putHeader("content-type", HttpContentType.APPLICATION_JSON.toString()).setStatusCode(statusCode)
         .end(content);
   }
 
