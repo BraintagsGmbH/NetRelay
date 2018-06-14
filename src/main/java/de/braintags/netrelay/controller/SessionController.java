@@ -16,7 +16,7 @@ import java.util.Objects;
 import java.util.Properties;
 
 import de.braintags.netrelay.routing.RouterDefinition;
-import de.braintags.vertx.services.base.util.EclipseDetection;
+import de.braintags.vertx.util.DebugDetection;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.handler.SessionHandler;
 import io.vertx.ext.web.sstore.ClusteredSessionStore;
@@ -82,7 +82,7 @@ public class SessionController extends AbstractController {
     case LOCAL_SESSION_STORE:
       sessionHandler = SessionHandler
             .create(LocalSessionStore.create(getVertx(), getSessionMapName(properties), parseExpiration(properties)))
-            .setCookieHttpOnlyFlag(true).setCookieSecureFlag(!EclipseDetection.isTest());
+            .setCookieHttpOnlyFlag(true).setCookieSecureFlag(!DebugDetection.isTest());
         break;
 
     case CLUSTERED_SESSION_STORE:
