@@ -20,6 +20,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 
 import de.braintags.netrelay.routing.RouterDefinition;
+import de.braintags.vertx.util.DebugDetection;
 import de.braintags.vertx.util.ExceptionUtil;
 import de.braintags.vertx.util.exception.InitException;
 import de.braintags.vertx.util.request.RequestUtil;
@@ -156,8 +157,11 @@ public class FailureController extends AbstractController {
       if (responseIsEndable(context.response())) {
         String reply = String.format("Statuscode %d for request %s", context.statusCode(),
             context.request().absoluteURI());
-        reply += "\n" + error.toString();
-        reply += "\n" + ExceptionUtil.getStackTrace(error);
+
+        if (DebugDetection.isLaunchedByEclipse()) {
+          reply += "\n" + error.toString();
+          reply += "\n" + ExceptionUtil.getStackTrace(error);
+        }
         handleDefaultStatus(context, reply);
       }
     }
