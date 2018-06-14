@@ -80,8 +80,9 @@ public class SessionController extends AbstractController {
     switch (store) {
     case LOCAL_SESSION_STORE:
       sessionHandler = SessionHandler
-          .create(LocalSessionStore.create(getVertx(), getSessionMapName(properties), parseExpiration(properties)));
-      break;
+            .create(LocalSessionStore.create(getVertx(), getSessionMapName(properties), parseExpiration(properties)))
+            .setCookieHttpOnlyFlag(true).setCookieSecureFlag(true);
+        break;
 
     case CLUSTERED_SESSION_STORE:
       sessionHandler = SessionHandler.create(ClusteredSessionStore.create(getVertx(), getSessionMapName(properties)));
