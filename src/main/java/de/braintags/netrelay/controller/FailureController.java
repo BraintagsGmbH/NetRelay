@@ -183,10 +183,6 @@ public class FailureController extends AbstractController {
   }
 
   private void reactByStatusCode(final RoutingContext context) {
-    HttpResponseStatus status = context.statusCode() > 0 ? HttpResponseStatus.valueOf(context.statusCode()) : null;
-    String reply = String.format("Statuscode %d %s for request %s", context.statusCode(),
-        status == null ? "" : "( " + status.reasonPhrase() + " )", context.request().absoluteURI());
-    LOGGER.error(reply);
     String redirect = getRedirectByStatusCode(context.statusCode());
     if (redirect != null && !context.request().path().equalsIgnoreCase(redirect)) {
       RequestUtil.sendRedirect(context, redirect);
@@ -209,6 +205,10 @@ public class FailureController extends AbstractController {
   private void handleDefaultStatus(final RoutingContext context, final String message) {
     HttpServerResponse response = context.response();
     if (responseIsEndable(response)) {
+      HttpResponseStatus status = context.statusCode() > 0 ? HttpResponseStatus.valueOf(context.statusCode()) : null;
+      String reply = String.format("Statuscode %d %s for request %s", context.statusCode(),
+          status == null ? "" : "( " + status.reasonPhrase() + " )", context.request().absoluteURI());
+      LOGGER.error(reply);
       int code = context.statusCode() > 0 ? context.statusCode() : HttpResponseStatus.INTERNAL_SERVER_ERROR.code();
       response.setStatusCode(code);
       response.end(message == null ? "" : message);
