@@ -155,8 +155,8 @@ public class FailureController extends AbstractController {
       RequestUtil.sendRedirect(context, redirect);
     } else {
       if (responseIsEndable(context.response())) {
-        String reply = String.format("Statuscode %d for request %s", context.statusCode(),
-            context.request().absoluteURI());
+        String reply = String.format("Statuscode %d for request %s with method %s", context.statusCode(),
+            context.request().absoluteURI(), context.request().method().name());
 
         if (DebugDetection.isLaunchedByEclipse()) {
           reply += "\n" + error.toString();
