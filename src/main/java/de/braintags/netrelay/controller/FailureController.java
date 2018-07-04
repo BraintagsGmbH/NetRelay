@@ -154,16 +154,14 @@ public class FailureController extends AbstractController {
     if (redirect != null && !context.request().path().equalsIgnoreCase(redirect)) {
       RequestUtil.sendRedirect(context, redirect);
     } else {
-      if (responseIsEndable(context.response())) {
-        String reply = String.format("Statuscode %d for request %s with method %s", context.statusCode(),
-            context.request().absoluteURI(), context.request().method().name());
+      String reply = String.format("Statuscode %d for request %s with method %s", context.statusCode(),
+          context.request().absoluteURI(), context.request().method().name());
 
-        if (DebugDetection.isLaunchedByEclipse()) {
-          reply += "\n" + error.toString();
-          reply += "\n" + ExceptionUtil.getStackTrace(error);
-        }
-        handleDefaultStatus(context, reply);
+      if (DebugDetection.isLaunchedByEclipse()) {
+        reply += "\n" + error.toString();
+        reply += "\n" + ExceptionUtil.getStackTrace(error);
       }
+      handleDefaultStatus(context, reply);
     }
   }
 
@@ -204,14 +202,13 @@ public class FailureController extends AbstractController {
 
   private void handleDefaultStatus(final RoutingContext context, final String message) {
     HttpServerResponse response = context.response();
+    int code = context.statusCode() > 0 ? context.statusCode() : HttpResponseStatus.INTERNAL_SERVER_ERROR.code();
+    response.setStatusCode(code);
+    String reply = String.format("Statuscode %d %s for request %s with method %s", context.statusCode(),
+        "( " + HttpResponseStatus.valueOf(context.statusCode()).reasonPhrase() + " )", context.request().absoluteURI(),
+        context.request().method().name());
+    LOGGER.error(reply);
     if (responseIsEndable(response)) {
-      HttpResponseStatus status = context.statusCode() > 0 ? HttpResponseStatus.valueOf(context.statusCode()) : null;
-      String reply = String.format("Statuscode %d %s for request %s with method %s", context.statusCode(),
-          status == null ? "" : "( " + status.reasonPhrase() + " )", context.request().absoluteURI(),
-          context.request().method().name());
-      LOGGER.error(reply);
-      int code = context.statusCode() > 0 ? context.statusCode() : HttpResponseStatus.INTERNAL_SERVER_ERROR.code();
-      response.setStatusCode(code);
       response.end(message == null ? "" : message);
     }
   }
