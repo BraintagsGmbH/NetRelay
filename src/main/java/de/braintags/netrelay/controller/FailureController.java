@@ -205,7 +205,7 @@ public class FailureController extends AbstractController {
     int code = context.statusCode() > 0 ? context.statusCode() : HttpResponseStatus.INTERNAL_SERVER_ERROR.code();
     response.setStatusCode(code);
     String reply = String.format("Statuscode %d %s for request %s with method %s", context.statusCode(),
-        "( " + HttpResponseStatus.valueOf(context.statusCode()).reasonPhrase() + " )", context.request().absoluteURI(),
+        "( " + HttpResponseStatus.valueOf(code).reasonPhrase() + " )", context.request().absoluteURI(),
         context.request().method().name());
     LOGGER.error(reply);
     if (responseIsEndable(response)) {
