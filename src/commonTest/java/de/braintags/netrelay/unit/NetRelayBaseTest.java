@@ -23,7 +23,9 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Rule;
+import org.junit.rules.DisableOnDebug;
 import org.junit.rules.TestName;
+import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 
 import de.braintags.netrelay.NetRelay;
@@ -84,7 +86,7 @@ public abstract class NetRelayBaseTest {
   public static String HOSTNAME = "localhost";
 
   @Rule
-  public Timeout rule = Timeout.seconds(getTimeout());
+  public TestRule rule = new DisableOnDebug(Timeout.seconds(getTimeout()));
 
   private static int getTimeout() {
     return Integer.parseInt(System.getProperty("testTimeout", "20"));
