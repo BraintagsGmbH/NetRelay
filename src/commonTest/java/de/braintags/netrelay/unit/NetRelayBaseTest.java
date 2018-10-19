@@ -121,14 +121,6 @@ public abstract class NetRelayBaseTest {
 
   }
 
-  @Before
-  public final void afterTest(final TestContext context) {
-    stopTest(context);
-  }
-
-  protected void stopTest(final TestContext context) {
-  }
-
   protected void undeployVerticle(final TestContext context, final AbstractVerticle verticle) {
     LOGGER.debug("undeploying verticle " + verticle.deploymentID());
     Async async = context.async();
